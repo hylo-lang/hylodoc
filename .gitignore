@@ -1,0 +1,16 @@
+/.build
+/.*-build
+/Packages
+
+/*.xcodeproj
+Package.resolved
+
+**.lib
+**.7z
+llvm.pc
+
+# IDEs
+/.vscode
+/.swiftpm
+/.vscode/launch.json
+/.idea

@@ -1,0 +1,24 @@
+image: swift:5.9
+stages:
+  - build
+  - test
+
+build-job:
+  stage: build
+  script:
+    - swift build -c debug
+
+cli-tests-job:
+  stage: test
+  script:
+    - swift test --filter CLITests
+
+code-gen-tests-job:
+  stage: test
+  script:
+    - swift test --filter CodeGenTests
+
+frontend-tests-job:
+  stage: test
+  script:
+    - swift test --filter FrontEndTests
