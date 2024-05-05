@@ -36,7 +36,8 @@
             },
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
-                "sswg.swift-lang"
+                "sswg.swift-lang",
+                "ms-azuretools.vscode-docker"
             ]
         }
     },

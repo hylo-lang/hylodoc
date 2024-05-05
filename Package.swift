@@ -30,7 +30,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-collections.git",from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-format", branch: "release/5.9"),
-        .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
+        // .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
+        .package(url: "https://github.com/tothambrus11/hylo.git", branch: "main"),
         .package(url: "https://github.com/johnxnguyen/Down", from: "0.11.0"),
     ],
     targets: [
@@ -54,7 +55,8 @@ let package = Package(
             name: "DocExtractor",
             dependencies: [
                 "DocumentationDB",
-                .product(name: "Down", package: "Down")
+                .product(name: "Down", package: "Down"),
+                .product(name: "FrontEnd", package: "hylo"),
                 // todo add this once Hylo exports the library properly: .product(name: "FrontEnd", package: "hylo"),
             ],
             exclude: ["module.md"],
