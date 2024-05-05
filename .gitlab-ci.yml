@@ -1,4 +1,4 @@
-image: swift:5.9
+image: processeus/hylo-base-image:1.0.0
 stages:
   - build
   - test
@@ -7,18 +7,23 @@ build-job:
   stage: build
   script:
     - swift build -c debug
+  artifacts:
+    paths: [.build/]
 
 cli-tests-job:
   stage: test
-  script:
+  needs: [build-job]
+  script: 
     - swift test --filter CLITests
 
 code-gen-tests-job:
   stage: test
+  needs: [build-job]
   script:
     - swift test --filter CodeGenTests
 
 frontend-tests-job:
   stage: test
+  needs: [build-job]
   script:
     - swift test --filter FrontEndTests
