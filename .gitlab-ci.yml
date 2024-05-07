@@ -20,10 +20,10 @@ code-gen-tests-job:
   stage: test
   needs: [build-job]
   script:
-    - swift test --filter CodeGenTests
+    - swift test --filter WebsiteGenTests
 
 frontend-tests-job:
   stage: test
   needs: [build-job]
   script:
-    - swift test --filter FrontEndTests
+    - swift test --filter DocExtractorTests
