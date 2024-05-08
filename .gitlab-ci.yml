@@ -7,7 +7,15 @@ stages:
 format-job:
   stage: format
   script:
-    - swift-format lint -r --configuration .swift-format.json -p Sources Tests Package.swift
+    - >
+      output="$(swift-format lint -r --configuration .swift-format.json -p Sources Tests Package.swift)";
+      if [ -n "$output" ]; then
+        echo "$output";
+        echo "Formatting issues detected.";
+        exit 1;
+      else
+        echo "No formatting issues found.";
+      fi
 
 build-job:
   stage: build
