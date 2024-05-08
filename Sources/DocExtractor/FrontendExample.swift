@@ -1,9 +1,8 @@
-import Foundation
 import DocumentationDB
+import Foundation
 import FrontEnd
-
 
 // a function that returns if a number is even or not
 public func isEven(number: Int) -> Bool {
-    return number % 2 == 0
+  return number % 2 == 0
 }

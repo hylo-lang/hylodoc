@@ -1,4 +1,5 @@
 /// # File-Level
+///
 /// This file contains the data stored about symbols in the documentation database.
 /// When editing, look up the specification for the corresponding syntactic element that
 /// you want to add: [https://github.com/hylo-lang/specification/blob/main/spec.md](Hylo Language Specification)
@@ -10,81 +11,79 @@
 // todo support structural types such as tuples
 // One might want to represent something like this: `Union<A, B>`
 // -> here A and B are generic parameters, and Equatable and Hashable are constraints (traits) on them
-// 
+//
 // For now, this works for Int, String, and for these very simple types.
 public struct TypeReference {
-    /// The name of the type reference used in the declaration. (e.g. `Int` in `let x: Int`)
-    public let name: String
+  /// The name of the type reference used in the declaration. (e.g. `Int` in `let x: Int`)
+  public let name: String
 
-    /// The symbol that this type reference refers to, if it exists in the database.
-    public let symbol: SymbolID?
+  /// The symbol that this type reference refers to, if it exists in the database.
+  public let symbol: SymbolID?
 }
 
-/// A range of characters in a source file. 
-/// 
+/// A range of characters in a source file.
+///
 /// note: lookup is nontrivial (O(n)) because of unicode
 public typealias SourceRange = Range<String.Index>
 
-
 /// Common fields that all symbols have.
 public struct SymbolCommon {
-    /// The name of the symbol.
-    public let name: String
+  /// The name of the symbol.
+  public let name: String
 
-    /// The source asset that this symbol is defined in.
-    public let sourceAsset: SourceFileAsset.ID
+  /// The source asset that this symbol is defined in.
+  public let sourceAsset: SourceFileAsset.ID
 
-    /// The range of characters in the source file where this symbol is defined.
-    public let sourceRange: SourceRange
+  /// The range of characters in the source file where this symbol is defined.
+  public let sourceRange: SourceRange
 }
 
 public enum Mutability {
-    case mutable
-    case immutable
+  case mutable
+  case immutable
 }
 
 public enum SymbolVisibility {
-    case Private
-    case Public
+  case Private
+  case Public
 }
 
 public enum PassingConvention {
-    case `inout`
-    case `let`
-    case `sink`
-    case `set`
+  case `inout`
+  case `let`
+  case `sink`
+  case `set`
 }
 
 public enum MethodReceiverConvention {
-    case `inout`
-    case `let`
-    case `sink`
+  case `inout`
+  case `let`
+  case `sink`
 }
 
 public enum ParameterName {
-    case unnamed(internalName: String)
-    case namedSame(as: String)
-    case namedDifferent(internalName: String, externalName: String)
+  case unnamed(internalName: String)
+  case namedSame(as: String)
+  case namedDifferent(internalName: String, externalName: String)
 
-    public var externalName: String? {
-        switch self {
-        case .unnamed:
-            return nil
-        case .namedSame(as: let name):
-            return name
-        case .namedDifferent(_, let name):
-            return name
-        }
+  public var externalName: String? {
+    switch self {
+    case .unnamed:
+      return nil
+    case .namedSame(as: let name):
+      return name
+    case .namedDifferent(_, let name):
+      return name
     }
+  }
 }
 
 public struct Parameter {
-    public let name: ParameterName
-    public let type: TypeReference
-    public let passingConvention: PassingConvention
-    public let defaultValue: String?
+  public let name: ParameterName
+  public let type: TypeReference
+  public let passingConvention: PassingConvention
+  public let defaultValue: String?
 }
-
 
 /// A function declaration that is outside of a type or trait declaration.
 public struct FunctionDeclaration {
@@ -98,9 +97,8 @@ public struct FunctionDeclaration {
     // see: https://github.com/hylo-lang/specification/blob/main/spec.md#generic-clauses
 }
 
-
 /// A let or var binding declaration
-/// 
+///
 /// Note: In the source code, one might declare a binding pattern:
 /// ```hylo
 /// let (name, age): (String, Int) = ("Thomas", 21)
@@ -109,13 +107,14 @@ public struct FunctionDeclaration {
 /// potential documentation above should be just copied for now. Later, we might want to
 /// support a more complex representation and a custom documentation for binding patterns.
 public struct BindingDeclaration {
-    public typealias ID = CustomID<BindingDeclaration>
+  public typealias ID = CustomID<BindingDeclaration>
 
-    public let common: SymbolCommon
-    public let type: TypeReference
-    public let visibility: SymbolVisibility
-    public let mutability: Mutability
-    public let defaultValue: String? // todo might need to be something more complex but for now it's OK
+  public let common: SymbolCommon
+  public let type: TypeReference
+  public let visibility: SymbolVisibility
+  public let mutability: Mutability
+  // todo might need to be something more complex but for now it's OK
+  public let defaultValue: String?
 }
 
 /// A method declaration that is inside a type or trait declaration.
@@ -133,14 +132,14 @@ public struct BindingDeclaration {
 
 
 public enum SymbolID {
-    case Function(FunctionDeclaration.ID)
-    case Binding(BindingDeclaration.ID)
-    // todo: add more cases for other kinds of symbols
+  case function(FunctionDeclaration.ID)
+  case binding(BindingDeclaration.ID)
+  // todo: add more cases for other kinds of symbols
 }
 
 
 public struct SymbolDatabase {
-    var functions: EntityStore<FunctionDeclaration> = .init()
-    var bindings: EntityStore<BindingDeclaration> = .init()
-    // todo: add more cases for other kinds of symbols
+  var functions: EntityStore<FunctionDeclaration> = .init()
+  var bindings: EntityStore<BindingDeclaration> = .init()
+  // todo: add more cases for other kinds of symbols
 }

@@ -1,6 +1,6 @@
 @main
 struct Main {
-    public static func main() {
-        print("Hello, World!")
-    }
+  public static func main() {
+    print("Hello, World!")
+  }
 }
