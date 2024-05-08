@@ -1,7 +1,13 @@
-image: processeus/hylo-base-image:1.0.0
+image: alexcazacu1/hylo-base-image-cicd:1.0.1
 stages:
+  - format
   - build
   - test
+
+format-job:
+  stage: format
+  script:
+    - swift-format lint -r --configuration .swift-format.json -p Sources Tests Package.swift
 
 build-job:
   stage: build

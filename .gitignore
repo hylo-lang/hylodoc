@@ -1,6 +1,7 @@
 /.build
 /.*-build
 /Packages
+/swift-format
 
 /*.xcodeproj
 Package.resolved
