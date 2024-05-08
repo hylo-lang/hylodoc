@@ -1,0 +1,6 @@
+#!/bin/sh
+# Format the staged Swift files
+git diff --cached --name-only --diff-filter=ACM | grep '\.swift$' | while read filename; do
+  swift-format --in-place "$filename"
+  git add "$filename"
+done
