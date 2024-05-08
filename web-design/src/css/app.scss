@@ -1,0 +1,15 @@
+@layer base {
+  * {
+    @apply font-sans font-normal box-border;
+  }
+
+  body {
+    @apply w-full h-screen bg-gradient-to-br from-35% from-zinc-950 to-zinc-900 text-white p-8;
+  }
+
+  p, span {
+    @apply bg-none text-gray-300 text-sm font-normal p-0 m-0;
+  }
+
+  // default styling goes here
+}

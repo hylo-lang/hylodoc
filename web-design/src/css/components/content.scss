@@ -1,0 +1,29 @@
+.content {
+  @apply w-full flex flex-wrap flex-col;
+
+  .section {
+    @apply flex-auto w-full;
+
+    h1 {
+      @apply text-white font-semibold text-3xl m-0 p-0;
+    }
+
+    p, span {
+      @apply mt-1 mb-1;
+    }
+
+    code {
+      @apply block w-full bg-zinc-800 text-zinc-200 rounded-lg text-sm p-2 mt-3;
+    }
+
+    // First section bigger heading
+    &:first-child > h1 {
+      @apply text-4xl;
+    }
+
+    // Dividing line between sections
+    &:not(:first-child) {
+      @apply pt-5 border-t border-zinc-700 mt-5;
+    }
+  }
+}
