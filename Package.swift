@@ -8,12 +8,13 @@ let allTargetsSwiftSettings: [SwiftSetting] = [
   .unsafeFlags(["-warnings-as-errors"])
 ]
 
-
 /// Dependencies for documentation extraction.
 
 let docGenerationDependency: [Package.Dependency] =
   ProcessInfo.processInfo.environment["HYLO_ENABLE_DOC_GENERATION"] != nil
   ? [.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.1.0")] : []
+
+/// Dependencies for documentation extraction.
 
 let package = Package(
   name: "HyloDoc",
@@ -47,7 +48,9 @@ let package = Package(
       swiftSettings: allTargetsSwiftSettings),
     .target(
       name: "DocumentationDB",
-      dependencies: [],
+      dependencies: [
+        .product(name: "FrontEnd", package: "hylo")
+      ],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .target(
@@ -73,6 +76,11 @@ let package = Package(
     .testTarget(
       name: "DocExtractorTests",
       dependencies: ["DocExtractor"],
+      exclude: ["module.md"],
+      swiftSettings: allTargetsSwiftSettings),
+    .testTarget(
+      name: "DocumentationDBTests",
+      dependencies: ["DocumentationDB"],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
