@@ -3,7 +3,7 @@
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
-            "SWIFT_VERSION" : "5.9",
+            "SWIFT_VERSION": "5.9",
             "HYLO_LLVM_BUILD_TYPE": "${localEnv:HYLO_LLVM_BUILD_TYPE:MinSizeRel}"
         }
     },
@@ -32,12 +32,50 @@
         "vscode": {
             // Set *default* container specific settings.json values on container create.
             "settings": {
-                "lldb.library": "/usr/lib/liblldb.so"
+                "lldb.library": "/usr/lib/liblldb.so",
+                "[swift]": {
+                    "editor.defaultFormatter": "sswg.swift-lang"
+                },
+                "launch": {
+                    "configurations": [
+                        {
+                            "type": "lldb",
+                            "request": "launch",
+                            "name": "Debug Tests",
+                            "program": "${workspaceFolder}/.build/debug/HyloDocPackageTests.xctest",
+                            "args": [],
+                            "cwd": "${workspaceFolder}",
+                            "preLaunchTask": "Build All Swift Stuff Including Tests"
+                        }
+                    ]
+                },
+                // specify a custom tasks
+                "tasks": {
+                    "version": "2.0.0",
+                    "tasks": [
+                        {
+                            "label": "Build All Swift Stuff Including Tests",
+                            "type": "shell",
+                            "command": "swift build --build-tests",
+                            "group": {
+                                "kind": "build",
+                                "isDefault": true
+                            },
+                            "problemMatcher": [
+                                "$swift"
+                            ]
+                        }
+                    ]
+                }
+                
             },
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
                 "sswg.swift-lang",
-                "ms-azuretools.vscode-docker"
+                "ms-azuretools.vscode-docker",
+                "vadimcn.vscode-lldb",
+                "GitHub.copilot",
+                "GitHub.copilot-chat"
             ]
         }
     },
