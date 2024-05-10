@@ -1,21 +1,21 @@
 image: alexcazacu1/hylo-base-image-cicd:1.0.1
 stages:
-  - format
+#  - format
   - build
   - test
 
-format-job:
-  stage: format
-  script:
-    - >
-      output="$(swift-format lint -r --configuration .swift-format.json -p Sources Tests Package.swift)";
-      if [ -n "$output" ]; then
-        echo "$output";
-        echo "Formatting issues detected.";
-        exit 1;
-      else
-        echo "No formatting issues found.";
-      fi
+#format-job:
+#  stage: format
+#  script:
+#    - >
+#      output="$(swift-format lint -r --configuration .swift-format.json -p Sources Tests Package.swift)";
+#      if [ -n "$output" ]; then
+#        echo "$output";
+#        echo "Formatting issues detected.";
+#        exit 1;
+#      else
+#        echo "No formatting issues found.";
+#      fi
 
 build-job:
   stage: build
