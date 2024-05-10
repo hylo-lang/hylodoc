@@ -34,8 +34,11 @@
             "settings": {
                 "lldb.library": "/usr/lib/liblldb.so",
                 "[swift]": {
-                    "editor.defaultFormatter": "sswg.swift-lang"
-                },
+                    "editor.defaultFormatter": "vknabel.vscode-apple-swift-format"
+                },            
+                "apple-swift-format.path": [
+                    "swift-format"
+                ],
                 "launch": {
                     "configurations": [
                         {
@@ -75,7 +78,8 @@
                 "ms-azuretools.vscode-docker",
                 "vadimcn.vscode-lldb",
                 "GitHub.copilot",
-                "GitHub.copilot-chat"
+                "GitHub.copilot-chat",
+                "vknabel.vscode-apple-swift-format"
             ]
         }
     },
