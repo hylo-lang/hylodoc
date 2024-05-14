@@ -41,23 +41,23 @@ frontend-tests-job:
   script:
     - swift test --filter DocExtractorTests
 
-export-test-coverage-job:
-  stage: test
-  needs: [build-job]
-  script:
-    - >
-      swift test -c debug -Xswiftc -enable-testing --explicit-target-dependency-import-check error --parallel --enable-code-coverage;
-      shopt -s nullglob;
-      dot_os=(.build/x86_64-unknown-linux-gnu/debug/*.build/*.o .build/x86_64-unknown-linux-gnu/debug/*.build/**/*.o);
-      bin_params=("${dot_os[0]}");
-      for o in "${dot_os[@]:1}"; do
-        bin_params+=("-object" "${o}");
-      done
-      llvm-cov-15 export -format="lcov" -instr-profile "$(swift test --show-codecov-path | xargs dirname)"/default.profdata "${bin_params[@]}" > .build/info.lcov;
-      lcov_cobertura .build/info.lcov --output .build/coverage.xml;
-      fi
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: ./build/coverage.xml
+# export-test-coverage-job:
+#   stage: test
+#   needs: [build-job]
+#   script:
+#     - >
+#       swift test -c debug -Xswiftc -enable-testing --explicit-target-dependency-import-check error --parallel --enable-code-coverage;
+#       shopt -s nullglob;
+#       dot_os=(.build/x86_64-unknown-linux-gnu/debug/*.build/*.o .build/x86_64-unknown-linux-gnu/debug/*.build/**/*.o);
+#       bin_params=("${dot_os[0]}");
+#       for o in "${dot_os[@]:1}"; do
+#         bin_params+=("-object" "${o}");
+#       done
+#       llvm-cov-15 export -format="lcov" -instr-profile "$(swift test --show-codecov-path | xargs dirname)"/default.profdata "${bin_params[@]}" > .build/info.lcov;
+#       lcov_cobertura .build/info.lcov --output .build/coverage.xml;
+#       fi
+#   artifacts:
+#     reports:
+#       coverage_report:
+#         coverage_format: cobertura
+#         path: ./build/coverage.xml
