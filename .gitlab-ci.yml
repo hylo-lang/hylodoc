@@ -47,16 +47,16 @@ export-test-coverage-job:
   needs: [build-job]
   script:
     - >
+      swift test -c debug -Xswiftc -enable-testing --explicit-target-dependency-import-check error --parallel --enable-code-coverage
       shopt -s nullglob;
       dot_os=(.build/${CI_COMMIT_REF_NAME}/*.build/*.o .build/${CI_COMMIT_REF_NAME}/*.build/**/*.o);
       bin_params=("${dot_os[0]}");
       for o in "${dot_os[@]:1}"; do
         bin_params+=("-object" "${o}");
       done
-      llvm-cov export -format="lcov" -instr-profile "$(swift test -c $CI_COMMIT_REF_NAME --show-codecov-path | xargs dirname)"/default.profdata "${bin_params[@]}" > coverage_reports/info.lcov;
+      llvm-cov export -format="lcov" -instr-profile "$(swift test --show-codecov-path | xargs dirname)"/default.profdata "${bin_params[@]}" > ./build/info.lcov;
       fi
   artifacts:
-    paths:
-      - coverage_reports/
+    paths: [.build/]
     reports:
-      cobertura: coverage_reports/info.lcov
+      cobertura: ./build/info.lcov
