@@ -12,11 +12,15 @@ public protocol IdentifiedEntity {
 
 /// A unique identifier that is a separate nominal type for each different kind of object that T refers to.
 /// It is useful because it makes it impossible to pass/assign the wrong types of IDs to each other.
-public struct DocumentationID<T: IdentifiedEntity>: DocumentationIDProtocol {
+public struct DocumentationID<T: IdentifiedEntity>: DocumentationIDProtocol, CustomDebugStringConvertible {
   public typealias Element = T
   public let raw: UInt32
   public init(_ raw: UInt32) {
     self.raw = raw
+  }
+
+  public var debugDescription: String {
+    return "DocID<\(T.self)>(\(raw))"
   }
 }
 
@@ -75,5 +79,9 @@ public struct AdaptedEntityStore<OriginalASTNodeType: Node & HasAssociatedDocume
     let newID = entityStore.insert(entity)
     idMapping[id] = newID
     return newID
+  }
+
+  public func documentationId(of: OriginalASTNodeType.ID) -> OriginalASTNodeType.DocumentationT.ID? {
+    return idMapping[of]
   }
 }
