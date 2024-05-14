@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:5.10
 import Foundation
 import PackageDescription
 
@@ -28,7 +28,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.1.4"),
     .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0"),
     .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.0"),
-    .package(url: "https://github.com/apple/swift-format", branch: "release/5.9"),
+    .package(url: "https://github.com/apple/swift-format", branch: "release/5.10"),
     // .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
     .package(url: "https://github.com/tothambrus11/hylo.git", branch: "main"),
     .package(url: "https://github.com/johnxnguyen/Down", from: "0.11.0"),

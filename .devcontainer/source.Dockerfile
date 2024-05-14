@@ -1,4 +1,4 @@
-ARG SWIFT_VERSION=5.9
+ARG SWIFT_VERSION=5.10
 # Other ARG declarations must follow FROM
 FROM swift:${SWIFT_VERSION}
 
@@ -48,7 +48,7 @@ RUN <<EOT bash -ex -o pipefail
 EOT
 
 # Clone and build the swift-format library. Note the version is the same as Hylo.
-RUN git clone -b release/5.9 https://github.com/apple/swift-format.git
+RUN git clone -b release/5.10 https://github.com/apple/swift-format.git
 WORKDIR /swift-format
 RUN swift build -c release
 ENV PATH="/swift-format/.build/release:$PATH"
