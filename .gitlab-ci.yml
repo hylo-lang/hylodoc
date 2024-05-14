@@ -12,7 +12,6 @@ format-job:
       if [ -n "$output" ]; then
         echo "$output";
         echo "Formatting issues detected.";
-#        exit 1;
       else
         echo "No formatting issues found.";
       fi
@@ -47,7 +46,7 @@ export-test-coverage-job:
   needs: [build-job]
   script:
     - >
-      swift test -c debug -Xswiftc -enable-testing --explicit-target-dependency-import-check error --parallel --enable-code-coverage
+      swift test -c debug -Xswiftc -enable-testing --explicit-target-dependency-import-check error --parallel --enable-code-coverage;
       shopt -s nullglob;
       dot_os=(.build/${CI_COMMIT_REF_NAME}/*.build/*.o .build/${CI_COMMIT_REF_NAME}/*.build/**/*.o);
       bin_params=("${dot_os[0]}");
