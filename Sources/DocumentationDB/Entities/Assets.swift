@@ -27,6 +27,7 @@ public struct ArticleAsset : IdentifiedEntity {
 // Sourcefile-level documentation
 public struct SourceFileAsset: IdentifiedEntity {
   public let generalDescription: GeneralDescriptionFields
+  public let translationUnit: TranslationUnit.ID
 }
 
 /// An asset representing any other kind of file in the project - e.g. images, attachments, etc.
