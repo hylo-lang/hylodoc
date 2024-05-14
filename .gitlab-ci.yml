@@ -1,4 +1,4 @@
-image: alexcazacu1/hylo-base-image-cicd:1.0.1
+image: alexcazacu1/hylo-base-image-cicd:1.0.2
 stages:
   - format
   - build
@@ -48,14 +48,16 @@ export-test-coverage-job:
     - >
       swift test -c debug -Xswiftc -enable-testing --explicit-target-dependency-import-check error --parallel --enable-code-coverage;
       shopt -s nullglob;
-      dot_os=(.build/${CI_COMMIT_REF_NAME}/*.build/*.o .build/${CI_COMMIT_REF_NAME}/*.build/**/*.o);
+      dot_os=(.build/x86_64-unknown-linux-gnu/debug/*.build/*.o .build/x86_64-unknown-linux-gnu/debug/*.build/**/*.o);
       bin_params=("${dot_os[0]}");
       for o in "${dot_os[@]:1}"; do
         bin_params+=("-object" "${o}");
       done
-      llvm-cov export -format="lcov" -instr-profile "$(swift test --show-codecov-path | xargs dirname)"/default.profdata "${bin_params[@]}" > ./build/info.lcov;
+      llvm-cov-15 export -format="lcov" -instr-profile "$(swift test --show-codecov-path | xargs dirname)"/default.profdata "${bin_params[@]}" > .build/info.lcov;
+      lcov_cobertura .build/info.lcov --output .build/coverage.xml;
       fi
   artifacts:
-    paths: [.build/]
     reports:
-      cobertura: ./build/info.lcov
+      coverage_report:
+        coverage_format: cobertura
+        path: ./build/coverage.xml

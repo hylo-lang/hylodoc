@@ -52,3 +52,6 @@ RUN git clone -b release/5.9 https://github.com/apple/swift-format.git
 WORKDIR /swift-format
 RUN swift build -c release
 ENV PATH="/swift-format/.build/release:$PATH"
+
+# Tool for coverage reports inside Gitlab
+RUN pip3 install lcov_cobertura
