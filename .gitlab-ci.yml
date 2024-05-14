@@ -41,3 +41,22 @@ frontend-tests-job:
   needs: [build-job]
   script:
     - swift test --filter DocExtractorTests
+
+export-test-coverage-job:
+  stage: test
+  needs: [build-job]
+  script:
+    - >
+      shopt -s nullglob;
+      dot_os=(.build/${CI_COMMIT_REF_NAME}/*.build/*.o .build/${CI_COMMIT_REF_NAME}/*.build/**/*.o);
+      bin_params=("${dot_os[0]}");
+      for o in "${dot_os[@]:1}"; do
+        bin_params+=("-object" "${o}");
+      done
+      llvm-cov export -format="lcov" -instr-profile "$(swift test -c $CI_COMMIT_REF_NAME --show-codecov-path | xargs dirname)"/default.profdata "${bin_params[@]}" > coverage_reports/info.lcov;
+      fi
+  artifacts:
+    paths:
+      - coverage_reports/
+    reports:
+      cobertura: coverage_reports/info.lcov

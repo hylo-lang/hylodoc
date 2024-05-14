@@ -3,6 +3,10 @@
 /Packages
 /swift-format
 
+**.lcov
+**.profdata
+**.profraw
+
 /*.xcodeproj
 Package.resolved
 
