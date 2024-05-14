@@ -1,4 +1,5 @@
 import FrontEnd
+import DequeModule
 
 /// An asset representing a module in the project, which is essentially a folder containing other assets.
 public struct ModuleAsset : IdentifiedEntity {
@@ -63,10 +64,10 @@ public extension AdaptedEntityStore<ModuleDecl> {
   
   /// Returns all child modules of the given module, including the module itself.
   func allDescendantModules(of: ModuleAsset.ID) -> [ModuleAsset.ID] {
-    var stack: [ModuleAsset.ID] = [of]
+    var stack: Deque = [of]
     var result: [ModuleAsset.ID] = []
   
-    while let current = stack.popLast() {
+    while let current = stack.popFirst() {
       result.append(current)
       stack.append(contentsOf: self[documentationId: current]!.children.compactMap { child in
         switch child {

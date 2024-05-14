@@ -33,6 +33,7 @@ let package = Package(
     // .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
     .package(url: "https://github.com/tothambrus11/hylo.git", branch: "main"),
     .package(url: "https://github.com/johnxnguyen/Down", from: "0.11.0"),
+    .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.15.1")
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -65,8 +66,14 @@ let package = Package(
       swiftSettings: allTargetsSwiftSettings),
     .target(
       name: "WebsiteGen",
-      dependencies: ["DocExtractor", "DocumentationDB"],
+      dependencies: [
+        "DocExtractor",
+        "DocumentationDB",
+        .product(name: "DequeModule", package: "swift-collections"),
+        .product(name: "Stencil", package: "stencil")
+      ],
       exclude: ["module.md"],
+      resources: [.process("Resources/templates/")],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "WebsiteGenTests",
