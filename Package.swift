@@ -73,7 +73,7 @@ let package = Package(
         .product(name: "Stencil", package: "stencil")
       ],
       exclude: ["module.md"],
-      resources: [.process("Resources/templates/")],
+      resources: [.process("Resources/")],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "WebsiteGenTests",
