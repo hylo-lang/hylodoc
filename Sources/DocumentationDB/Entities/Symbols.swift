@@ -56,7 +56,6 @@ public struct SymbolStore {
   public var subscriptImplDocs: AdaptedEntityStore<SubscriptImpl> = .init()
   public var initializerDocs: AdaptedEntityStore<InitializerDecl> = .init()
 
-  public var fileLevelDocs: AdaptedEntityStore<TranslationUnit> = .init()
   public var traitDocs: AdaptedEntityStore<TraitDecl> = .init()
   public var productTypeDocs: AdaptedEntityStore<ProductTypeDecl> = .init()
 }
