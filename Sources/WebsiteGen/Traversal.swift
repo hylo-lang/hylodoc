@@ -4,55 +4,59 @@ import DocumentationDB
 import Stencil
 import DequeModule
 
-/// Generate a module and its child assets
+/// Traverse a module and its children and generate the respective pages
 ///
 /// - Parameters:
-///   - ctx: context used for page generation
-///   - of: module to generate for
-public func TraverseModule(ctx: GenerationContext, of: ModuleAsset) {
-    // Generate module
-    GenerateModulePage(ctx: ctx, of: of)
-    
-    // Generate module children
-    TraverseModuleChildren(ctx: ctx, of: of.children)
-}
-
-/// Generate all child assets of a module
-///
-/// - Parameters:
-///   - ctx: context used for page generation
-///   - of: array of child asset ids
-public func TraverseModuleChildren(ctx: GenerationContext, of: [AnyAssetID]) {
-    for assetId in of {
-        switch assetId {
-        case .sourceFile(let id):
-            let sourceFile = ctx.documentation.assetStore.sourceFiles[documentationId: id]!
-            GenerateSourceFilePage(ctx: ctx, of: sourceFile)
-            
-            // Generate symbols in source-file
-            TraverseSymbols(ctx: ctx, rootNode: sourceFile.translationUnit)
-            break
-        case .article(let id):
-            let article = ctx.documentation.assetStore.articles[id]!
-            GenerateArticlePage(ctx: ctx, of: article)
-            break
-        case .otherFile(_):
-            // This can only be embedded and does not show up separatly
-            break
-        case .module(_):
-            // This is already being taken care of in GenerateDocumentation
-            break
-        }
+///   - ctx: context used for page generation, containing documentation database, ast and stencil templating
+///   - of: root module to start traversal and generation from
+public func TraverseAssets(ctx: GenerationContext, rootModule: ModuleDecl.ID) {
+    // Traverse modules from root in breath-first order and generate pages
+    let moduleIds = ctx.documentation.assetStore.modules.allDescendantModules(ofAstNodeId: rootModule)
+    for moduleId in moduleIds {
+        let module = ctx.documentation.assetStore.modules[documentationId: moduleId]!
+        
+        // Generate module
+        GenerateModulePage(ctx: ctx, of: module)
+        
+        // Traverse module children
+        module.children.forEach { child in TraverseChildAsset(ctx: ctx, of: child) }
     }
 }
 
-/// Generate all child symbols of a root-node
+/// Traverse child asset of a module and generate it and its children if any
 ///
 /// - Parameters:
-///   - ctx: context used for page generation
-///   - rootNode: node to start traversing from
+///   - ctx: context used for page generation, containing documentation database, ast and stencil templating
+///   - of:  child asset id to traverse and generate pages off
+public func TraverseChildAsset(ctx: GenerationContext, of: AnyAssetID) {
+    switch of {
+    case .sourceFile(let id):
+        let sourceFile = ctx.documentation.assetStore.sourceFiles[documentationId: id]!
+        GenerateSourceFilePage(ctx: ctx, of: sourceFile)
+        
+        // Traverse and generate all symbols in source-file
+        TraverseSymbols(ctx: ctx, rootNode: sourceFile.translationUnit)
+        break
+    case .article(let id):
+        let article = ctx.documentation.assetStore.articles[id]!
+        GenerateArticlePage(ctx: ctx, of: article)
+        break
+    case .otherFile(_):
+        // This can only be embedded and does not show up separatly, therefore we do not traverse it.
+        break
+    case .module(_):
+        // This is already being taken care of in TraverseModule, so this can be ignored
+        break
+    }
+}
+
+/// Traverse all child symbols of a root-node and generate their pages
+///
+/// - Parameters:
+///   - ctx: context used for page generation, containing documentation database, ast and stencil templating
+///   - rootNode: source-file node to start traversing from
 public func TraverseSymbols(ctx: GenerationContext, rootNode: TranslationUnit.ID) {
-    var stack: Deque<AnyDeclID> = Deque(ctx.typedProgram.ast[rootNode].decls)
+    var stack: Deque<AnyDeclID> = Deque(ctx.typedProgram.ast[rootNode]!.decls)
     while let cursor = stack.popLast() {
         switch cursor.kind {
         case AssociatedTypeDecl.self:
@@ -108,9 +112,7 @@ public func TraverseSymbols(ctx: GenerationContext, rootNode: TranslationUnit.ID
             let decl = ctx.typedProgram.ast[id]!
             
             // Add children on top of stack
-            for child in decl.impls {
-                stack.append(AnyDeclID(child))
-            }
+            stack.append(contentsOf: decl.impls.map { child in return AnyDeclID(child) })
             
             // Generate page
             let declDoc = ctx.documentation.symbols.methodDeclDocs[astNodeId: id]!
@@ -129,9 +131,7 @@ public func TraverseSymbols(ctx: GenerationContext, rootNode: TranslationUnit.ID
             let decl = ctx.typedProgram.ast[id]!
             
             // Add children on top of stack
-            for child in decl.impls {
-                stack.append(AnyDeclID(child))
-            }
+            stack.append(contentsOf: decl.impls.map { child in return AnyDeclID(child) })
             
             // Generate page
             let declDoc = ctx.documentation.symbols.subscriptDeclDocs[astNodeId: id]!
@@ -158,9 +158,7 @@ public func TraverseSymbols(ctx: GenerationContext, rootNode: TranslationUnit.ID
             let decl = ctx.typedProgram.ast[id]!
             
             // Add children on top of stack
-            for child in decl.members {
-                stack.append(child)
-            }
+            stack.append(contentsOf: decl.members)
             
             // Generate page
             let declDoc = ctx.documentation.symbols.traitDocs[astNodeId: id]!
@@ -171,9 +169,7 @@ public func TraverseSymbols(ctx: GenerationContext, rootNode: TranslationUnit.ID
             let decl = ctx.typedProgram.ast[id]!
             
             // Add children on top of stack
-            for child in decl.members {
-                stack.append(child)
-            }
+            stack.append(contentsOf: decl.members)
             
             // Generate page
             let declDoc = ctx.documentation.symbols.productTypeDocs[astNodeId: id]!

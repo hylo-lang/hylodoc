@@ -1,37 +1,42 @@
 import DocumentationDB
 
-/// Generate source-file page
+/// Render the source-file page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: source file asset
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: source file asset to render and export page of
 public func GenerateSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) {
 
 }
 
-/// Generate article page
+/// Render the article page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: article asset
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: article asset to render and export page of
 public func GenerateArticlePage(ctx: GenerationContext, of: ArticleAsset) {
 
 }
 
-/// Generate module page
+/// Render the module page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: module asset
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: module asset to render and export page of
 public func GenerateModulePage(ctx: GenerationContext, of: ModuleAsset) {
 
 }
 
-/// Generate other-file page
+/// Render the other-file page and export it at the right location
+///
+/// Other files do not show up separatly, but are always embedded into other documentation such as that of symbols or other assets.
+/// This method therefore returns the content directly from rendering the file.
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: other file asset
-public func GenerateOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset) {
-
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: other file asset to render page of
+///
+/// - Returns: the rendered content of the local file
+public func GenerateOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset) -> String {
+    return ""
 }

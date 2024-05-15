@@ -1,133 +1,133 @@
 import FrontEnd
 import DocumentationDB
 
-/// Generate associated-type page
+/// Render the  associated-type page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: associated-type declaration
-///   - with: associated-type documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: associated-type declaration to render and export page of
+///   - with: parsed associated-type documentation string
 public func GenerateAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeDecl, with: AssociatedTypeDocumentation) {
     
 }
 
-/// Generate associated-value page
+/// Render the  associated-value page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: associated-value declaration
-///   - with: associated-value documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: associated-value declaration to render and export page of
+///   - with: parsed associated-value documentation string
 public func GenerateAssociatedValuePage(ctx: GenerationContext, of: AssociatedValueDecl, with: AssociatedValueDocumentation) {
     
 }
 
-/// Generate type-alias page
+/// Render the  type-alias page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: type-alias declaration
-///   - with: type-alias documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: type-alias declaration to render and export page of
+///   - with: parsed type-alias documentation string
 public func GenerateTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl, with: TypeAliasDocumentation) {
     
 }
 
-/// Generate binding page
+/// Render the  binding page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: binding declaration
-///   - with: binding documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: binding declaration to render and export page of
+///   - with: parsed binding documentation string
 public func GenerateBindingPage(ctx: GenerationContext, of: BindingDecl, with: BindingDocumentation) {
     
 }
 
-/// Generate operator page
+/// Render the  operator page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: operator declaration
-///   - with: operator documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: operator declaration to render and export page of
+///   - with: parsed operator documentation string
 public func GenerateOperatorPage(ctx: GenerationContext, of: OperatorDecl, with: OperatorDocumentation) {
     
 }
 
-/// Generate function page
+/// Render the  function page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: function declaration
-///   - with: function documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: function declaration to render and export page of
+///   - with: parsed function documentation string
 public func GenerateFunctionPage(ctx: GenerationContext, of: FunctionDecl, with: FunctionDocumentation) {
     
 }
 
-/// Generate method page
+/// Render the  method page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: method declaration
-///   - with: method documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: method declaration to render and export page of
+///   - with: parsed method documentation string
 public func GenerateMethodPage(ctx: GenerationContext, of: MethodDecl, with: MethodDeclDocumentation) {
     
 }
 
-/// Generate method-implementation page
+/// Render the  method-implementation page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: method-implementation declaration
-///   - with: method-implementation documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: method-implementation declaration to render and export page of
+///   - with: parsed method-implementation documentation string
 public func GenerateMethodImplementationPage(ctx: GenerationContext, of: MethodImpl, with: MethodImplDocumentation) {
     
 }
 
-/// Generate subscript page
+/// Render the  subscript page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: subscript declaration
-///   - with: subscript documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: subscript declaration to render and export page of
+///   - with: parsed subscript documentation string
 public func GenerateSubscriptPage(ctx: GenerationContext, of: SubscriptDecl, with: SubscriptDeclDocumentation) {
     
 }
 
-/// Generate subscript-implementation page
+/// Render the  subscript-implementation page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: subscript-implementation declaration
-///   - with: subscript-implementation documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: subscript-implementation declaration to render and export page of
+///   - with: parsed subscript-implementation documentation string
 public func GenerateSubscriptImplementationPage(ctx: GenerationContext, of: SubscriptImpl, with: SubscriptImplDoc) {
     
 }
 
-/// Generate initializer page
+/// Render the  initializer page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: initializer declaration
-///   - with: initializer documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: initializer declaration to render and export page of
+///   - with: parsed initializer documentation string
 public func GenerateInitializerPage(ctx: GenerationContext, of: InitializerDecl, with: InitializerDocumentation) {
     
 }
 
-/// Generate trait page
+/// Render the  trait page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: trait declaration
-///   - with: trait documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: trait declaration to render and export page of
+///   - with: parsed trait documentation string
 public func GenerateTraitPage(ctx: GenerationContext, of: TraitDecl, with: TraitDocumentation) {
 
 }
 
 
-/// Generate product-type page
+/// Render the product-type page and export it at the right location
 ///
 /// - Parameters:
-///   - ctx: context for page generation
-///   - of: product-type declaration
-///   - with: product-type documentation
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+///   - of: product-type declaration to render and export page of
+///   - with: parsed product-type documentation string
 public func GenerateProductTypePage(ctx: GenerationContext, of: ProductTypeDecl, with: ProductTypeDocumentation) {
 
 }
