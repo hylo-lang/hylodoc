@@ -15,7 +15,7 @@ public struct GenerationContext {
 ///   - db: documentation database
 ///   - ast: abstract syntax tree
 ///   - rootModule: the identity of the root module
-public func GenerateDocumentation(db: DocumentationDatabase, typedProgram: TypedProgram, rootModule: ModuleDecl.ID) {
+public func GenerateDocumentation(db: DocumentationDatabase, typedProgram: TypedProgram, rootModule: ModuleAsset.ID, target: URL) {
     // Setup Context
     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]));
     let ctx = GenerationContext(
@@ -25,7 +25,7 @@ public func GenerateDocumentation(db: DocumentationDatabase, typedProgram: Typed
     )
     
     // Traverse modules from root in breath-first order and generate pages
-    TraverseAssets(ctx: ctx, rootModule: rootModule)
+    TraverseAssets(ctx: ctx, of: .module(rootModule), at: target)
     
     // Copy assets to target
 }
