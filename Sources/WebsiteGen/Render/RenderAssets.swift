@@ -1,34 +1,37 @@
 import DocumentationDB
 import Foundation
 
-/// Render the source-file page and export it at the right location
+/// Render the source-file page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
-///   - of: source file asset to render and export page of
-///   - at: file location to export to
-public func GenerateSourceFilePage(ctx: GenerationContext, of: SourceFileAsset, at: URL) {
-
+///   - of: source file asset to render page of
+///
+/// - Returns: the contents of the rendered page
+public func RenderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) -> String {
+    return ""
 }
 
-/// Render the article page and export it at the right location
+/// Render the article page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
-///   - of: article asset to render and export page of
-///   - at: file location to export to
-public func GenerateArticlePage(ctx: GenerationContext, of: ArticleAsset, at: URL) {
-
+///   - of: article asset to render page of
+///
+/// - Returns: the contents of the rendered page
+public func RenderArticlePage(ctx: GenerationContext, of: ArticleAsset) -> String {
+    return ""
 }
 
-/// Render the module page and export it at the right location
+/// Render the module page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
-///   - of: module asset to render and export page of
-///   - at: file location to export to
-public func GenerateModulePage(ctx: GenerationContext, of: ModuleAsset, at: URL) {
-
+///   - of: module asset to render page of
+///
+/// - Returns: the contents of the rendered page
+public func RenderModulePage(ctx: GenerationContext, of: ModuleAsset) -> String {
+    return ""
 }
 
 /// Render the other-file page and return the result
@@ -40,7 +43,7 @@ public func GenerateModulePage(ctx: GenerationContext, of: ModuleAsset, at: URL)
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: other file asset to render page of
 ///
-/// - Returns: the rendered content of the local file
-public func GenerateOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset) -> String {
+/// - Returns: the contents of the rendered local file
+public func RenderOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset) -> String {
     return ""
 }

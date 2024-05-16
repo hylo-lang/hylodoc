@@ -9,7 +9,7 @@ public struct GenerationContext {
     public let typedProgram: TypedProgram
 }
 
-/// Generate the full documentation website
+/// Render the full documentation website
 ///
 /// - Parameters:
 ///   - db: documentation database
@@ -24,8 +24,10 @@ public func GenerateDocumentation(db: DocumentationDatabase, typedProgram: Typed
         typedProgram: typedProgram
     )
     
-    // Traverse modules from root in breath-first order and generate pages
-    TraverseAssets(ctx: ctx, of: .module(rootModule), at: target)
+    // Resolve URL's
+    //TraverseAssets(ctx: ctx, root: AnyAssetID(rootModule), visitor: nil)
+    
+    //TODO generate stuff
     
     // Copy assets to target
 }
