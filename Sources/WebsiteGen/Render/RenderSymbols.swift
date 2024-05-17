@@ -2,7 +2,7 @@ import FrontEnd
 import DocumentationDB
 import Foundation
 
-/// Render the  associated-type page
+/// Render the associated-type page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -10,11 +10,11 @@ import Foundation
 ///   - with: parsed associated-type documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeDecl, with: AssociatedTypeDocumentation) -> String {
+public func renderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeDecl, with: AssociatedTypeDocumentation) -> String {
     return ""
 }
 
-/// Render the  associated-value page
+/// Render the associated-value page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -22,11 +22,11 @@ public func RenderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeD
 ///   - with: parsed associated-value documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderAssociatedValuePage(ctx: GenerationContext, of: AssociatedValueDecl, with: AssociatedValueDocumentation) -> String {
+public func renderAssociatedValuePage(ctx: GenerationContext, of: AssociatedValueDecl, with: AssociatedValueDocumentation) -> String {
     return ""
 }
 
-/// Render the  type-alias page
+/// Render the type-alias page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -34,11 +34,11 @@ public func RenderAssociatedValuePage(ctx: GenerationContext, of: AssociatedValu
 ///   - with: parsed type-alias documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl, with: TypeAliasDocumentation) -> String {
+public func renderTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl, with: TypeAliasDocumentation) -> String {
     return ""
 }
 
-/// Render the  binding page
+/// Render the binding page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -46,11 +46,11 @@ public func RenderTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl, with:
 ///   - with: parsed binding documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderBindingPage(ctx: GenerationContext, of: BindingDecl, with: BindingDocumentation) -> String {
+public func renderBindingPage(ctx: GenerationContext, of: BindingDecl, with: BindingDocumentation) -> String {
     return ""
 }
 
-/// Render the  operator page
+/// Render the operator page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -58,11 +58,11 @@ public func RenderBindingPage(ctx: GenerationContext, of: BindingDecl, with: Bin
 ///   - with: parsed operator documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderOperatorPage(ctx: GenerationContext, of: OperatorDecl, with: OperatorDocumentation) -> String {
+public func renderOperatorPage(ctx: GenerationContext, of: OperatorDecl, with: OperatorDocumentation) -> String {
     return ""
 }
 
-/// Render the  function page
+/// Render the function page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -70,11 +70,11 @@ public func RenderOperatorPage(ctx: GenerationContext, of: OperatorDecl, with: O
 ///   - with: parsed function documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderFunctionPage(ctx: GenerationContext, of: FunctionDecl, with: FunctionDocumentation) -> String {
+public func renderFunctionPage(ctx: GenerationContext, of: FunctionDecl, with: FunctionDocumentation) -> String {
     return ""
 }
 
-/// Render the  method page
+/// Render the method page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -82,11 +82,11 @@ public func RenderFunctionPage(ctx: GenerationContext, of: FunctionDecl, with: F
 ///   - with: parsed method documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderMethodPage(ctx: GenerationContext, of: MethodDecl, with: MethodDeclDocumentation) -> String {
+public func renderMethodPage(ctx: GenerationContext, of: MethodDecl, with: MethodDeclDocumentation) -> String {
     return ""
 }
 
-/// Render the  method-implementation page
+/// Render the method-implementation page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -94,11 +94,11 @@ public func RenderMethodPage(ctx: GenerationContext, of: MethodDecl, with: Metho
 ///   - with: parsed method-implementation documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderMethodImplementationPage(ctx: GenerationContext, of: MethodImpl, with: MethodImplDocumentation) -> String {
+public func renderMethodImplementationPage(ctx: GenerationContext, of: MethodImpl, with: MethodImplDocumentation) -> String {
     return ""
 }
 
-/// Render the  subscript page
+/// Render the subscript page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -106,11 +106,11 @@ public func RenderMethodImplementationPage(ctx: GenerationContext, of: MethodImp
 ///   - with: parsed subscript documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl, with: SubscriptDeclDocumentation) -> String {
+public func renderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl, with: SubscriptDeclDocumentation) -> String {
     return ""
 }
 
-/// Render the  subscript-implementation page
+/// Render the subscript-implementation page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -118,11 +118,11 @@ public func RenderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl, with:
 ///   - with: parsed subscript-implementation documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderSubscriptImplementationPage(ctx: GenerationContext, of: SubscriptImpl, with: SubscriptImplDoc) -> String {
+public func renderSubscriptImplementationPage(ctx: GenerationContext, of: SubscriptImpl, with: SubscriptImplDoc) -> String {
     return ""
 }
 
-/// Render the  initializer page
+/// Render the initializer page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -130,11 +130,11 @@ public func RenderSubscriptImplementationPage(ctx: GenerationContext, of: Subscr
 ///   - with: parsed initializer documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderInitializerPage(ctx: GenerationContext, of: InitializerDecl, with: InitializerDocumentation) -> String {
+public func renderInitializerPage(ctx: GenerationContext, of: InitializerDecl, with: InitializerDocumentation) -> String {
     return ""
 }
 
-/// Render the  trait page
+/// Render the trait page
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
@@ -142,7 +142,7 @@ public func RenderInitializerPage(ctx: GenerationContext, of: InitializerDecl, w
 ///   - with: parsed trait documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderTraitPage(ctx: GenerationContext, of: TraitDecl, with: TraitDocumentation) -> String {
+public func renderTraitPage(ctx: GenerationContext, of: TraitDecl, with: TraitDocumentation) -> String {
     return ""
 }
 
@@ -155,6 +155,6 @@ public func RenderTraitPage(ctx: GenerationContext, of: TraitDecl, with: TraitDo
 ///   - with: parsed product-type documentation string
 ///
 /// - Returns: contents of the rendered page
-public func RenderProductTypePage(ctx: GenerationContext, of: ProductTypeDecl, with: ProductTypeDocumentation) -> String {
+public func renderProductTypePage(ctx: GenerationContext, of: ProductTypeDecl, with: ProductTypeDocumentation) -> String {
     return ""
 }

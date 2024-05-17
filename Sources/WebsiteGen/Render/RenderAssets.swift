@@ -8,7 +8,7 @@ import Foundation
 ///   - of: source file asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func RenderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) -> String {
+public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) -> String {
     return ""
 }
 
@@ -19,7 +19,7 @@ public func RenderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) ->
 ///   - of: article asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func RenderArticlePage(ctx: GenerationContext, of: ArticleAsset) -> String {
+public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset) -> String {
     return ""
 }
 
@@ -30,7 +30,7 @@ public func RenderArticlePage(ctx: GenerationContext, of: ArticleAsset) -> Strin
 ///   - of: module asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func RenderModulePage(ctx: GenerationContext, of: ModuleAsset) -> String {
+public func renderModulePage(ctx: GenerationContext, of: ModuleAsset) -> String {
     return ""
 }
 
@@ -44,6 +44,6 @@ public func RenderModulePage(ctx: GenerationContext, of: ModuleAsset) -> String 
 ///   - of: other file asset to render page of
 ///
 /// - Returns: the contents of the rendered local file
-public func RenderOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset) -> String {
+public func renderOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset) -> String {
     return ""
 }

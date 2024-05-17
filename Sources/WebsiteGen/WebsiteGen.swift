@@ -15,7 +15,7 @@ public struct GenerationContext {
 ///   - db: documentation database
 ///   - ast: abstract syntax tree
 ///   - rootModule: the identity of the root module
-public func GenerateDocumentation(db: DocumentationDatabase, typedProgram: TypedProgram, rootModule: ModuleAsset.ID, target: URL) {
+public func generateDocumentation(db: DocumentationDatabase, typedProgram: TypedProgram, rootModule: ModuleAsset.ID, target: URL) {
     // Setup Context
     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]));
     let ctx = GenerationContext(
@@ -24,10 +24,20 @@ public func GenerateDocumentation(db: DocumentationDatabase, typedProgram: Typed
         typedProgram: typedProgram
     )
     
-    // Resolve URL's
-    //TraverseAssets(ctx: ctx, root: AnyAssetID(rootModule), visitor: nil)
+    //TODO Resolve URL's
     
-    //TODO generate stuff
+    // Generate assets and symbols
+    struct GeneratingVisitor: DocumentationVisitor {
+        public func visitAsset(path: DynamicPath, assetId: AnyAssetID) {
+            //TODO
+        }
+        
+        public func visitSymbol(path: DynamicPath, symbolId: AnyDeclID) {
+            //TODO
+        }
+    }
+    let visitor = GeneratingVisitor()
+    traverse(ctx: ctx, root: .module(rootModule), visitor: visitor)
     
     // Copy assets to target
 }
