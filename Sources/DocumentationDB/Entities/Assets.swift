@@ -56,29 +56,3 @@ public struct AssetStore {
   public var articles: EntityStore<ArticleAsset> = .init()
   public var otherFiles: EntityStore<OtherLocalFileAsset> = .init()
 }
-
-public extension AdaptedEntityStore<ModuleDecl> {
-  func allDescendantModules(ofAstNodeId id: ModuleDecl.ID) -> [ModuleAsset.ID] {
-    return allDescendantModules(of: documentationId(of: id)!)
-  }
-  
-  /// Returns all child modules of the given module, including the module itself.
-  func allDescendantModules(of: ModuleAsset.ID) -> [ModuleAsset.ID] {
-    var stack: Deque = [of]
-    var result: [ModuleAsset.ID] = []
-  
-    while let current = stack.popFirst() {
-      result.append(current)
-      stack.append(contentsOf: self[documentationId: current]!.children.compactMap { child in
-        switch child {
-        case .module(let id):
-          return id
-        default:
-          return nil
-        }
-      })
-    }
-
-    return result
-  }
-}
