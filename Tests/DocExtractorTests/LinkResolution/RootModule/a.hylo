@@ -1,0 +1,24 @@
+type Vector: Deinitializable {
+  public memberwise init
+
+  public var x: Int
+  public var y: Int
+
+  fun add(dx: Int, dy: Int) {
+    &x += dx
+    &y += dy
+  }
+
+  fun add(s: Int) {
+    &x += s
+    &y += s
+  }
+
+  type Inner: Deinitializable{
+    public var x: Int
+
+    fun add(dx: Int) {
+      &x += dx
+    }
+  }
+}

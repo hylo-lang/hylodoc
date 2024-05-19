@@ -1,12 +1,81 @@
 import Foundation
 import DocumentationDB
-import FrontEnd
+@testable import FrontEnd
+
+public struct EntityRef {
+  public let moduleName: String?
+  public let identifiers: [String]
+  // todo add function parameter labels
+}
+
+// todo support parameter labels
+public func parseName(name: String) -> EntityRef? {
+  let components = name
+    .components(separatedBy: ".")
+    .map({ $0.trimmingCharacters(in: .whitespaces) })
+  
+  if (components.isEmpty) { return nil }
+  
+  var moduleName: String? = nil
+  let first = components[0]
+  if(first.starts(with: "@")) {
+    moduleName = String(first.suffix(from: first.index(after: first.startIndex)))
+  }
+
+  let identifiers = moduleName != nil ? Array(components[1...]) : components
+  
+  return EntityRef(moduleName: moduleName, identifiers: identifiers)
+}
+
+public func resolveReference(refString: String, in scope: AnyScopeID, exposedTo: AnyScopeID, using typeChecker: inout TypeChecker) -> Set<AnyDeclID>? {
+  return parseName(name: refString).flatMap({ ref in
+    return resolveReference(ref: ref, in: scope, exposedTo: exposedTo, using: &typeChecker)
+  })
+}
+
+
+public func resolveReference(ref: EntityRef, in scope: AnyScopeID, exposedTo: AnyScopeID, using typeChecker: inout TypeChecker) -> Set<AnyDeclID>? {
+  if(ref.moduleName != nil) {
+    let ast = typeChecker.program.ast
+    let moduleId = ast.modules.first(where: { moduleId in
+      return ast[moduleId].baseName == ref.moduleName
+    })
+    guard moduleId != nil else { return nil }
+
+    let moduleScope = AnyScopeID(moduleId!)
+    return resolveReference(identifiers: .init(ref.identifiers), in: moduleScope, exposedTo: exposedTo, using: &typeChecker)
+  }
+  return resolveReference(identifiers: .init(ref.identifiers), in: scope, exposedTo: scope, using: &typeChecker)
+}
+
+public func resolveReference(identifiers: ArraySlice<String>, in scope: AnyScopeID, exposedTo: AnyScopeID, using typeChecker: inout TypeChecker) -> Set<AnyDeclID>? {
+  guard let first = identifiers.first else { return nil }
+
+  return typeChecker.lookup(unqualified: first, in: scope)
+  
+  // let decls = typeChecker.lookup(first, in: scope, exposedTo: exposedTo)
+
+  // let rest = identifiers.dropFirst()
+
+  // if (rest.isEmpty) { return decls }
+
+  // var result = Set<AnyDeclID>()
+
+  // for decl in decls { 
+  //   guard let subRes = resolveReference(identifiers: rest, in: typeChecker.program.nodeToScope[decl]!, exposedTo: exposedTo, using: &typeChecker) else {return nil}
+  //   result.formUnion(subRes)
+  // }
+
+  // return result
+
+}
 
 public func resolveLinkExample() {
     let productName = "myProduct"
 
     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("ExampleModule")
 
+    
     /// An instance that includes just the standard library.
     var ast = AST(ConditionalCompilationFactors())
 
