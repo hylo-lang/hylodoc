@@ -51,8 +51,8 @@ public enum AnyAssetID : Equatable, Hashable {
 }
 
 public struct AssetStore {
-  public var modules: AdaptedEntityStore<ModuleDecl> = .init()
-  public var sourceFiles: AdaptedEntityStore<TranslationUnit> = .init()
+  public var modules: AdaptedEntityStore<ModuleDecl, ModuleAsset> = .init()
+  public var sourceFiles: AdaptedEntityStore<TranslationUnit, SourceFileAsset> = .init()
   public var articles: EntityStore<ArticleAsset> = .init()
   public var otherFiles: EntityStore<OtherLocalFileAsset> = .init()
 }

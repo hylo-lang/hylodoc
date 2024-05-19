@@ -48,40 +48,32 @@ public struct EntityStore<T: IdentifiedEntity> {
   }
 }
 
-/// A protocol that requies a type to have an associated type that
-/// denotes the related documentation type for a given AST node type.
-public protocol HasAssociatedDocumentationTypes {
-  associatedtype DocumentationT: IdentifiedEntity
-}
-
 /// Adapted Entity Store
-public struct AdaptedEntityStore<OriginalASTNodeType: Node & HasAssociatedDocumentationTypes> {
-  public typealias DocumentationT = OriginalASTNodeType.DocumentationT
-
+public struct AdaptedEntityStore<ASTNodeType: Node, StoredDataT: IdentifiedEntity> {
   /// The entity store that stores the documentation entities in contiguous memory for fast lookup by documentation entity IDs.
-  private var entityStore: EntityStore<OriginalASTNodeType.DocumentationT> = .init()
+  private var entityStore: EntityStore<StoredDataT> = .init()
 
   /// A mapping from AST node IDs to documentation entity IDs.
-  private var idMapping: [OriginalASTNodeType.ID: OriginalASTNodeType.DocumentationT.ID] = [:]
+  private var idMapping: [ASTNodeType.ID: StoredDataT.ID] = [:]
 
   /// Returns the documentation entity for the given AST node ID if it exists.
-  public subscript(astNodeId id: OriginalASTNodeType.ID) -> OriginalASTNodeType.DocumentationT? {
+  public subscript(astNodeId id: ASTNodeType.ID) -> StoredDataT? {
     return idMapping[id].flatMap { entityStore[$0] }
   }
 
   /// Returns the documentation entity for the given documentation entity ID if it exists.
-  public subscript(documentationId id: OriginalASTNodeType.DocumentationT.ID) -> OriginalASTNodeType.DocumentationT? {
+  public subscript(documentationId id: StoredDataT.ID) -> StoredDataT? {
     return entityStore[id]
   }
 
   /// Inserts the given documentation entity for the given AST node ID, and returns the documentation ID of the inserted entity.
-  public mutating func insert(_ entity: OriginalASTNodeType.DocumentationT, for id: OriginalASTNodeType.ID) -> DocumentationT.ID {
+  public mutating func insert(_ entity: StoredDataT, for id: ASTNodeType.ID) -> StoredDataT.ID {
     let newID = entityStore.insert(entity)
     idMapping[id] = newID
     return newID
   }
 
-  public func documentationId(of: OriginalASTNodeType.ID) -> OriginalASTNodeType.DocumentationT.ID? {
+  public func documentationId(of: ASTNodeType.ID) -> StoredDataT.ID? {
     return idMapping[of]
   }
 }

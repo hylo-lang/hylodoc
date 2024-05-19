@@ -118,7 +118,7 @@ public func renderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl, with:
 ///   - with: parsed subscript-implementation documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderSubscriptImplementationPage(ctx: GenerationContext, of: SubscriptImpl, with: SubscriptImplDoc) -> String {
+public func renderSubscriptImplementationPage(ctx: GenerationContext, of: SubscriptImpl, with: SubscriptImplDocumentation) -> String {
     return ""
 }
 

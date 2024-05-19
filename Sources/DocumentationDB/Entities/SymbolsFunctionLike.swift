@@ -49,7 +49,7 @@ public struct SubscriptDeclDocumentation: IdentifiedEntity {
 }
 
 /// Additional documentation that is specific to a subscript implementation (let, inout, etc.)
-public struct SubscriptImplDoc: IdentifiedEntity {
+public struct SubscriptImplDocumentation: IdentifiedEntity {
   public let documentation: SubscriptCommonDocumentation
 }
 
