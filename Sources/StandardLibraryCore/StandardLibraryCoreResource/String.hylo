@@ -1,0 +1,24 @@
+/// A Unicode string.
+public type String {
+
+  /// The contents of the string, encoded in UTF8.
+  public var utf8: UTF8Array
+
+  memberwise init
+
+  /// Returns `true` if `self` is empty.
+  public fun is_empty() -> Bool {
+    utf8.is_empty()
+  }
+
+}
+
+public conformance String: Deinitializable {}
+
+public conformance String: Copyable {
+
+  public fun copy() -> Self {
+    String(utf8: utf8.copy())
+  }
+
+}

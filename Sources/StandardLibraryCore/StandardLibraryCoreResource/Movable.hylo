@@ -1,0 +1,21 @@
+/// A type whose values can be relocated to different storage.
+public trait Movable {
+
+  /// Gives `self` the value of a consumed `source`.
+  fun take_value(from source: sink Self) {
+    set
+    inout
+  }
+
+}
+
+public extension Movable {
+
+  /// Exchanges the value of `self` with that of `other`.
+  public fun exchange(with other: inout Self) inout {
+    sink let x = self
+    &self = other
+    &other = x
+  }
+
+}

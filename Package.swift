@@ -31,7 +31,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.0"),
     .package(url: "https://github.com/apple/swift-format", branch: "release/5.10"),
     // .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
-    .package(url: "https://github.com/tothambrus11/hylo.git", branch: "main"),
+    .package(url: "https://github.com/tothambrus11/hylo.git", branch: "publish-lookup-functions"),
     .package(url: "https://github.com/johnxnguyen/Down", from: "0.11.0"),
     .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.15.1")
   ],
@@ -77,12 +77,12 @@ let package = Package(
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "WebsiteGenTests",
-      dependencies: ["WebsiteGen"],
+      dependencies: ["WebsiteGen", "StandardLibraryCore"],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "DocExtractorTests",
-      dependencies: ["DocExtractor"],
+      dependencies: ["DocExtractor", "StandardLibraryCore"],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
@@ -95,5 +95,11 @@ let package = Package(
       dependencies: ["hdc"],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
+    .target(
+      name: "StandardLibraryCore",
+      dependencies: [.product(name: "FrontEnd", package: "hylo")],
+      resources: [.copy("StandardLibraryCoreResource")],
+      swiftSettings: allTargetsSwiftSettings
+    )
   ]
 )

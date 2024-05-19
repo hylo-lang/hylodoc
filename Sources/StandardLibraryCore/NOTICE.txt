@@ -1,0 +1,7 @@
+This module is copied from the open source Hylo project under the Apache 2.0 license which is available at
+https://github.com/hylo-lang/hylo
+
+We copied the core part of the standard library to our code base to ease the testing of our documentation compiler
+and extended it with some additional functions that help importing the library as an AST module.
+
+The original code is available at https://github.com/hylo-lang/hylo/tree/main/StandardLibrary/Sources/Core

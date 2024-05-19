@@ -1,0 +1,2 @@
+/// A memory address.
+typealias MemoryAddress = PointerToMutable<Never>
