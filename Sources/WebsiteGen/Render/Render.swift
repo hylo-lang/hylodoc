@@ -11,14 +11,14 @@ import DocumentationDB
 /// - Returns: the contents of the rendered page
 public func renderAssetPage(ctx: GenerationContext, of: AnyAssetID) -> String {
     switch of {
-    case .module(let id):
-        let module = ctx.documentation.assetStore.modules[documentationId: id]!
-        return renderModulePage(ctx: ctx, of: module)
+    case .folder(let id):
+        let folder = ctx.documentation.assets.folders[id]!
+        return renderFolderPage(ctx: ctx, of: folder)
     case .sourceFile(let id):
-        let sourceFile = ctx.documentation.assetStore.sourceFiles[documentationId: id]!
+        let sourceFile = ctx.documentation.assets.sourceFiles[documentationId: id]!
         return renderSourceFilePage(ctx: ctx, of: sourceFile)
     case .article(let id):
-        let article = ctx.documentation.assetStore.articles[id]!
+        let article = ctx.documentation.assets.articles[id]!
         return renderArticlePage(ctx: ctx, of: article)
     case .otherFile(_):
         // Generic asset, like an image

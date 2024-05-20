@@ -21,14 +21,14 @@ public protocol Exporter {
 public func generateAsset(ctx: GenerationContext, of: AnyAssetID, to: inout URL, with: Exporter) {
     if case AnyAssetID.otherFile(let id) = of {
         // Copy file to target
-        let otherFile = ctx.documentation.assetStore.otherFiles[id]!
+        let otherFile = ctx.documentation.assets.otherFiles[id]!
         with.file(from: URL(fileURLWithPath: otherFile.fileName), to: to)
         return
     }
     
     // Create directory structure
     switch of {
-    case .module(_),
+    case .folder(_),
         .sourceFile(_):
         // Create directory
         with.directory(to: to)

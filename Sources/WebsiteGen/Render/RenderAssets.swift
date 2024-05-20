@@ -23,14 +23,17 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset) -> Strin
     return ""
 }
 
-/// Render the module page
+/// Renders the page for a folder
+/// 
+/// Displays the folder title as a title, optionally the content of the related article (FolderAsset.documentation), 
+/// and a list of child assets along with links and their summaries.
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: module asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderModulePage(ctx: GenerationContext, of: ModuleAsset) -> String {
+public func renderFolderPage(ctx: GenerationContext, of: FolderAsset) -> String {
     return ""
 }
 

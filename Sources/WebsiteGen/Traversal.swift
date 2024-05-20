@@ -33,16 +33,16 @@ private func traverseAssets(ctx: GenerationContext, root: AnyAssetID, visitor: D
     visitor.visitAsset(path: path, assetId: root)
     
     switch root {
-    case .module(let id):
+    case .folder(let id):
         // Traverse children
-        let module = ctx.documentation.assetStore.modules[documentationId: id]!
-        module.children.forEach {
+        let folder = ctx.documentation.assets.folders[id]!
+        folder.children.forEach {
             child in traverseAssets(ctx: ctx, root: child, visitor: visitor, path: &path)
         }
         break
     case .sourceFile(let id):
         // Traverse children
-        let sourceFile = ctx.documentation.assetStore.sourceFiles[documentationId: id]!
+        let sourceFile = ctx.documentation.assets.sourceFiles[documentationId: id]!
         ctx.typedProgram.ast[sourceFile.translationUnit]!.decls.forEach {
             child in traverseSymbols(ctx: ctx, root: child, visitor: visitor, path: &path)
         }

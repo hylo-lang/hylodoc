@@ -1,15 +1,15 @@
 import FrontEnd
 import DequeModule
 
-/// An asset representing a module in the project, which is essentially a folder containing other assets.
-public struct ModuleAsset : IdentifiedEntity {
+/// An asset representing a folder in the project, containing other assets.
+public struct FolderAsset : IdentifiedEntity {
   /// The name of the module (the folder name)
   public let name: String
 
-  /// The documentation article for the module, if exists
+  /// The documentation article for the module, if exists (index.hylodoc)
   public let documentation: ArticleAsset.ID?
 
-  /// The list of child assets in this module
+  /// The list of child assets in this folder
   public let children: [AnyAssetID]
 }
 
@@ -27,6 +27,7 @@ public struct ArticleAsset : IdentifiedEntity {
 
 // Sourcefile-level documentation
 public struct SourceFileAsset: IdentifiedEntity {
+  public let fileName: String
   public let generalDescription: GeneralDescriptionFields
   public let translationUnit: TranslationUnit.ID
 }
@@ -46,12 +47,12 @@ public struct OtherLocalFileAsset : IdentifiedEntity {
 public enum AnyAssetID : Equatable, Hashable {
   case sourceFile(SourceFileAsset.ID)
   case article(ArticleAsset.ID)
-  case module(ModuleAsset.ID)
+  case folder(FolderAsset.ID)
   case otherFile(OtherLocalFileAsset.ID)
 }
 
 public struct AssetStore {
-  public var modules: AdaptedEntityStore<ModuleDecl, ModuleAsset> = .init()
+  public var folders: EntityStore<FolderAsset> = .init()
   public var sourceFiles: AdaptedEntityStore<TranslationUnit, SourceFileAsset> = .init()
   public var articles: EntityStore<ArticleAsset> = .init()
   public var otherFiles: EntityStore<OtherLocalFileAsset> = .init()

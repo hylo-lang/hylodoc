@@ -7,43 +7,32 @@ final class DocumentationDBWorks: XCTestCase {
   func insertElements() {
     var db = DocumentationDatabase()
 
-    // These are the IDs coming from the AST.
-    let rootModuleASTNodeId : ModuleDecl.ID = .init(rawValue: 0)
-    let childModuleASTNodeId : ModuleDecl.ID = .init(rawValue: 1)
-
     // These are the IDs that can be used to efficiently refer to the documentation entities.
-    let childModuleDocId = db.assetStore.modules.insert(
+    let childFolderDocId = db.assets.folders.insert(
         .init(
-            name: "ChildModule", 
+            name: "ChildFolder", 
             documentation: nil,
             children: []
-        ), 
-        for: childModuleASTNodeId
+        )
     )
 
-    let parentModuleDocId = db.assetStore.modules.insert(
+    let parentFolderDocId = db.assets.folders.insert(
         .init(
-            name: "RootModule", 
+            name: "RootFolder", 
             documentation: nil,
             children: [
-                AnyAssetID.module(childModuleDocId)
+                AnyAssetID.folder(childFolderDocId)
             ]
-        ),
-        for: rootModuleASTNodeId
+        )
     )
 
     // Check if the data can be retrieved correctly by documentation id
-    XCTAssertEqual(db.assetStore.modules[documentationId: parentModuleDocId]?.name, "RootModule")
+    XCTAssertEqual(db.assets.folders[parentFolderDocId]?.name, "RootFolder")
     
-    let childAssetIds = db.assetStore.modules[documentationId: parentModuleDocId]!.children
+    let childAssetIds = db.assets.folders[parentFolderDocId]!.children
     XCTAssertEqual(childAssetIds.count, 1)
-    XCTAssertEqual(childAssetIds[0], AnyAssetID.module(childModuleDocId))
+    XCTAssertEqual(childAssetIds[0], AnyAssetID.folder(childFolderDocId))
 
-    XCTAssertEqual(db.assetStore.modules[documentationId: childModuleDocId]?.name, "ChildModule")
-
-
-    // Check if the data can be retrieved correctly by AST id
-    XCTAssertEqual(db.assetStore.modules[astNodeId: rootModuleASTNodeId]?.name, "RootModule")
-    XCTAssertEqual(db.assetStore.modules[astNodeId: childModuleASTNodeId]?.name, "ChildModule")
+    XCTAssertEqual(db.assets.folders[childFolderDocId]?.name, "ChildFolder")
   }
 }
