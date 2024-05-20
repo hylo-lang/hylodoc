@@ -10,4 +10,7 @@ public struct DocumentationDatabase {
 
   /// The list of modules that we have documentation for.
   public var modules: EntityStore<ModuleInfo> = .init()
+
+  // default initializer public:
+  public init() {}
 }
