@@ -6,7 +6,7 @@ public struct FolderAsset : IdentifiedEntity {
   /// The name of the module (the folder name)
   public let name: String
 
-  /// The documentation article for the module, if exists (index.hylodoc)
+  /// The documentation article for the module, if exists (a index.hylodoc file located in this folder)
   public let documentation: ArticleAsset.ID?
 
   /// The list of child assets in this folder
