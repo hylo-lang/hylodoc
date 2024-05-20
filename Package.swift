@@ -32,7 +32,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-format", branch: "release/5.10"),
     // .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
     .package(url: "https://github.com/tothambrus11/hylo.git", branch: "publish-lookup-functions"),
-    .package(url: "https://github.com/johnxnguyen/Down", from: "0.11.0"),
+    .package(url: "https://github.com/objecthub/swift-markdownkit.git", from: "1.1.8"),
     .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.15.1")
   ],
   targets: [
@@ -50,7 +50,8 @@ let package = Package(
     .target(
       name: "DocumentationDB",
       dependencies: [
-        .product(name: "FrontEnd", package: "hylo")
+        .product(name: "FrontEnd", package: "hylo"),
+        .product(name: "MarkdownKit", package: "swift-markdownkit")
       ],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
@@ -58,7 +59,7 @@ let package = Package(
       name: "DocExtractor",
       dependencies: [
         "DocumentationDB",
-        .product(name: "Down", package: "Down"),
+        .product(name: "MarkdownKit", package: "swift-markdownkit"),
         .product(name: "FrontEnd", package: "hylo"),
         // todo add this once Hylo exports the library properly: .product(name: "FrontEnd", package: "hylo"),
       ],

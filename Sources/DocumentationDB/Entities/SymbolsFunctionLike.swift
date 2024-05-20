@@ -1,3 +1,5 @@
+import MarkdownKit
+
 /// Documentation of a free function declaration (not a method) or a static function declaration.
 public struct FunctionDocumentation: IdentifiedEntity {
   public let documentation: CommonFunctionDocumentation
@@ -73,30 +75,30 @@ public struct SynthesizedFunctionDocumentation {}
 /// Documentation of the returned value of a function or method
 public enum ReturnsInfo {
   /// Used when there is one paragraph of `# Returns:` documentation.
-  case always(AnyMarkdownNodeID)
+  case always(Block)
   
   /// Used when the function returns different information in different cases.
   /// This can be expressed as adding list items after the `# Returns:` section header. 
-  case cases([AnyMarkdownNodeID])
+  case cases([Block])
 }
 
 /// Documentation of the yielded value of a subscript or property
 public enum YieldsInfo {
   /// Used when there is one paragraph of `# Yields:` documentation.
-  case always(AnyMarkdownNodeID)
+  case always(Block)
   
   /// Used when the function returns different information in different cases.
   /// This can be expressed as adding list items after the `# Yields:` section header. 
-  case cases([AnyMarkdownNodeID])
+  case cases([Block])
 }
 
 
 /// Documentation of the behavior of a function-like when it throws an exception.
 public enum ThrowsInfo {
   /// Used when there is one paragraph of `# Throws:` documentation.
-  case generally(AnyMarkdownNodeID)
+  case generally(Block)
 
   /// Used when the function throws different exceptions in different cases and the
   /// developer wants to document these cases separately in a list form.
-  case cases([AnyMarkdownNodeID])
+  case cases([Block])
 }

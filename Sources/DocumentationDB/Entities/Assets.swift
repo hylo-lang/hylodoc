@@ -1,5 +1,6 @@
 import FrontEnd
 import DequeModule
+import MarkdownKit
 
 /// An asset representing a folder in the project, containing other assets.
 public struct FolderAsset : IdentifiedEntity {
@@ -21,7 +22,7 @@ public struct ArticleAsset : IdentifiedEntity {
   public let title: String?
 
   /// The content of the article, excluding the first-level heading at the beginning, if present.
-  public let content: AnyMarkdownNodeID
+  public let content: Block
 }
 
 

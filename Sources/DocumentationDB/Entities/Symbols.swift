@@ -2,12 +2,13 @@
 /// This file contains the data stored about symbols in the documentation database.
 
 import FrontEnd
+import MarkdownKit
 
 /// Description fields that are common to all kinds of symbol documentation entities.
 public struct GeneralDescriptionFields {
-  public let summary: AnyMarkdownNodeID?
-  public let description: AnyMarkdownNodeID?
-  public let seeAlso: [AnyMarkdownNodeID] // probably a link but it can also be just a text referring to something
+  public let summary: Block?
+  public let description: Block?
+  public let seeAlso: [Block] // probably a link but it can also be just a text referring to something
 }
 
 /// Documentation of a typealias declaration
@@ -16,25 +17,25 @@ public struct TypeAliasDocumentation: IdentifiedEntity {
 }
 
 public struct Invariant {
-  public let description: AnyMarkdownNodeID
+  public let description: Block
 }
 public struct Precondition {
-  public let description: AnyMarkdownNodeID
+  public let description: Block
 }
 public struct Postcondition {
-  public let description: AnyMarkdownNodeID
+  public let description: Block
 }
 
 
 public struct GenericParameterDocumentation {
-  public let description: AnyMarkdownNodeID
+  public let description: Block
 }
 
 /// A map that associates each generic parameter declaration with its documentation.
 public typealias GenericParameterDocumentations = [GenericParameterDecl.ID : GenericParameterDocumentation]
 
 public struct ParameterDocumentation {
-  public let description: AnyMarkdownNodeID
+  public let description: Block
 }
 
 /// A map that associates each parameter declaration with its documentation.
