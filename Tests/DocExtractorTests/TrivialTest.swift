@@ -85,6 +85,12 @@ final class MarkdownParsingTests: XCTestCase {
 
     do {
       let apiresult = try parseMarkdown(from: codeLines)
+
+      guard case .apiDoc = apiresult.type else {
+        XCTFail("Not interpreted as Api Doc")
+        return
+      }
+
       let blocks = apiresult.content
       if !blocks.isEmpty {
         for block in blocks {
@@ -157,6 +163,11 @@ final class MarkdownParsingTests: XCTestCase {
 
     do {
       let apiresult = try parseMarkdown(from: codeLines)
+
+      guard case .fileDoc = apiresult.type else {
+        XCTFail("Not interpreted as Api Doc")
+        return
+      }
 
       let blocks = apiresult.content
 

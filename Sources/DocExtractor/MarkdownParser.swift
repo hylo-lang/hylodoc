@@ -52,10 +52,17 @@ func processCommentLines(_ lines: [String]) throws -> [String] {
   return processedLines
 }
 
+public enum DocType {
+  case fileDoc
+  case apiDoc
+  //  case sectionDoc
+}
+
 // Data structure for parsing result
 public struct MarkdownDocResult {
   var content: [Block]
   var specialSections: [SpecialSection]
+  let type: DocType
 }
 
 public struct SpecialSection {
@@ -109,8 +116,27 @@ func parseMarkdownHelper(_ document: Blocks) throws -> MarkdownDocResult {
     sections.append(section)
   }
 
+  let docType = try! getDocType(content: content, sections: sections)
+
   return MarkdownDocResult(
     content: content,
-    specialSections: sections
+    specialSections: sections,
+    type: docType
   )
+}
+
+func getDocType(content: [Block], sections: [SpecialSection]) throws -> DocType {
+  if content.isEmpty {
+    if !sections.isEmpty {
+      if sections.first!.name == "File-level:" || sections.first!.name == "File-level" {
+        return .fileDoc
+      } else {
+        return .apiDoc
+      }
+    } else {
+      throw MarkdownParserError.improperStructure("No content and no special sections detected")
+    }
+  } else {
+    return .apiDoc
+  }
 }
