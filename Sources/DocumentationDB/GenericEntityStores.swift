@@ -57,12 +57,18 @@ public struct AdaptedEntityStore<ASTNodeType: Node, StoredDataT: IdentifiedEntit
   private var idMapping: [ASTNodeType.ID: StoredDataT.ID] = [:]
 
   /// Returns the documentation entity for the given AST node ID if it exists.
-  public subscript(astNodeId id: ASTNodeType.ID) -> StoredDataT? {
+  /// 
+  /// - Parameters:
+  ///   - id: The AST node ID to look up.
+  public subscript(_ id: ASTNodeType.ID) -> StoredDataT? {
     return idMapping[id].flatMap { entityStore[$0] }
   }
 
   /// Returns the documentation entity for the given documentation entity ID if it exists.
-  public subscript(documentationId id: StoredDataT.ID) -> StoredDataT? {
+  /// 
+  /// - Parameters:
+  ///   - id: The documentation entity ID to look up.
+  public subscript(_ id: StoredDataT.ID) -> StoredDataT? {
     return entityStore[id]
   }
 

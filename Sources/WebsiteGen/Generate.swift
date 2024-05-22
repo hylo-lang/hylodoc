@@ -22,7 +22,7 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, to: inout URL,
     if case AnyAssetID.otherFile(let id) = of {
         // Copy file to target
         let otherFile = ctx.documentation.assets.otherFiles[id]!
-        with.file(from: URL(fileURLWithPath: otherFile.fileName), to: to)
+        with.file(from: otherFile.location, to: to)
         return
     }
     

@@ -42,7 +42,7 @@ private func traverseAssets(ctx: GenerationContext, root: AnyAssetID, visitor: D
         break
     case .sourceFile(let id):
         // Traverse children
-        let sourceFile = ctx.documentation.assets.sourceFiles[documentationId: id]!
+        let sourceFile = ctx.documentation.assets.sourceFiles[id]!
         ctx.typedProgram.ast[sourceFile.translationUnit]!.decls.forEach {
             child in traverseSymbols(ctx: ctx, root: child, visitor: visitor, path: &path)
         }
