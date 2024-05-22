@@ -4,9 +4,9 @@ import FrontEnd
 
 /// Protocol responsible for how to store assets and other pages
 public protocol Exporter {
-    func file(from: URL, to: URL)
-    func html(content: String, to: URL)
-    func directory(to: URL)
+    func file(from: URL, to: URL) throws
+    func html(content: String, to: URL) throws
+    func directory(to: URL) throws
 }
 
 /// Render and export an arbitrary asset page
@@ -16,33 +16,21 @@ public protocol Exporter {
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: asset to render page of
-///   - to: file location to export the content to
 ///   - with: exporter, used to handle file writes and directory creation
-public func generateAsset(ctx: GenerationContext, of: AnyAssetID, to: inout URL, with: Exporter) throws {
-    if case AnyAssetID.otherFile(let id) = of {
+public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter) throws {
+    let target = ctx.urlResolver.pathToFile(target: .asset(of))
+
+    // Handle other file
+    if case .otherFile(let id) = of {
         // Copy file to target
         let otherFile = ctx.documentation.assets.otherFiles[id]!
-        with.file(from: otherFile.location, to: to)
+        try with.file(from: otherFile.location, to: target)
         return
     }
-    
-    // Create directory structure
-    switch of {
-    case .folder(_),
-        .sourceFile(_):
-        // Create directory
-        with.directory(to: to)
-        
-        // Extend path to write page to index.html in directory
-        to.appendPathComponent("index.html")
-        break
-    default:
-        break
-    }
-    
+
     // Render and export page
     let content = try renderAssetPage(ctx: ctx, of: of)
-    with.html(content: content, to: to)
+    with.html(content: content, to: target)
 }
 
 /// Render and export an arbitrary symbol page
@@ -50,9 +38,37 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, to: inout URL,
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: symbol to render page of
-///   - to: file location to export the content to
-public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, to: URL, with: Exporter) {
+public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter) throws {
+    let target = ctx.urlResolver.pathToFile(target: .symbol(of))
+
     // Render and export page
     let content = renderSymbolPage(ctx: ctx, of: of)
-    with.html(content: content, to: to)
+    try with.html(content: content, to: target)
+}
+
+public struct DefaultExporter : Exporter {
+    public func file(from: URL, to: URL) throws {
+        // Create parent directory structure
+        let url = URL(fileURLWithPath: "", relativeTo: to)
+        let parentDirectory: URL = url.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
+
+        // Copy file
+        try FileManager.default.copyItem(at: from, to: to)
+    }
+
+    public func html(content: String, to: URL) throws {
+        // Create parent directory structure
+        let url = URL(fileURLWithPath: "", relativeTo: to)
+        let parentDirectory: URL = url.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
+
+        // Write file
+        try content.write(to: to, atomically: false, encoding: String.Encoding.utf8)
+    }
+
+    public func directory(to: URL) throws {
+        // Create directory and parents
+        try FileManager.default.createDirectory(at: to, withIntermediateDirectories: true)
+    }
 }

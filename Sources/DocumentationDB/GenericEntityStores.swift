@@ -26,7 +26,7 @@ public struct DocumentationID<T: IdentifiedEntity>: DocumentationIDProtocol,
   }
 }
 
-public protocol ReadableEntityStoreProtocol {
+public protocol ReadableEntityStoreProtocol: Sequence {
   associatedtype Entity: IdentifiedEntity
   subscript(_ id: DocumentationID<Entity>) -> Entity? { get }
 }
@@ -58,6 +58,11 @@ public struct EntityStore<T: IdentifiedEntity> : ReadableEntityStoreProtocol {
 
   public init<S>(from entities: S) where S: Sequence, S.Element == T {
     self.entities = Array(entities)
+  }
+
+  /// conformance to Sequence protocol
+  public func makeIterator() -> some IteratorProtocol<T> {
+    return entities.makeIterator()
   }
 }
 
@@ -103,5 +108,10 @@ public struct AdaptedEntityStore<ASTNodeType: Node, StoredDataT: IdentifiedEntit
 
   public func documentationId(of: ASTNodeType.ID) -> StoredDataT.ID? {
     return idMapping[of]
+  }
+
+  /// conformance to Sequence protocol
+  public func makeIterator() -> some IteratorProtocol<StoredDataT> {
+    return entityStore.makeIterator()
   }
 }
