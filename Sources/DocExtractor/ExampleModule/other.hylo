@@ -1,6 +1,8 @@
 
 public let a = 1
 
+/// for A
+/// Nice :)
 public type A {
     public let b = 4
     public property c: Builtin.word { b }

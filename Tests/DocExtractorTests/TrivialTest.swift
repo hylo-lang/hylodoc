@@ -4,6 +4,7 @@ import XCTest
 
 final class DealerTests: XCTestCase {
   func testIsEven() {
-    extractData()
+    // extractData()
+    extractComments()
   }
 }

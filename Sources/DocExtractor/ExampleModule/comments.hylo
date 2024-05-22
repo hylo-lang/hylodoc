@@ -1,0 +1,24 @@
+/// # File-Level
+/// wow nice file bro
+
+/// for MyType
+public type MyType {
+    
+    /// for InnerType
+    type InnerType {
+        /// for test
+
+        fun test() {}
+    }
+}
+
+/// Random
+  /// Stuff
+
+
+
+let x = "";
+/// aasdasd
+
+///as 
+/// asd
