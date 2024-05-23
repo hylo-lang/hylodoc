@@ -28,7 +28,7 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset) throws -
         arr["name"] = title
     }
     else {
-        arr["name"] = of.name
+        arr["name"] = of.name.components(separatedBy: ".").first!
     }
 
     arr["content"] = HtmlGenerator.standard.generate(block: of.content)

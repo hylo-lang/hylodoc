@@ -19,7 +19,7 @@ public func renderAssetPage(ctx: GenerationContext, of: AnyAssetID) throws -> St
         return renderSourceFilePage(ctx: ctx, of: sourceFile)
     case .article(let id):
         let article = ctx.documentation.assets.articles[id]!
-        return renderArticlePage(ctx: ctx, of: article)
+        return try renderArticlePage(ctx: ctx, of: article)
     case .otherFile(_):
         // Generic asset, like an image
         return ""
