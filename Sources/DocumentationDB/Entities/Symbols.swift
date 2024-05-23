@@ -5,10 +5,16 @@ import FrontEnd
 import MarkdownKit
 
 /// Description fields that are common to all kinds of symbol documentation entities.
-public struct GeneralDescriptionFields {
+public struct GeneralDescriptionFields : Equatable {
   public let summary: Block?
   public let description: Block?
   public let seeAlso: [Block] // probably a link but it can also be just a text referring to something
+
+  public init(summary: Block?, description: Block?, seeAlso: [Block]) {
+    self.summary = summary
+    self.description = description
+    self.seeAlso = seeAlso
+  }
 }
 
 /// Documentation of a typealias declaration
@@ -43,7 +49,7 @@ public typealias ParameterDocumentations = [ParameterDecl.ID : ParameterDocument
 
 
 /// A collection of documentation information for symbols, organized by symbol kind.
-public struct SymbolStore {
+public struct SymbolDocStore {
   public var associatedTypeDocs: AdaptedEntityStore<AssociatedTypeDecl, AssociatedTypeDocumentation> = .init()
   public var associatedValueDocs: AdaptedEntityStore<AssociatedValueDecl, AssociatedValueDocumentation> = .init()
   public var TypeAliasDocs: AdaptedEntityStore<TypeAliasDecl, TypeAliasDocumentation> = .init()
@@ -59,4 +65,6 @@ public struct SymbolStore {
 
   public var traitDocs: AdaptedEntityStore<TraitDecl, TraitDocumentation> = .init()
   public var productTypeDocs: AdaptedEntityStore<ProductTypeDecl, ProductTypeDocumentation> = .init()
+
+  public init() {}
 }

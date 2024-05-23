@@ -4,12 +4,15 @@ import FrontEnd
 import MarkdownKit
 
 /// A protocol for assets in the documentation database.
-public protocol Asset {
+public protocol Asset : IdentifiedEntity {
   /// The location of the asset on the filesystem.
   var location: URL { get }
 
   /// Either the file or folder name of the asset.
   var name: String { get }
+
+  associatedtype EntityStoreT: ReadableEntityStoreProtocol where EntityStoreT.Entity == Self
+  static func specificStore(from: AssetStore) -> EntityStoreT
 }
 
 /// Default implementation to get name from the location's last path component.
@@ -34,10 +37,15 @@ public struct FolderAsset: IdentifiedEntity, Asset {
     self.documentation = documentation
     self.children = children
   }
+
+  public typealias EntityStoreT = EntityStore<FolderAsset>
+  public static func specificStore(from assets: AssetStore) -> EntityStoreT {
+    return assets.folders
+  }
 }
 
 /// An asset representing an article in the project, which is stored inside a .hylodoc file.
-public struct ArticleAsset: IdentifiedEntity, Asset {
+public struct ArticleAsset: IdentifiedEntity, Asset, Equatable {
   public let location: URL
 
   /// The title of the article, if present at the beginning of the document
@@ -51,10 +59,15 @@ public struct ArticleAsset: IdentifiedEntity, Asset {
     self.title = title
     self.content = content
   }
+
+  public typealias EntityStoreT = EntityStore<ArticleAsset>
+  public static func specificStore(from assets: AssetStore) -> EntityStoreT {
+    return assets.articles
+  }
 }
 
 // Sourcefile-level documentation
-public struct SourceFileAsset: IdentifiedEntity, Asset {
+public struct SourceFileAsset: IdentifiedEntity, Asset, Equatable {
   public let location: URL
 
   /// The optional file-level documentation for the source file.
@@ -62,16 +75,32 @@ public struct SourceFileAsset: IdentifiedEntity, Asset {
 
   /// The translation unit ID that this source file belongs to.
   public let translationUnit: TranslationUnit.ID
+
+  public init(location: URL, generalDescription: GeneralDescriptionFields, translationUnit: TranslationUnit.ID) {
+    self.location = location
+    self.generalDescription = generalDescription
+    self.translationUnit = translationUnit
+  }
+
+  public typealias EntityStoreT = AdaptedEntityStore<TranslationUnit, SourceFileAsset>
+  public static func specificStore(from assets: AssetStore) -> EntityStoreT {
+    return assets.sourceFiles
+  }
 }
 
 /// An asset representing any other kind of file in the project - e.g. images, attachments, etc.
 ///
 /// This is useful for linking to files in the project that are not source files.
-public struct OtherLocalFileAsset: IdentifiedEntity, Asset {
+public struct OtherLocalFileAsset: IdentifiedEntity, Asset, Equatable {
   public let location: URL
 
-  init(location: URL) {
+  public init(location: URL) {
     self.location = location
+  }
+
+  public typealias EntityStoreT = EntityStore<OtherLocalFileAsset>
+  public static func specificStore(from assets: AssetStore) -> EntityStoreT {
+    return assets.otherFiles
   }
 }
 
@@ -84,6 +113,19 @@ public enum AnyAssetID: Equatable, Hashable {
   case article(ArticleAsset.ID)
   case folder(FolderAsset.ID)
   case otherFile(OtherLocalFileAsset.ID)
+
+  public init(from: SourceFileAsset.ID) {
+    self = .sourceFile(from)
+  }
+  public init(from: ArticleAsset.ID) {
+    self = .article(from)
+  }
+  public init(from: FolderAsset.ID) {
+    self = .folder(from)
+  }
+  public init(from: OtherLocalFileAsset.ID) {
+    self = .otherFile(from)
+  }
 }
 
 public struct AssetStore {
@@ -104,4 +146,24 @@ public struct AssetStore {
       return otherFiles[id]?.location
     }
   }
+
+  public subscript(_ id: AnyAssetID) -> (any Asset)? {
+    switch id {
+    case .sourceFile(let id):
+      return sourceFiles[id]
+    case .article(let id):
+      return articles[id]
+    case .folder(let id):
+      return folders[id]
+    case .otherFile(let id):
+      return otherFiles[id]
+    }
+  }
+
+  public subscript<T: Asset>(_ id: T.ID) -> T? {
+    let a = T.specificStore(from: self)
+    return a[id]
+  }
+
+  public init() {}
 }
