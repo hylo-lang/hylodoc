@@ -18,7 +18,7 @@ public protocol Exporter {
 ///   - of: asset to render page of
 ///   - to: file location to export the content to
 ///   - with: exporter, used to handle file writes and directory creation
-public func generateAsset(ctx: GenerationContext, of: AnyAssetID, to: inout URL, with: Exporter) {
+public func generateAsset(ctx: GenerationContext, of: AnyAssetID, to: inout URL, with: Exporter) throws {
     if case AnyAssetID.otherFile(let id) = of {
         // Copy file to target
         let otherFile = ctx.documentation.assets.otherFiles[id]!
@@ -41,7 +41,7 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, to: inout URL,
     }
     
     // Render and export page
-    let content = renderAssetPage(ctx: ctx, of: of)
+    let content = try renderAssetPage(ctx: ctx, of: of)
     with.html(content: content, to: to)
 }
 

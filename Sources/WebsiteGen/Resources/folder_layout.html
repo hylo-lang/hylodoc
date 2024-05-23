@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block header %}
+    <div class="section">
+        <h1>{{ name }}</h1>
+    </div>
+{% endblock %}
+{% block content %}
+    {% if overview %}
+        <h2>Overview</h2>
+        {{ overview|default: "DEFAULT_OVERVIEW" }}
+    {% endif %}
+    {% if children %}
+        <h2>Topics</h2>
+        {% for childTitle,childUrl in children %}<a href="{{ childUrl }}">{{ childTitle }}</a>{% endfor %}
+    {% endif %}
+{% endblock %}

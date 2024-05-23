@@ -9,11 +9,11 @@ import DocumentationDB
 ///   - of: asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderAssetPage(ctx: GenerationContext, of: AnyAssetID) -> String {
+public func renderAssetPage(ctx: GenerationContext, of: AnyAssetID) throws -> String {
     switch of {
     case .folder(let id):
         let folder = ctx.documentation.assets.folders[id]!
-        return renderFolderPage(ctx: ctx, of: folder)
+        return try renderFolderPage(ctx: ctx, of: folder)
     case .sourceFile(let id):
         let sourceFile = ctx.documentation.assets.sourceFiles[id]!
         return renderSourceFilePage(ctx: ctx, of: sourceFile)
