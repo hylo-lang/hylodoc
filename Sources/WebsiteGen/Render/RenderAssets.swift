@@ -21,8 +21,19 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) ->
 ///   - of: article asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset) -> String {
-    return ""
+public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset) throws -> String {
+    var arr: [String: Any] = [:]
+
+    if let title = of.title {
+        arr["name"] = title
+    }
+    else {
+        arr["name"] = of.name
+    }
+
+    arr["content"] = HtmlGenerator.standard.generate(block: of.content)
+
+    return try ctx.stencil.renderTemplate(name: "article_layout.html", context: arr)
 }
 
 /// Renders the page for a folder
