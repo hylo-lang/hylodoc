@@ -1,6 +1,7 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
+import PathWrangler
 import Stencil
 
 public struct GenerationContext {
@@ -13,11 +14,13 @@ public struct GenerationContext {
 /// Render the full documentation website
 ///
 /// - Parameters:
-///   - db: documentation database
-///   - ast: abstract syntax tree
-///   - rootModule: the identity of the root module
+///   - documentation: documentation database
+///   - typedProgram: typed program
+///   - target: directory to export documentation to
 public func generateDocumentation(
-  documentation: DocumentationDatabase, typedProgram: TypedProgram, target: URL
+  documentation: DocumentationDatabase,
+  typedProgram: TypedProgram,
+  target: URL
 ) {
   // Setup Context
   let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
@@ -25,7 +28,7 @@ public func generateDocumentation(
     documentation: documentation,
     stencil: stencil,
     typedProgram: typedProgram,
-    urlResolver: URLResolver()
+    urlResolver: URLResolver(baseUrl: AbsolutePath(url: target)!)
   )
 
   // Resolve URL's

@@ -1,49 +1,36 @@
 import Foundation
+import PathWrangler
 
 public struct URLResolver {
-  private var references: [AnyTargetID: (URL, Int)] = [:]
+  private var references: [AnyTargetID: RelativePath] = [:]
+  private let baseUrl: AbsolutePath
+
+  public init(baseUrl: AbsolutePath) {
+    self.baseUrl = baseUrl
+  }
 
   // Resolve the reference to a target
-  public mutating func resolve(path: TargetPath) {
-    references[path.target()] = (path.url(), path.depth())
+  public mutating func resolve(target: AnyTargetID, filePath: RelativePath) {
+    references[target] = filePath
   }
 
   // Get the file path of the target
   public func pathToFile(target: AnyTargetID) -> URL {
-    return references[target]!.0
+    return URL(path: references[target]!.absolute(in: baseUrl))
   }
 
   // Get the relative path of the target to the root
-  public func pathToRoot(target: AnyTargetID) -> URL {
-    return URL(fileURLWithPath: String(repeating: "../", count: references[target]!.1))
+  public func pathToRoot(target: AnyTargetID) -> RelativePath {
+    let depth = references[target]!.pathString.filter { $0 == "/" }.count
+    return RelativePath(pathString: String(repeating: "../", count: depth))
   }
 
   // Get a url referencing from one target to another
-  public func refer(from: AnyTargetID, to: AnyTargetID) -> URL {
-    // Refers to itself
-    if from == to {
-      return URL(fileURLWithPath: "")
-    }
+  public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath {
+    let fromUrl = references[from]!
+    let toUrl = references[to]!
 
-    // Get path components
-    let fromFile = pathToFile(target: from).pathComponents
-    let toFile = pathToFile(target: to).pathComponents
-
-    // Find how many parts are similar
-    var similar = 0
-    let maxSimilar = min(fromFile.count, toFile.count) - 1  // the actual file can not be similar
-    while similar < maxSimilar && fromFile[similar] == toFile[similar] {
-      similar += 1
-    }
-
-    // Construct url keeping common parents in mind
-    var url = URL(fileURLWithPath: String(repeating: "../", count: fromFile.count - similar))
-    while similar < toFile.count {
-      url.appendPathComponent(toFile[similar])
-      similar += 1
-    }
-
-    return url
+    return fromUrl.refer(to: toUrl)
   }
 
 }
@@ -56,6 +43,6 @@ public struct URLResolvingVisitor: DocumentationVisitor {
   }
 
   public mutating func visit(path: TargetPath) {
-    urlResolver.resolve(path: path)
+    urlResolver.resolve(target: path.target(), filePath: path.url())
   }
 }

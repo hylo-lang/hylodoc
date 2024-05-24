@@ -1,5 +1,6 @@
 import DocumentationDB
 import MarkdownKit
+import PathWrangler
 import StandardLibraryCore
 import Stencil
 import XCTest
@@ -39,7 +40,8 @@ final class ArticleTest: XCTestCase {
     let ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
-      typedProgram: typedProgram
+      typedProgram: typedProgram,
+      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
 
     let article1Id = db.assets.articles.insert(
@@ -97,7 +99,8 @@ final class ArticleTest: XCTestCase {
     let ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
-      typedProgram: typedProgram
+      typedProgram: typedProgram,
+      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
 
     let article1Id = db.assets.articles.insert(

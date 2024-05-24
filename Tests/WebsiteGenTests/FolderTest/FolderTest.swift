@@ -1,5 +1,6 @@
 import DocumentationDB
 import MarkdownKit
+import PathWrangler
 import StandardLibraryCore
 import Stencil
 import XCTest
@@ -46,7 +47,8 @@ final class FolderTest: XCTestCase {
     let ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
-      typedProgram: typedProgram
+      typedProgram: typedProgram,
+      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
 
     var res: String = ""
@@ -108,7 +110,8 @@ final class FolderTest: XCTestCase {
     let ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
-      typedProgram: typedProgram
+      typedProgram: typedProgram,
+      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
 
     var res: String = ""
@@ -197,7 +200,8 @@ final class FolderTest: XCTestCase {
     let ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
-      typedProgram: typedProgram
+      typedProgram: typedProgram,
+      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
 
     var res: String = ""

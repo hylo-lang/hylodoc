@@ -48,21 +48,11 @@ public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter
 
 public struct DefaultExporter: Exporter {
   public func file(from: URL, to: URL) throws {
-    // Create parent directory structure
-    let url = URL(fileURLWithPath: "", relativeTo: to)
-    let parentDirectory: URL = url.deletingLastPathComponent()
-    try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
-
     // Copy file
     try FileManager.default.copyItem(at: from, to: to)
   }
 
   public func html(content: String, to: URL) throws {
-    // Create parent directory structure
-    let url = URL(fileURLWithPath: "", relativeTo: to)
-    let parentDirectory: URL = url.deletingLastPathComponent()
-    try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
-
     // Write file
     try content.write(to: to, atomically: false, encoding: String.Encoding.utf8)
   }

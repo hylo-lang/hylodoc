@@ -2,6 +2,7 @@ import DequeModule
 import DocumentationDB
 import Foundation
 import FrontEnd
+import PathWrangler
 
 /// An identifier that uniquely identifies an asset or symbol in a path
 ///
@@ -49,30 +50,19 @@ public struct TargetPath {
     return stack.last!
   }
 
-  // Get how many directories deep the path is
-  public func depth() -> Int {
-    var index = 0
-    while index < stack.count, case .asset(_) = stack[index] {
-      index += 1
-    }
-
-    return index
-  }
-
   // Generate the url belonging to the current stack
-  public func url() -> URL {
-    var url = URL(fileURLWithPath: "")
+  public func url() -> RelativePath {
+    var url = RelativePath(pathString: "")
 
     var index = 0
     while index < stack.count, case .asset(let id) = stack[index] {
-      url.appendPathComponent(
-        convertAssetToPath(ctx: ctx, asset: id, last: (index + 1 == stack.count)))
+      url = url / convertAssetToPath(ctx: ctx, asset: id, last: (index + 1 == stack.count))
       index += 1
     }
 
     if index + 1 < stack.count {
       // symbol name as part of url?
-      url.appendPathComponent("symbol-\(symbolCounter).html")
+      url = url / "symbol-\(symbolCounter).html"
     }
 
     return url
