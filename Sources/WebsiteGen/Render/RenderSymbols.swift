@@ -1,6 +1,6 @@
-import FrontEnd
 import DocumentationDB
 import Foundation
+import FrontEnd
 
 /// Render the associated-type page
 ///
@@ -10,8 +10,10 @@ import Foundation
 ///   - with: parsed associated-type documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeDecl, with: AssociatedTypeDocumentation) -> String {
-    return ""
+public func renderAssociatedTypePage(
+  ctx: GenerationContext, of: AssociatedTypeDecl, with: AssociatedTypeDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the associated-value page
@@ -22,8 +24,10 @@ public func renderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeD
 ///   - with: parsed associated-value documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderAssociatedValuePage(ctx: GenerationContext, of: AssociatedValueDecl, with: AssociatedValueDocumentation) -> String {
-    return ""
+public func renderAssociatedValuePage(
+  ctx: GenerationContext, of: AssociatedValueDecl, with: AssociatedValueDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the type-alias page
@@ -34,8 +38,10 @@ public func renderAssociatedValuePage(ctx: GenerationContext, of: AssociatedValu
 ///   - with: parsed type-alias documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl, with: TypeAliasDocumentation) -> String {
-    return ""
+public func renderTypeAliasPage(
+  ctx: GenerationContext, of: TypeAliasDecl, with: TypeAliasDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the binding page
@@ -46,8 +52,10 @@ public func renderTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl, with:
 ///   - with: parsed binding documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderBindingPage(ctx: GenerationContext, of: BindingDecl, with: BindingDocumentation) -> String {
-    return ""
+public func renderBindingPage(ctx: GenerationContext, of: BindingDecl, with: BindingDocumentation)
+  -> String
+{
+  return ""
 }
 
 /// Render the operator page
@@ -58,8 +66,10 @@ public func renderBindingPage(ctx: GenerationContext, of: BindingDecl, with: Bin
 ///   - with: parsed operator documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderOperatorPage(ctx: GenerationContext, of: OperatorDecl, with: OperatorDocumentation) -> String {
-    return ""
+public func renderOperatorPage(
+  ctx: GenerationContext, of: OperatorDecl, with: OperatorDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the function page
@@ -70,8 +80,10 @@ public func renderOperatorPage(ctx: GenerationContext, of: OperatorDecl, with: O
 ///   - with: parsed function documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderFunctionPage(ctx: GenerationContext, of: FunctionDecl, with: FunctionDocumentation) -> String {
-    return ""
+public func renderFunctionPage(
+  ctx: GenerationContext, of: FunctionDecl, with: FunctionDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the method page
@@ -82,8 +94,10 @@ public func renderFunctionPage(ctx: GenerationContext, of: FunctionDecl, with: F
 ///   - with: parsed method documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderMethodPage(ctx: GenerationContext, of: MethodDecl, with: MethodDeclDocumentation) -> String {
-    return ""
+public func renderMethodPage(ctx: GenerationContext, of: MethodDecl, with: MethodDeclDocumentation)
+  -> String
+{
+  return ""
 }
 
 /// Render the method-implementation page
@@ -94,8 +108,10 @@ public func renderMethodPage(ctx: GenerationContext, of: MethodDecl, with: Metho
 ///   - with: parsed method-implementation documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderMethodImplementationPage(ctx: GenerationContext, of: MethodImpl, with: MethodImplDocumentation) -> String {
-    return ""
+public func renderMethodImplementationPage(
+  ctx: GenerationContext, of: MethodImpl, with: MethodImplDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the subscript page
@@ -106,8 +122,10 @@ public func renderMethodImplementationPage(ctx: GenerationContext, of: MethodImp
 ///   - with: parsed subscript documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl, with: SubscriptDeclDocumentation) -> String {
-    return ""
+public func renderSubscriptPage(
+  ctx: GenerationContext, of: SubscriptDecl, with: SubscriptDeclDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the subscript-implementation page
@@ -118,8 +136,10 @@ public func renderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl, with:
 ///   - with: parsed subscript-implementation documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderSubscriptImplementationPage(ctx: GenerationContext, of: SubscriptImpl, with: SubscriptImplDocumentation) -> String {
-    return ""
+public func renderSubscriptImplementationPage(
+  ctx: GenerationContext, of: SubscriptImpl, with: SubscriptImplDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the initializer page
@@ -130,8 +150,10 @@ public func renderSubscriptImplementationPage(ctx: GenerationContext, of: Subscr
 ///   - with: parsed initializer documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderInitializerPage(ctx: GenerationContext, of: InitializerDecl, with: InitializerDocumentation) -> String {
-    return ""
+public func renderInitializerPage(
+  ctx: GenerationContext, of: InitializerDecl, with: InitializerDocumentation
+) -> String {
+  return ""
 }
 
 /// Render the trait page
@@ -142,10 +164,11 @@ public func renderInitializerPage(ctx: GenerationContext, of: InitializerDecl, w
 ///   - with: parsed trait documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderTraitPage(ctx: GenerationContext, of: TraitDecl, with: TraitDocumentation) -> String {
-    return ""
+public func renderTraitPage(ctx: GenerationContext, of: TraitDecl, with: TraitDocumentation)
+  -> String
+{
+  return ""
 }
-
 
 /// Render the product-type page
 ///
@@ -155,6 +178,8 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl, with: TraitDo
 ///   - with: parsed product-type documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderProductTypePage(ctx: GenerationContext, of: ProductTypeDecl, with: ProductTypeDocumentation) -> String {
-    return ""
+public func renderProductTypePage(
+  ctx: GenerationContext, of: ProductTypeDecl, with: ProductTypeDocumentation
+) -> String {
+  return ""
 }

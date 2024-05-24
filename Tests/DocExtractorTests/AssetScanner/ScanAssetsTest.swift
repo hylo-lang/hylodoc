@@ -1,8 +1,8 @@
 import DocExtractor
 import DocumentationDB
+import FrontEnd
 import StandardLibraryCore
 import XCTest
-import FrontEnd
 
 func assetNameIs(_ name: String, _ assets: AssetStore) -> ((AnyAssetID) -> Bool) {
   { assets[$0]?.location.lastPathComponent == name }
@@ -28,7 +28,6 @@ final class ScanAssetsTests: XCTestCase {
       "ModuleB", sourceCode: sourceFiles(in: [moduleBPath]), builtinModuleAccess: true,
       diagnostics: &diagnostics)
 
-    
     XCTAssert(diagnostics.isEmpty, diagnostics.description)
 
     let typedProgram = try! TypedProgram(
@@ -37,20 +36,22 @@ final class ScanAssetsTests: XCTestCase {
       tracingInferenceIf: { (_, _) in false })
 
     XCTAssert(diagnostics.isEmpty, diagnostics.description)
-    
+
     // WHEN trying to extract documentation
-    
-    let result = extractDocumentation(typedProgram: typedProgram, for: [
-      .init(name: "ModuleA", rootFolderPath: moduleAPath, astId: moduleAId),
-      .init(name: "ModuleB", rootFolderPath: moduleBPath, astId: moduleBId)
-    ])
-    
+
+    let result = extractDocumentation(
+      typedProgram: typedProgram,
+      for: [
+        .init(name: "ModuleA", rootFolderPath: moduleAPath, astId: moduleAId),
+        .init(name: "ModuleB", rootFolderPath: moduleBPath, astId: moduleBId),
+      ])
+
     // THEN the documentation should be extracted successfully
     switch result {
-      case .failure(let error):
-        XCTFail("Failed to extract documentation: \(error)")
-      default:
-        break
+    case .failure(let error):
+      XCTFail("Failed to extract documentation: \(error)")
+    default:
+      break
     }
 
     let db = try! result.get()
@@ -66,7 +67,7 @@ final class ScanAssetsTests: XCTestCase {
     XCTAssertEqual(moduleA.name, "ModuleA")
     XCTAssertEqual(moduleA.astId, moduleAId)
     XCTAssertEqual(moduleA.rootFolderPath, moduleAPath)
-    
+
     XCTAssertEqual(moduleB.name, "ModuleB")
     XCTAssertEqual(moduleB.astId, moduleBId)
     XCTAssertEqual(moduleB.rootFolderPath, moduleBPath)
@@ -81,17 +82,21 @@ final class ScanAssetsTests: XCTestCase {
     }
 
     XCTAssertEqual(moduleARootFolder.location, moduleAPath)
-    XCTAssertEqual(moduleARootFolder.documentation, nil, "ModuleA root folder should not have documentation")
+    XCTAssertEqual(
+      moduleARootFolder.documentation, nil, "ModuleA root folder should not have documentation")
     XCTAssertEqual(moduleARootFolder.children.count, 1)
-    
-    XCTAssertEqual(moduleBRootFolder.location, moduleBPath)
-    XCTAssertNotEqual(moduleBRootFolder.documentation, nil, "ModuleB root folder should have documentation")
-    XCTAssertEqual(moduleBRootFolder.children.count, 5)
 
+    XCTAssertEqual(moduleBRootFolder.location, moduleBPath)
+    XCTAssertNotEqual(
+      moduleBRootFolder.documentation, nil, "ModuleB root folder should have documentation")
+    XCTAssertEqual(moduleBRootFolder.children.count, 5)
 
     // Check child assets
     // ModuleA/c.hylo
-    guard let cDotHyloAnyAssetId = moduleARootFolder.children.first(where: assetNameIs("c.hylo", db.assets)) else {
+    guard
+      let cDotHyloAnyAssetId = moduleARootFolder.children.first(
+        where: assetNameIs("c.hylo", db.assets))
+    else {
       return XCTFail("ModuleA root folder should contain c.hylo")
     }
     guard case .sourceFile(_) = cDotHyloAnyAssetId else {
@@ -99,7 +104,10 @@ final class ScanAssetsTests: XCTestCase {
     }
 
     // ModuleB/index.hylodoc
-    guard let indexDotHylodocAnyAssetId = moduleBRootFolder.children.first(where: assetNameIs("index.hylodoc", db.assets)) else {
+    guard
+      let indexDotHylodocAnyAssetId = moduleBRootFolder.children.first(
+        where: assetNameIs("index.hylodoc", db.assets))
+    else {
       return XCTFail("ModuleB root folder should contain index.hylodoc")
     }
     guard case .article(_) = indexDotHylodocAnyAssetId else {
@@ -107,16 +115,23 @@ final class ScanAssetsTests: XCTestCase {
     }
 
     // ModuleB/Article Without Title.hylodoc
-    guard let articleWithoutTitleDotHylodocAnyAssetId = moduleBRootFolder.children.first(where: assetNameIs("Article Without Title.hylodoc", db.assets)) else {
+    guard
+      let articleWithoutTitleDotHylodocAnyAssetId = moduleBRootFolder.children.first(
+        where: assetNameIs("Article Without Title.hylodoc", db.assets))
+    else {
       return XCTFail("ModuleB root folder should contain Article Without Title.hylodoc")
     }
     guard case .article(let articleId) = articleWithoutTitleDotHylodocAnyAssetId else {
-      return XCTFail("ModuleB root folder should contain Article Without Title.hylodoc as an article")
+      return XCTFail(
+        "ModuleB root folder should contain Article Without Title.hylodoc as an article")
     }
     XCTAssertEqual(db.assets[articleId]!.title, nil)
 
     // ModuleB/a.hylo
-    guard let aDotHyloAnyAssetId = moduleBRootFolder.children.first(where: assetNameIs("a.hylo", db.assets)) else {
+    guard
+      let aDotHyloAnyAssetId = moduleBRootFolder.children.first(
+        where: assetNameIs("a.hylo", db.assets))
+    else {
       return XCTFail("ModuleB root folder should contain a.hylo")
     }
     guard case .sourceFile(_) = aDotHyloAnyAssetId else {
@@ -124,7 +139,10 @@ final class ScanAssetsTests: XCTestCase {
     }
 
     // ModuleB/other file.txt
-    guard let otherFileTxtAnyAssetId = moduleBRootFolder.children.first(where: assetNameIs("other file.txt", db.assets)) else {
+    guard
+      let otherFileTxtAnyAssetId = moduleBRootFolder.children.first(
+        where: assetNameIs("other file.txt", db.assets))
+    else {
       return XCTFail("ModuleB root folder should contain other file.txt")
     }
     guard case .otherFile(_) = otherFileTxtAnyAssetId else {
@@ -132,7 +150,10 @@ final class ScanAssetsTests: XCTestCase {
     }
 
     // ModuleB/Subfolder
-    guard let subfolderAnyAssetId = moduleBRootFolder.children.first(where: assetNameIs("Subfolder", db.assets)) else {
+    guard
+      let subfolderAnyAssetId = moduleBRootFolder.children.first(
+        where: assetNameIs("Subfolder", db.assets))
+    else {
       return XCTFail("ModuleB root folder should contain Subfolder")
     }
     guard case .folder(let subfolderId) = subfolderAnyAssetId else {
@@ -146,7 +167,10 @@ final class ScanAssetsTests: XCTestCase {
     XCTAssertEqual(subfolder.children.count, 2)
 
     // ModuleB/Subfolder/child.hylo
-    guard let childDotHyloAnyAssetId = subfolder.children.first(where: assetNameIs("child.hylo", db.assets)) else {
+    guard
+      let childDotHyloAnyAssetId = subfolder.children.first(
+        where: assetNameIs("child.hylo", db.assets))
+    else {
       return XCTFail("Subfolder should contain child.hylo")
     }
     guard case .sourceFile(_) = childDotHyloAnyAssetId else {
@@ -154,7 +178,10 @@ final class ScanAssetsTests: XCTestCase {
     }
 
     // ModuleB/Subfolder/index.hylodoc
-    guard let subfolderIndexDotHylodocAnyAssetId = subfolder.children.first(where: assetNameIs("index.hylodoc", db.assets)) else {
+    guard
+      let subfolderIndexDotHylodocAnyAssetId = subfolder.children.first(
+        where: assetNameIs("index.hylodoc", db.assets))
+    else {
       return XCTFail("Subfolder should contain index.hylodoc")
     }
     guard case .article(let subfolderIndexArticleId) = subfolderIndexDotHylodocAnyAssetId else {

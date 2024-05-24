@@ -1,4 +1,3 @@
-
 /// Documentation of product types
 public struct ProductTypeDocumentation: IdentifiedEntity {
   public let generalDescription: GeneralDescriptionFields

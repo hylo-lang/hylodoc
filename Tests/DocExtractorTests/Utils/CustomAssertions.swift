@@ -6,10 +6,8 @@ func assertContains(
 ) {
   if !string.contains(what) {
     XCTFail(
-      "String expected to contain: \n" +
-      ANSIColors.green("```\n\(what)\n```\n") +
-      "but it was actually:\n" +
-      ANSIColors.red("```\n\(string)\n```"),
+      "String expected to contain: \n" + ANSIColors.green("```\n\(what)\n```\n")
+        + "but it was actually:\n" + ANSIColors.red("```\n\(string)\n```"),
       file: file, line: line)
     return
   }
@@ -20,10 +18,8 @@ func assertNotContains(
 ) {
   if string.contains(what) {
     XCTFail(
-      "String expected NOT to contain: \n" +
-      ANSIColors.yellow("```\n\(what)\n```\n") +
-      "but it was actually:\n" +
-      ANSIColors.red("```\n\(string)\n```"),
+      "String expected NOT to contain: \n" + ANSIColors.yellow("```\n\(what)\n```\n")
+        + "but it was actually:\n" + ANSIColors.red("```\n\(string)\n```"),
       file: file, line: line)
     return
   }

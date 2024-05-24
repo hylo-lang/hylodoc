@@ -78,7 +78,7 @@ public enum MarkdownParserError: Error, CustomStringConvertible {
 
 public struct RealLowLevelCommentParser: LowLevelCommentParser {
   public init() {}
-  
+
   public enum ParsingError: Error, Equatable {
     case missingWhitespace(inLine: String)
     case emptySpecialSectionHeading

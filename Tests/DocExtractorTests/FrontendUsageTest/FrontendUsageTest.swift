@@ -1,9 +1,6 @@
 import DocumentationDB
-
 import Foundation
-
 import FrontEnd
-
 import XCTest
 
 final class FrontendUsageTest: XCTestCase {

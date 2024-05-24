@@ -73,10 +73,12 @@ func processChild<Visitor: AssetProcessingVisitor>(
       .mapError { .sourceFileProcessingError(path, $0) }
   case "hylodoc":
     return visitor.processArticle(path: path)
-      .map {(
-        AnyAssetID(from: $0), 
-        folderDoc: path.lastPathComponent == "index.hylodoc" ? $0 : nil
-      )}
+      .map {
+        (
+          AnyAssetID(from: $0),
+          folderDoc: path.lastPathComponent == "index.hylodoc" ? $0 : nil
+        )
+      }
       .mapError { .articleProcessingError(path, $0) }
   default:
     return visitor.processOtherAsset(path: path)

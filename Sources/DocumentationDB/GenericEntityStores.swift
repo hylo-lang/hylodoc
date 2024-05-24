@@ -37,7 +37,7 @@ public protocol ReadableEntityStoreProtocol: Sequence {
 /// great cache locality.
 ///
 /// It supports insertion and lookup but no modification or deletion of elements.
-public struct EntityStore<T: IdentifiedEntity> : ReadableEntityStoreProtocol {
+public struct EntityStore<T: IdentifiedEntity>: ReadableEntityStoreProtocol {
   private var entities: [T] = []
 
   /// Can be used to access the entity with the given ID (for reading) like this: entityStore[id]
@@ -67,7 +67,9 @@ public struct EntityStore<T: IdentifiedEntity> : ReadableEntityStoreProtocol {
 }
 
 /// Adapted Entity Store
-public struct AdaptedEntityStore<ASTNodeType: Node, StoredDataT: IdentifiedEntity> : ReadableEntityStoreProtocol {
+public struct AdaptedEntityStore<ASTNodeType: Node, StoredDataT: IdentifiedEntity>:
+  ReadableEntityStoreProtocol
+{
   /// The entity store that stores the documentation entities in contiguous memory for fast lookup by documentation entity IDs.
   private var entityStore: EntityStore<StoredDataT> = .init()
 

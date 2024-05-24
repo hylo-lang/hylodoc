@@ -13,7 +13,9 @@ public struct DocumentationDatabase {
 
   public init() {}
 
-  public init(assets: AssetStore, symbols: SymbolDocStore, modules: AdaptedEntityStore<ModuleDecl, ModuleInfo>) {
+  public init(
+    assets: AssetStore, symbols: SymbolDocStore, modules: AdaptedEntityStore<ModuleDecl, ModuleInfo>
+  ) {
     self.assets = assets
     self.symbols = symbols
     self.modules = modules

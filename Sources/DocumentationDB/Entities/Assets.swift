@@ -4,7 +4,7 @@ import FrontEnd
 import MarkdownKit
 
 /// A protocol for assets in the documentation database.
-public protocol Asset : IdentifiedEntity {
+public protocol Asset: IdentifiedEntity {
   /// The location of the asset on the filesystem.
   var location: URL { get }
 
@@ -76,7 +76,9 @@ public struct SourceFileAsset: IdentifiedEntity, Asset, Equatable {
   /// The translation unit ID that this source file belongs to.
   public let translationUnit: TranslationUnit.ID
 
-  public init(location: URL, generalDescription: GeneralDescriptionFields, translationUnit: TranslationUnit.ID) {
+  public init(
+    location: URL, generalDescription: GeneralDescriptionFields, translationUnit: TranslationUnit.ID
+  ) {
     self.location = location
     self.generalDescription = generalDescription
     self.translationUnit = translationUnit

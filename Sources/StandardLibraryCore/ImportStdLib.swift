@@ -1,5 +1,5 @@
-import FrontEnd
 import Foundation
+import FrontEnd
 
 public func loadStandardLibraryCore(diagnostics: inout DiagnosticSet) -> AST {
   let url = Bundle.module.url(forResource: "StandardLibraryCoreResource", withExtension: nil)!

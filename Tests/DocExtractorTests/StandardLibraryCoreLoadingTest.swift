@@ -1,7 +1,7 @@
+import StandardLibraryCore
 import XCTest
 
 @testable import FrontEnd
-import StandardLibraryCore
 
 final class StandardLibraryCoreLoadingTest: XCTestCase {
   func testStdLibCanBeLoaded() {
@@ -12,7 +12,7 @@ final class StandardLibraryCoreLoadingTest: XCTestCase {
     let typedProgram = try! TypedProgram(
       annotating: ScopedProgram(ast), inParallel: false,
       reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_,_) in false })
+      tracingInferenceIf: { (_, _) in false })
 
     XCTAssertFalse(typedProgram.ast.modules.isEmpty)
 

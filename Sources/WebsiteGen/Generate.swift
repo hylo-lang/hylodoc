@@ -1,12 +1,12 @@
-import Foundation
 import DocumentationDB
+import Foundation
 import FrontEnd
 
 /// Protocol responsible for how to store assets and other pages
 public protocol Exporter {
-    func file(from: URL, to: URL) throws
-    func html(content: String, to: URL) throws
-    func directory(to: URL) throws
+  func file(from: URL, to: URL) throws
+  func html(content: String, to: URL) throws
+  func directory(to: URL) throws
 }
 
 /// Render and export an arbitrary asset page
@@ -18,19 +18,19 @@ public protocol Exporter {
 ///   - of: asset to render page of
 ///   - with: exporter, used to handle file writes and directory creation
 public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter) throws {
-    let target = ctx.urlResolver.pathToFile(target: .asset(of))
+  let target = ctx.urlResolver.pathToFile(target: .asset(of))
 
-    // Handle other file
-    if case .otherFile(let id) = of {
-        // Copy file to target
-        let otherFile = ctx.documentation.assets.otherFiles[id]!
-        try with.file(from: otherFile.location, to: target)
-        return
-    }
+  // Handle other file
+  if case .otherFile(let id) = of {
+    // Copy file to target
+    let otherFile = ctx.documentation.assets.otherFiles[id]!
+    try with.file(from: otherFile.location, to: target)
+    return
+  }
 
-    // Render and export page
-    let content = try renderAssetPage(ctx: ctx, of: of)
-    with.html(content: content, to: target)
+  // Render and export page
+  let content = try renderAssetPage(ctx: ctx, of: of)
+  try with.html(content: content, to: target)
 }
 
 /// Render and export an arbitrary symbol page
@@ -39,36 +39,36 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: symbol to render page of
 public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter) throws {
-    let target = ctx.urlResolver.pathToFile(target: .symbol(of))
+  let target = ctx.urlResolver.pathToFile(target: .symbol(of))
 
-    // Render and export page
-    let content = renderSymbolPage(ctx: ctx, of: of)
-    try with.html(content: content, to: target)
+  // Render and export page
+  let content = renderSymbolPage(ctx: ctx, of: of)
+  try with.html(content: content, to: target)
 }
 
-public struct DefaultExporter : Exporter {
-    public func file(from: URL, to: URL) throws {
-        // Create parent directory structure
-        let url = URL(fileURLWithPath: "", relativeTo: to)
-        let parentDirectory: URL = url.deletingLastPathComponent()
-        try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
+public struct DefaultExporter: Exporter {
+  public func file(from: URL, to: URL) throws {
+    // Create parent directory structure
+    let url = URL(fileURLWithPath: "", relativeTo: to)
+    let parentDirectory: URL = url.deletingLastPathComponent()
+    try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
 
-        // Copy file
-        try FileManager.default.copyItem(at: from, to: to)
-    }
+    // Copy file
+    try FileManager.default.copyItem(at: from, to: to)
+  }
 
-    public func html(content: String, to: URL) throws {
-        // Create parent directory structure
-        let url = URL(fileURLWithPath: "", relativeTo: to)
-        let parentDirectory: URL = url.deletingLastPathComponent()
-        try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
+  public func html(content: String, to: URL) throws {
+    // Create parent directory structure
+    let url = URL(fileURLWithPath: "", relativeTo: to)
+    let parentDirectory: URL = url.deletingLastPathComponent()
+    try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
 
-        // Write file
-        try content.write(to: to, atomically: false, encoding: String.Encoding.utf8)
-    }
+    // Write file
+    try content.write(to: to, atomically: false, encoding: String.Encoding.utf8)
+  }
 
-    public func directory(to: URL) throws {
-        // Create directory and parents
-        try FileManager.default.createDirectory(at: to, withIntermediateDirectories: true)
-    }
+  public func directory(to: URL) throws {
+    // Create directory and parents
+    try FileManager.default.createDirectory(at: to, withIntermediateDirectories: true)
+  }
 }

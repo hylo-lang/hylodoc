@@ -1,13 +1,13 @@
+import DocumentationDB
 import Foundation
 import FrontEnd
-import DocumentationDB
 import Stencil
 
 public struct GenerationContext {
-    public let documentation: DocumentationDatabase
-    public let stencil: Environment
-    public let typedProgram: TypedProgram
-    public var urlResolver: URLResolver
+  public let documentation: DocumentationDatabase
+  public let stencil: Environment
+  public let typedProgram: TypedProgram
+  public var urlResolver: URLResolver
 }
 
 /// Render the full documentation website

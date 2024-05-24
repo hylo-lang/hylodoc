@@ -6,7 +6,7 @@ public struct FunctionDocumentation: IdentifiedEntity {
 }
 
 /// A method declaration within a product type or trait
-/// 
+///
 /// Note: method declarations might have multiple implementations inside, and each implementation
 /// might also have additional documentation. In that case, that should be also displayed additionally.
 public struct MethodDeclDocumentation: IdentifiedEntity {
@@ -14,15 +14,14 @@ public struct MethodDeclDocumentation: IdentifiedEntity {
 }
 
 /// Documentation of a method implementation.
-/// 
-/// A method declaration might have one or more implementations inside for 
+///
+/// A method declaration might have one or more implementations inside for
 /// the different access effects (let, inout, sink, etc.). Each implementation might
 /// want to have its own documentation to specify the behavior of the implementation and to
 /// add additional information that is only relevant to that implementation.
 public struct MethodImplDocumentation: IdentifiedEntity {
   public let documentation: CommonFunctionDocumentation
 }
-
 
 public struct CommonFunctionDocumentation {
   public let common: GeneralDescriptionFields
@@ -33,7 +32,6 @@ public struct CommonFunctionDocumentation {
   public let parameters: ParameterDocumentations
   public let genericParameters: GenericParameterDocumentations
 }
-
 
 /// Type initializer (e.g. init or memberwise init)
 public struct InitializerDocumentation: IdentifiedEntity {
@@ -69,16 +67,13 @@ public struct SubscriptCommonDocumentation {
 /// All information is already present in the declaration AST node SynthesizedFunctionDecl.
 public struct SynthesizedFunctionDocumentation {}
 
-
-
-
 /// Documentation of the returned value of a function or method
 public enum ReturnsInfo {
   /// Used when there is one paragraph of `# Returns:` documentation.
   case always(Block)
-  
+
   /// Used when the function returns different information in different cases.
-  /// This can be expressed as adding list items after the `# Returns:` section header. 
+  /// This can be expressed as adding list items after the `# Returns:` section header.
   case cases([Block])
 }
 
@@ -86,12 +81,11 @@ public enum ReturnsInfo {
 public enum YieldsInfo {
   /// Used when there is one paragraph of `# Yields:` documentation.
   case always(Block)
-  
+
   /// Used when the function returns different information in different cases.
-  /// This can be expressed as adding list items after the `# Yields:` section header. 
+  /// This can be expressed as adding list items after the `# Yields:` section header.
   case cases([Block])
 }
-
 
 /// Documentation of the behavior of a function-like when it throws an exception.
 public enum ThrowsInfo {

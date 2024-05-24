@@ -79,7 +79,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   /// - Precondition: The range should not contain any tokens.
   private mutating func processTokenRange(from start: SourceFile.Index, until end: SourceFile.Index)
   {
-    let content = source.text[start..<end]
+    let content = source.text[start ..< end]
     let lines = content.split(separator: "\n", omittingEmptySubsequences: false)
     processLines(lines, end)
   }

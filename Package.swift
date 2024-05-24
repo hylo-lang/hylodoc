@@ -33,7 +33,7 @@ let package = Package(
     // .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
     .package(url: "https://github.com/tothambrus11/hylo.git", branch: "publish-lookup-functions"),
     .package(url: "https://github.com/objecthub/swift-markdownkit.git", from: "1.1.8"),
-    .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.15.1")
+    .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.15.1"),
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -51,7 +51,7 @@ let package = Package(
       name: "DocumentationDB",
       dependencies: [
         .product(name: "FrontEnd", package: "hylo"),
-        .product(name: "MarkdownKit", package: "swift-markdownkit")
+        .product(name: "MarkdownKit", package: "swift-markdownkit"),
       ],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
@@ -71,7 +71,7 @@ let package = Package(
         "DocExtractor",
         "DocumentationDB",
         .product(name: "DequeModule", package: "swift-collections"),
-        .product(name: "Stencil", package: "stencil")
+        .product(name: "Stencil", package: "stencil"),
       ],
       exclude: ["module.md"],
       resources: [.process("Resources/")],
@@ -101,6 +101,6 @@ let package = Package(
       dependencies: [.product(name: "FrontEnd", package: "hylo")],
       resources: [.copy("StandardLibraryCoreResource")],
       swiftSettings: allTargetsSwiftSettings
-    )
+    ),
   ]
 )
