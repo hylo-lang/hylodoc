@@ -1,0 +1,7 @@
+
+public let a = 1
+
+public type A {
+    public let b = 4
+    public property c: Builtin.word { b }
+}

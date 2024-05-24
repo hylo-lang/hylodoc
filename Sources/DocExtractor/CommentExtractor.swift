@@ -3,20 +3,20 @@ import Foundation
 import FrontEnd
 
 /// A structure representing a source file with associated comments.
-struct CommentedFile {
+public struct CommentedFile {
 
   private let source: SourceFile
   private let commentParser: LowLevelCommentParser
 
-  private(set) var symbolComments: [TargetedSymbolDocInfo]
-  private(set) var fileComment: FileLevelInfo?
+  public private(set) var symbolComments: [TargetedSymbolDocInfo]
+  public private(set) var fileComment: FileLevelInfo?
 
   /// Initializes a `CommentedFile` with a given source file and comment parser.
   ///
   /// - Parameters:
   ///   - sourceFile: The source file to extract comments from.
   ///   - commentParser: The parser used to parse the comments.
-  init(_ sourceFile: SourceFile, _ commentParser: LowLevelCommentParser) {
+  public init(_ sourceFile: SourceFile, _ commentParser: LowLevelCommentParser) {
     self.source = sourceFile
     self.commentParser = commentParser
     symbolComments = [TargetedSymbolDocInfo]()
@@ -127,11 +127,11 @@ struct CommentedFile {
 }
 
 // A structure representing a symbol documentation with its associated target symbol index
-struct TargetedSymbolDocInfo {
+public struct TargetedSymbolDocInfo {
   public let info: SymbolDocInfo
   public let target: SourceFile.Index
 
-  init(_ info: SymbolDocInfo, _ target: SourceFile.Index) {
+  public init(_ info: SymbolDocInfo, _ target: SourceFile.Index) {
     self.info = info
     self.target = target
   }
@@ -140,7 +140,7 @@ struct TargetedSymbolDocInfo {
 public struct FileLevelInfo {
   public let text: String
 
-  init(_ text: String) {
+  public init(_ text: String) {
     self.text = text
   }
 }
@@ -148,7 +148,7 @@ public struct FileLevelInfo {
 public struct SymbolDocInfo {
   public let text: String
 
-  init(_ text: String) {
+  public init(_ text: String) {
     self.text = text
   }
 }

@@ -3,14 +3,7 @@ import XCTest
 
 @testable import DocExtractor
 
-final class DealerTests: XCTestCase {
-  func testIsEven() {
-    // extractData()
-    extractComments()
-  }
-}
-
-final class MarkdownParsingTests: XCTestCase {
+final class LowLevelMarkdownParsingTests: XCTestCase {
   func testProcessCommentLines_ValidInput() {
     let lines = [
       "/// First paragraph is the summary.",
