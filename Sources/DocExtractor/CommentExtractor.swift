@@ -4,10 +4,10 @@ import FrontEnd
 
 public struct DocumentedFile {
   /// The file-level comment if it exists.
-  public let fileLevel: LowLevelCommentInfo?
+  public let fileLevel: SourceRepresentable<LowLevelCommentInfo>?
 
   /// The comment at the given start index of a symbol
-  public let symbolComments: [SourceFile.Index: LowLevelCommentInfo]
+  public let symbolComments: [SourceFile.Index: SourceRepresentable<LowLevelCommentInfo>]
 }
 
 public protocol CommentParser {
@@ -42,8 +42,8 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   private let commentParser: LLCommentParser
 
   /// A list of symbol comments associated with their target index.
-  public private(set) var symbolComments: [SourceFile.Index: LowLevelCommentInfo] = [:]
-  public private(set) var fileComment: LowLevelCommentInfo?
+  public private(set) var symbolComments: [SourceFile.Index: SourceRepresentable<LowLevelCommentInfo>] = [:]
+  public private(set) var fileComment: SourceRepresentable<LowLevelCommentInfo>?
   public private(set) var diagnostics: DiagnosticSet = .init()
 
   /// Initializes a `CommentedFile` with a given source file and comment parser.
@@ -154,7 +154,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
         return
       }
 
-      self.fileComment = info
+      self.fileComment = .init(value: info, range: origin)
     case .symbol:
       guard target != nil else {
         diagnostics.insert(
@@ -165,7 +165,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
           ))
         return
       }
-      symbolComments[target!] = info
+      symbolComments[target!] = .init(value: info, range: origin)
     case .section:
       fatalError("Section comments are not supported yet")
       break

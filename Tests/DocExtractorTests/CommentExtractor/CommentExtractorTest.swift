@@ -48,10 +48,10 @@ final class CommentExtractorTest: XCTestCase {
       return
     }
 
-    XCTAssertEqual(symbolComment.contentBeforeSections.count, 1)
-    XCTAssertEqual(symbolComment.specialSections.count, 0)
-    assertContains(symbolComment.contentBeforeSections.description, what: "This is a comment.")
-    assertNotContains(symbolComment.contentBeforeSections.description, what: "public typealias")
+    XCTAssertEqual(symbolComment.value.contentBeforeSections.count, 1)
+    XCTAssertEqual(symbolComment.value.specialSections.count, 0)
+    assertContains(symbolComment.value.contentBeforeSections.description, what: "This is a comment.")
+    assertNotContains(symbolComment.value.contentBeforeSections.description, what: "public typealias")
   }
 
   // todo write more tests

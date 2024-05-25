@@ -53,12 +53,14 @@ func collectTranslationUnitsByURL(ast: AST) -> [URL: TranslationUnit.ID] {
   return luke.translationUnitsByURL
 }
 
-public struct DocDBBuilder: AssetProcessingVisitor {
+public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: AssetProcessingVisitor
+{
   public enum ArticleProcessingError: Error {
     case fileReadingError(URL, Error)
   }
   public enum SourceFileProcessingError: Error {
     case noTranslationUnitFound(for: URL)
+    case processingIssue(DiagnosticSet)
   }
   public enum OtherLocalFileProcessingError: Error {}
   public enum FolderProcessingError: Error {}
@@ -75,10 +77,12 @@ public struct DocDBBuilder: AssetProcessingVisitor {
   // Dependencies:
   private var fileManager: FileManager
   private let markdownParser: MarkdownParser
+  private let sourceFileDocumentor: SFDocumentor
 
   public init(
     modules: [InputModuleInfo],
     typedProgram: TypedProgram,
+    sourceFileDocumentor: SFDocumentor,
     fileManager: FileManager = .default,
     markdownParser: MarkdownParser = .standard
   ) {
@@ -87,6 +91,7 @@ public struct DocDBBuilder: AssetProcessingVisitor {
     self.fileManager = fileManager
     self.markdownParser = markdownParser
     self.translationUnitsByURL = collectTranslationUnitsByURL(ast: typedProgram.ast)
+    self.sourceFileDocumentor = sourceFileDocumentor
   }
 
   public mutating func processArticle(path: URL) -> Result<ArticleAsset.ID, ArticleProcessingError>
@@ -113,11 +118,19 @@ public struct DocDBBuilder: AssetProcessingVisitor {
       return .failure(.noTranslationUnitFound(for: path))
     }
 
+    var diagnostics = DiagnosticSet()
+    let fileLevelGeneralDescription = sourceFileDocumentor.document(
+      ast: typedProgram.ast, translationUnitId: tuID, into: &symbolDocs, diagnostics: &diagnostics)
+
+    guard diagnostics.isEmpty else {
+      return .failure(.processingIssue(diagnostics))
+    }
+
     return .success(
       assets.sourceFiles.insert(
         .init(
           location: path,
-          generalDescription: .init(summary: nil, description: nil, seeAlso: []),
+          generalDescription: fileLevelGeneralDescription,
           translationUnit: tuID
         ),
         for: tuID
@@ -165,13 +178,18 @@ public struct DocDBBuilder: AssetProcessingVisitor {
       }
   }
 }
+
+// todo make the error type independent of the dependency on the documentor
 /// Scans the assets in the given modules and calls the visitor for each asset.
 public func extractDocumentation(typedProgram: TypedProgram, for modules: [InputModuleInfo]) ->  //
-  Result<DocumentationDatabase, DocExtractionError<DocDBBuilder>>
+  Result<
+    DocumentationDatabase, DocExtractionError<DocDBBuildingAssetScanner<DummySourceFileDocumentor>>
+  >
 {
-  var builder = DocDBBuilder(
+  var builder = DocDBBuildingAssetScanner(
     modules: modules,
-    typedProgram: typedProgram
+    typedProgram: typedProgram,
+    sourceFileDocumentor: DummySourceFileDocumentor()
   )
   return builder.build()
 }

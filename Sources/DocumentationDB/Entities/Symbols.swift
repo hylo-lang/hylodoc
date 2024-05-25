@@ -20,10 +20,10 @@ public struct GeneralDescriptionFields: Equatable {
 /// Documentation of a typealias declaration
 public struct TypeAliasDocumentation: IdentifiedEntity {
   public let common: GeneralDescriptionFields
-    
-    public init(common: GeneralDescriptionFields) {
-        self.common = common
-    }
+
+  public init(common: GeneralDescriptionFields) {
+    self.common = common
+  }
 }
 
 public struct Invariant {
@@ -41,8 +41,7 @@ public struct GenericParameterDocumentation {
 }
 
 /// A map that associates each generic parameter declaration with its documentation.
-public typealias GenericParameterDocumentations = [GenericParameterDecl.ID:
-  GenericParameterDocumentation]
+public typealias GenericParameterDocumentations = [GenericParameterDecl.ID : GenericParameterDocumentation]
 
 public struct ParameterDocumentation {
   public let description: Block
@@ -53,27 +52,21 @@ public typealias ParameterDocumentations = [ParameterDecl.ID: ParameterDocumenta
 
 /// A collection of documentation information for symbols, organized by symbol kind.
 public struct SymbolDocStore {
-  public var associatedTypeDocs:
-    AdaptedEntityStore<AssociatedTypeDecl, AssociatedTypeDocumentation> = .init()
-  public var associatedValueDocs:
-    AdaptedEntityStore<AssociatedValueDecl, AssociatedValueDocumentation> = .init()
-  public var TypeAliasDocs: AdaptedEntityStore<TypeAliasDecl, TypeAliasDocumentation> = .init()
-  public var BindingDocs: AdaptedEntityStore<BindingDecl, BindingDocumentation> = .init()
+  public var associatedTypeDocs: AdaptedEntityStore<AssociatedTypeDecl, AssociatedTypeDocumentation> = .init()
+  public var associatedValueDocs: AdaptedEntityStore<AssociatedValueDecl, AssociatedValueDocumentation> = .init()
+  public var typeAliasDocs: AdaptedEntityStore<TypeAliasDecl, TypeAliasDocumentation> = .init()
+  public var bindingDocs: AdaptedEntityStore<BindingDecl, BindingDocumentation> = .init()
   public var operatorDocs: AdaptedEntityStore<OperatorDecl, OperatorDocumentation> = .init()
 
   public var functionDocs: AdaptedEntityStore<FunctionDecl, FunctionDocumentation> = .init()
   public var methodDeclDocs: AdaptedEntityStore<MethodDecl, MethodDeclDocumentation> = .init()
   public var methodImplDocs: AdaptedEntityStore<MethodImpl, MethodImplDocumentation> = .init()
-  public var subscriptDeclDocs: AdaptedEntityStore<SubscriptDecl, SubscriptDeclDocumentation> =
-    .init()
-  public var subscriptImplDocs: AdaptedEntityStore<SubscriptImpl, SubscriptImplDocumentation> =
-    .init()
-  public var initializerDocs: AdaptedEntityStore<InitializerDecl, InitializerDocumentation> =
-    .init()
+  public var subscriptDeclDocs: AdaptedEntityStore<SubscriptDecl, SubscriptDeclDocumentation> = .init()
+  public var subscriptImplDocs: AdaptedEntityStore<SubscriptImpl, SubscriptImplDocumentation> = .init()
+  public var initializerDocs: AdaptedEntityStore<InitializerDecl, InitializerDocumentation> = .init()
 
   public var traitDocs: AdaptedEntityStore<TraitDecl, TraitDocumentation> = .init()
-  public var productTypeDocs: AdaptedEntityStore<ProductTypeDecl, ProductTypeDocumentation> =
-    .init()
+  public var productTypeDocs: AdaptedEntityStore<ProductTypeDecl, ProductTypeDocumentation> = .init()
 
   public init() {}
 }

@@ -48,13 +48,13 @@ public func renderSymbolPage(ctx: GenerationContext, of: AnyDeclID) throws -> St
         let id = TypeAliasDecl.ID(of)!
         
         // Render page
-        let declDoc = ctx.documentation.symbols.TypeAliasDocs[id]!
+        let declDoc = ctx.documentation.symbols.typeAliasDocs[id]!
         return try renderTypeAliasPage(ctx: ctx, of: id, with: declDoc)
     case BindingDecl.self:
         let id = BindingDecl.ID(of)!
         
         // Render page
-        let declDoc = ctx.documentation.symbols.BindingDocs[id]!
+        let declDoc = ctx.documentation.symbols.bindingDocs[id]!
         return try renderBindingPage(ctx: ctx, of: id, with: declDoc)
     case OperatorDecl.self:
         let id = OperatorDecl.ID(of)!
