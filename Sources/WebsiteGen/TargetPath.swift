@@ -22,7 +22,35 @@ public struct TargetPath {
     self.ctx = ctx
   }
 
-  // Push asset onto stack
+  // Generate the url belonging to the current stack
+  var url: RelativePath {
+    var url = RelativePath(pathString: "")
+
+    // Directory structure
+    var index = 0
+    while index < stack.count, case .asset(let id) = stack[index] {
+      url = url / convertAssetToPath(ctx: ctx, asset: id)
+      index += 1
+    }
+
+    if index + 1 < stack.count {
+      // symbol name as part of url?
+      // counter for symbols
+      url = url / "symbol-\(symbolCounter).html"
+    } else if case .asset(let id) = stack[index - 1] {
+      if case .folder(_) = id {
+        // append index.html for folder since that has a nested structure
+        url = url / "index.html"
+      } else if case .sourceFile(_) = id {
+        // append index.html for sourceFile since that has a nested structure
+        url = url / "index.html"
+      }
+    }
+
+    return url
+  }
+
+  /// Push asset onto stack
   public mutating func push(asset: AnyAssetID) {
     stack.append(.asset(asset))
 
@@ -32,7 +60,7 @@ public struct TargetPath {
     }
   }
 
-  // Push symbol onto stack
+  /// Push symbol onto stack
   public mutating func push(decl: AnyDeclID) {
     stack.append(.symbol(decl))
 
@@ -40,48 +68,30 @@ public struct TargetPath {
     symbolCounter += 1
   }
 
-  // Pop top-item on the stack
+  /// Pop top-item on the stack
   public mutating func pop() {
     let _ = stack.popLast()
   }
 
-  // Get the current target
+  /// Get the current target
   public func target() -> AnyTargetID {
     return stack.last!
   }
 
-  // Generate the url belonging to the current stack
-  public func url() -> RelativePath {
-    var url = RelativePath(pathString: "")
-
-    var index = 0
-    while index < stack.count, case .asset(let id) = stack[index] {
-      url = url / convertAssetToPath(ctx: ctx, asset: id, last: (index + 1 == stack.count))
-      index += 1
-    }
-
-    if index + 1 < stack.count {
-      // symbol name as part of url?
-      url = url / "symbol-\(symbolCounter).html"
-    }
-
-    return url
-  }
-
 }
 
-private func convertAssetToPath(ctx: GenerationContext, asset: AnyAssetID, last: Bool) -> String {
+private func convertAssetToPath(ctx: GenerationContext, asset: AnyAssetID) -> String {
   switch asset {
   case .folder(let id):
     let folder = ctx.documentation.assets.folders[id]!
-    return folder.name + (last ? "/index.html" : "")
+    return folder.name
   case .sourceFile(let id):
     let sourceFile = ctx.documentation.assets.sourceFiles[id]!
-    let translationUnit = ctx.typedProgram.ast[sourceFile.translationUnit]!
-    return translationUnit.site.file.baseName + (last ? "/index.html" : "")
+    return String(sourceFile.location.lastPathComponent.lazy.split(separator: ".")[0])
   case .article(let id):
     let article = ctx.documentation.assets.articles[id]!
-    return article.name
+    return String(article.location.lastPathComponent.lazy.split(separator: ".")[0])
+      + ".article.html"
   case .otherFile(let id):
     let otherFile = ctx.documentation.assets.otherFiles[id]!
     return otherFile.name

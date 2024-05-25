@@ -43,6 +43,6 @@ public struct URLResolvingVisitor: DocumentationVisitor {
   }
 
   public mutating func visit(path: TargetPath) {
-    urlResolver.resolve(target: path.target(), filePath: path.url())
+    urlResolver.resolve(target: path.target(), filePath: path.url)
   }
 }
