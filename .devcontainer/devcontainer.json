@@ -52,6 +52,9 @@
                         }
                     ]
                 },
+                "editor.tabSize": 2,
+                "editor.insertSpaces": true,
+                "editor.detectIndentation": false,
                 // specify a custom tasks
                 "tasks": {
                     "version": "2.0.0",
