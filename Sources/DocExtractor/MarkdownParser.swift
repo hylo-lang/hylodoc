@@ -1,12 +1,70 @@
 import Foundation
 import MarkdownKit
 
-enum MarkdownParserError: Error, CustomStringConvertible {
+public struct LowLevelCommentInfo {
+  /// Markdown content before the special sections
+  public let contentBeforeSections: [Block]
+  public let specialSections: [SpecialSection]
+  public var type: CommentType {
+    guard let title = specialSections.first?.name.split(separator: ":").first else {
+      return .symbol
+    }
+
+    switch title.lowercased() {
+    case "file-level":
+      return .fileLevel
+    case "section":
+      return .section
+    default:
+      return .symbol
+    }
+  }
+
+  public init(
+    contentBeforeSections: [Block],
+    specialSections: [SpecialSection]
+  ) {
+    self.contentBeforeSections = contentBeforeSections
+    self.specialSections = specialSections
+  }
+
+  /// A Special section inside a documentation comment is a first-level heading
+  /// and the content after it.
+  public struct SpecialSection {
+    let name: String
+    var blocks: [Block]
+  }
+
+  /// The type of the documentation comment
+  public enum CommentType {
+    /// The documentation associated with a file.
+    ///
+    /// Start the comment with `/// # File-level:`
+    /// Max 1 is allowed per file.
+    case fileLevel
+
+    /// Documentation associated with an API element.
+    case symbol
+
+    /// Divides the file into sections.
+    ///
+    /// Start the comment with `/// # Section:`
+    /// Each section must have a title and optionally some summary and description
+    case section
+  }
+}
+
+public protocol LowLevelCommentParser {
+  associatedtype ParsingError: Error, Equatable
+  func parse(commentLines: [String]) -> Result<LowLevelCommentInfo, ParsingError>
+}
+
+public enum MarkdownParserError: Error, CustomStringConvertible {
   case invalidComment(line: String)
   case emptySection(String)
   case improperStructure(String)
 
-  var description: String {
+  public var description: String {
     switch self {
     case .invalidComment(let line):
       return "Invalid comment syntax: \(line)"
@@ -18,125 +76,96 @@ enum MarkdownParserError: Error, CustomStringConvertible {
   }
 }
 
-// Custom trimming function for line processing
-// In case a line has whitespaces before the slashes
-extension String {
-  func trimmingLeadingWhitespace() -> String {
-    guard let index = firstIndex(where: { !$0.isWhitespace }) else {
-      return ""
-    }
-    return String(self[index...])
-  }
-}
-
-// Remove leading /// and check for valid syntax
-func processCommentLines(_ lines: [String]) throws -> [String] {
-  var processedLines = [String]()
-
-  for line in lines {
-
-    let newLine = line.trimmingLeadingWhitespace()
-
-    if newLine.hasPrefix("/// ") {
-      processedLines.append(String(newLine.dropFirst(4)))
-    } else if newLine == "///" {
-      processedLines.append("")
-    } else if newLine.hasPrefix("///") {
-      print("Warning: Invalid comment syntax, add a whitespace after '///'.")
-      processedLines.append(String(newLine.dropFirst(3)))
-    } else {
-      throw MarkdownParserError.invalidComment(line: "Comment syntax is invalid at: " + line)
-    }
+public struct RealLowLevelCommentParser: LowLevelCommentParser {
+  public init() {}
+  
+  public enum ParsingError: Error, Equatable {
+    case missingWhitespace(inLine: String)
+    case emptySpecialSectionHeading
   }
 
-  return processedLines
-}
-
-public enum DocType {
-  case fileDoc
-  case apiDoc
-  //  case sectionDoc
-}
-
-// Data structure for parsing result
-public struct MarkdownDocResult {
-  var content: [Block]
-  var specialSections: [SpecialSection]
-  let type: DocType
-}
-
-public struct SpecialSection {
-  let name: String
-  var blocks: [Block]
-}
-
-// Calls Markdownkit to parse the comment block and then process result
-public func parseMarkdown(from lines: [String]) throws -> MarkdownDocResult {
-  let markdown = try processCommentLines(lines).joined(separator: "\n")
-  let document = MarkdownParser.standard.parse(markdown)
-
-  guard case let .document(blocks) = document else {
-    throw MarkdownParserError.improperStructure(
-      "Root node is not a document, it is a: " + document.debugDescription)
+  // Calls Markdownkit to parse the comment block and then process result
+  public func parse(commentLines: [String]) -> Result<LowLevelCommentInfo, ParsingError> {
+    stripLeadingDocSlashes(commentLines: commentLines)
+      .map { $0.joined(separator: "\n") }
+      .map { MarkdownParser.standard.parse($0) }
+      .flatMap { markdownDoc in
+        guard case let .document(blocks) = markdownDoc else {
+          fatalError(
+            "The underlying library failed to parse the markdown into a document. Result: \n\(markdownDoc.debugDescription)"
+          )
+        }
+        return parse(mdBlocks: blocks)
+      }
   }
-  return try parseMarkdownHelper(blocks)
-}
 
-// Splits the parsed markdown into pre-heading blocks (summary/description) and sections
-func parseMarkdownHelper(_ document: Blocks) throws -> MarkdownDocResult {
-  var currentSection: SpecialSection? = nil
-  var sections: [SpecialSection] = []
-  var content: [Block] = []
+  /// Removes leading `/// ` from the comment lines (including the first space after `///`).
+  ///
+  /// - Parameter lines: The lines of the comment block
+  /// - Returns: The lines without leading `/// `.
+  /// - Preconditions:
+  ///   - Lines must start with `///` after the leading whitespaces.
+  func stripLeadingDocSlashes(commentLines: [String]) -> Result<[Substring], ParsingError> {
+    commentLines.map { line in
+      let trimmedLine = line.trimmingPrefix { $0.isWhitespace }
+      precondition(
+        trimmedLine.starts(with: "///"),
+        "The comment line must start with '///': \(line)"
+      )
 
-  for block in document {
-    switch block {
-    case .heading(1, let text):
-      if let section = currentSection {
-        sections.append(section)
+      let withoutSlashes = trimmedLine.dropFirst(3)
+
+      if withoutSlashes.isEmpty {
+        return .success(withoutSlashes)
       }
 
-      let headingText = text.rawDescription.trimmingCharacters(in: .whitespaces)
-
-      guard !headingText.isEmpty else {
-        throw MarkdownParserError.improperStructure("Heading has no valid text")
+      guard withoutSlashes.first == " " else {
+        return .failure(.missingWhitespace(inLine: line))
       }
-
-      currentSection = SpecialSection(name: headingText, blocks: [])
-    default:
-      if var section = currentSection {
-        section.blocks.append(block)
-        currentSection = section
-      } else {
-        content.append(block)
-      }
+      return .success(withoutSlashes.dropFirst())
     }
+    .collectResults()
   }
 
-  if let section = currentSection {
-    sections.append(section)
-  }
+  // Splits the parsed markdown into pre-heading blocks (summary/description) and sections
+  func parse(mdBlocks document: Blocks) -> Result<LowLevelCommentInfo, ParsingError> {
+    var currentSection: LowLevelCommentInfo.SpecialSection? = nil
+    var sections: [LowLevelCommentInfo.SpecialSection] = []
+    var content: [Block] = []
 
-  let docType = try! getDocType(content: content, sections: sections)
+    for block in document {
+      switch block {
+      case .heading(1, let text):
+        if let section = currentSection {
+          sections.append(section)
+        }
 
-  return MarkdownDocResult(
-    content: content,
-    specialSections: sections,
-    type: docType
-  )
-}
+        let headingText = text.rawDescription.trimmingCharacters(in: .whitespaces)
 
-func getDocType(content: [Block], sections: [SpecialSection]) throws -> DocType {
-  if content.isEmpty {
-    if !sections.isEmpty {
-      if sections.first!.name == "File-level:" || sections.first!.name == "File-level" {
-        return .fileDoc
-      } else {
-        return .apiDoc
+        guard !headingText.isEmpty else {
+          return .failure(.emptySpecialSectionHeading)
+        }
+
+        currentSection = LowLevelCommentInfo.SpecialSection(name: headingText, blocks: [])
+      default:
+        if var section = currentSection {
+          section.blocks.append(block)
+          currentSection = section
+        } else {
+          content.append(block)
+        }
       }
-    } else {
-      throw MarkdownParserError.improperStructure("No content and no special sections detected")
     }
-  } else {
-    return .apiDoc
+
+    if let section = currentSection {
+      sections.append(section)
+    }
+
+    return .success(
+      LowLevelCommentInfo(
+        contentBeforeSections: content,
+        specialSections: sections
+      )
+    )
   }
 }

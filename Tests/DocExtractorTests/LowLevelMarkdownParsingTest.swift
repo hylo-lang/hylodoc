@@ -4,56 +4,93 @@ import XCTest
 @testable import DocExtractor
 
 final class LowLevelMarkdownParsingTests: XCTestCase {
-  func testProcessCommentLines_ValidInput() {
-    let lines = [
+  func testStripLeadingDocSlashes_ValidInput() {
+    let parser = RealLowLevelCommentParser()
+
+    let processed = parser.stripLeadingDocSlashes(commentLines: [
       "/// First paragraph is the summary.",
       "///",
       "/// Markdown __formatting__ is *supported*.",
-    ]
+    ])
 
-    do {
-      let processed = try processCommentLines(lines)
-      XCTAssertEqual(
-        processed,
-        [
-          "First paragraph is the summary.",
-          "",
-          "Markdown __formatting__ is *supported*.",
-        ])
-    } catch {
-      XCTFail("processCommentLines threw an unexpected error: \(error)")
-    }
+    let res = try? processed.get()
+    XCTAssertNotNil(res)
+
+    XCTAssertEqual(
+      res!,
+      [
+        "First paragraph is the summary.",
+        "",
+        "Markdown __formatting__ is *supported*.",
+      ]
+    )
+
   }
 
-  func testProcessCommentLines_LeadingWhitespaces() {
-    let lines = [
+  func testStripLeadingDocSlashes_LeadingWhitespacesAreStripped() {
+    let parser = RealLowLevelCommentParser()
+
+    let processed = parser.stripLeadingDocSlashes(commentLines: [
       " /// First paragraph is the summary.",
       "  /// Markdown __formatting__ is *supported*.",
-    ]
+    ])
 
-    do {
-      let processed = try processCommentLines(lines)
-      XCTAssertEqual(
-        processed,
-        [
-          "First paragraph is the summary.",
-          "Markdown __formatting__ is *supported*.",
-        ])
-    } catch {
-      XCTFail("processCommentLines threw an unexpected error: \(error)")
+    switch processed {
+      case .success(let result):
+        XCTAssertEqual(
+          result,
+          [
+            "First paragraph is the summary.",
+            "Markdown __formatting__ is *supported*.",
+          ]
+        )
+      case .failure(let error):
+        XCTFail("unexpected error: \(error)")
     }
   }
 
-  func testProcessCommentLines_invalidInput() {
-    let lines = [
-      "// First paragraph is the summary.",
-      "// Markdown __formatting__ is *supported*.",
-    ]
 
-    XCTAssertThrowsError(try processCommentLines(lines))
+  func testStripLeadingDocSlashes_OnlyFirstWhitespaceAfterSlashesIsStripped() {
+    let parser = RealLowLevelCommentParser()
+
+    let processed = parser.stripLeadingDocSlashes(commentLines: [
+      "/// First paragraph is the summary.",
+      "///     void main();",
+    ])
+
+    switch processed {
+      case .success(let result):
+        XCTAssertEqual(
+          result,
+          [
+            "First paragraph is the summary.",
+            "    void main();",
+          ]
+        )
+      case .failure(let error):
+        XCTFail("unexpected error: \(error)")
+    }
+  }
+
+  func testProcessCommentLines_invalidInputWithoutOneSpaceAfterSlashes() {
+    let parser = RealLowLevelCommentParser()
+
+    let processed = parser.stripLeadingDocSlashes(commentLines: [
+      "/// First paragraph is the summary.",
+      "///Markdown __formatting__ is *supported*.",
+    ])
+
+    switch processed {
+      case .success:
+        XCTFail("Expected an error, but got success.")
+      case .failure(let error):
+        XCTAssertEqual(error, .missingWhitespace(inLine: "///Markdown __formatting__ is *supported*."))
+    }
   }
 
   func testParseMarkdown_ValidAPIInput() {
+    let parser = RealLowLevelCommentParser()
+
     let codeLines = [
       "/// First paragraph is the summary.",
       "///",
@@ -67,7 +104,7 @@ final class LowLevelMarkdownParsingTests: XCTestCase {
       "/// - height: The height of the rectangle.",
       "///",
       "/// # Preconditions:",
-      "/// - width \\< height – the rectangle should be",
+      "/// - width \\< height - the rectangle should be",
       "/// longer vertically than horizontally",
       "/// - width and height must be positive",
       "///",
@@ -76,29 +113,32 @@ final class LowLevelMarkdownParsingTests: XCTestCase {
       "/// - 0 otherwise",
     ]
 
-    do {
-      let apiresult = try parseMarkdown(from: codeLines)
+    let result = parser.parse(commentLines: codeLines)
 
-      guard case .apiDoc = apiresult.type else {
-        XCTFail("Not interpreted as Api Doc")
-        return
-      }
+    switch result {
+      case .success(let parsed):
+        XCTAssertEqual(parsed.type, .symbol)
+        XCTAssertEqual(parsed.contentBeforeSections.count, 3)
+        XCTAssertEqual(parsed.specialSections.count, 3)
 
-      let blocks = apiresult.content
-      if !blocks.isEmpty {
-        for block in blocks {
-          print(block.debugDescription)
-        }
-      }
-      for section in apiresult.specialSections {
-        print(section.name)
-        for block in section.blocks {
-          print(block.debugDescription)
-        }
-      }
-      XCTAssert(true)
-    } catch {
-      XCTFail("parseMarkdown threw an unexpected error: \(error)")
+        let firstSection = parsed.specialSections[0]
+        XCTAssertEqual(firstSection.name, "Parameters:")
+        assertContains(firstSection.blocks.description, what: "width: The width of the rectangle.")
+        assertContains(firstSection.blocks.description, what: "height: The height of the rectangle.")
+
+        let secondSection = parsed.specialSections[1]
+        XCTAssertEqual(secondSection.name, "Preconditions:")
+        assertContains(secondSection.blocks.description, what: "width < height - the rectangle should be")
+        assertContains(secondSection.blocks.description, what: "longer vertically than horizontally")
+        assertContains(secondSection.blocks.description, what: "width and height must be positive")
+
+        let thirdSection = parsed.specialSections[2]
+        XCTAssertEqual(thirdSection.name, "Returns:")
+        XCTAssertTrue(thirdSection.blocks.description.contains("The calculated area if width is even"))
+        XCTAssertTrue(thirdSection.blocks.description.contains("0 otherwise"))
+
+      case .failure(let error):
+        XCTFail("Unexpected error: \(error)")
     }
   }
 
@@ -125,22 +165,18 @@ final class LowLevelMarkdownParsingTests: XCTestCase {
       "/// - 0 otherwise",
     ]
 
-    XCTAssertThrowsError(try parseMarkdown(from: codeLines)) { error in
-      if let markdownError = error as? MarkdownParserError {
-        switch markdownError {
-        case .improperStructure:
-          XCTAssert(true)
-        default:
-          XCTFail("Unexpected MarkdownParserError")
-        }
-      } else {
-        XCTFail("Unexpected error type. ")
-      }
+    let parser = RealLowLevelCommentParser()
+    let result = parser.parse(commentLines: codeLines)
+    
+    switch result {
+      case .success(let value):
+        XCTFail("Expected an error, but got success. Parsed as:\(value)")
+      case .failure(let error):
+        XCTAssertEqual(error, .emptySpecialSectionHeading)
     }
-
   }
 
-  func testParseMarkdown_ValidFileInput() {
+  func testParseMarkdown_ValidFileLevelInput() {
     let codeLines = [
       "/// # File-level: ",
       "///",
@@ -154,28 +190,29 @@ final class LowLevelMarkdownParsingTests: XCTestCase {
       "/// - height: The height of the rectangle.",
     ]
 
-    do {
-      let apiresult = try parseMarkdown(from: codeLines)
+    let parser = RealLowLevelCommentParser()
+    let result = parser.parse(commentLines: codeLines)
 
-      guard case .fileDoc = apiresult.type else {
-        XCTFail("Not interpreted as Api Doc")
-        return
-      }
+    switch result {
+      case .success(let parsed):
+        XCTAssertEqual(parsed.type, .fileLevel)
+        XCTAssertEqual(parsed.contentBeforeSections.count, 0)
+        XCTAssertEqual(parsed.specialSections.count, 2)
 
-      let blocks = apiresult.content
+        let fileLevelSection = parsed.specialSections[0]
+        XCTAssertEqual(fileLevelSection.name, "File-level:")
+      
+        assertContains(fileLevelSection.blocks.description, what: "in")
+        assertContains(fileLevelSection.blocks.description, what: "the description.")
+        assertContains(fileLevelSection.blocks.description, what: "It can also be multiple paragraphs long.")
 
-      if !blocks.isEmpty {
-        XCTFail("File-level was not interpreted as a heading.")
-      }
-      for section in apiresult.specialSections {
-        print(section.name)
-        for block in section.blocks {
-          print(block.debugDescription)
-        }
-      }
-      XCTAssert(true)
-    } catch {
-      XCTFail("parseMarkdown threw an unexpected error: \(error)")
+        let seeAlsoSection = parsed.specialSections[1]
+        XCTAssertEqual(seeAlsoSection.name, "See also:")
+        assertContains(seeAlsoSection.blocks.description, what: "width: The width of the rectangle.")
+        assertContains(seeAlsoSection.blocks.description, what: "height: The height of the rectangle.")
+
+      case .failure(let error):
+        XCTFail("Unexpected error: \(error)")
     }
   }
 }

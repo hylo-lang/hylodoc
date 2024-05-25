@@ -2,33 +2,59 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 
+public struct DocumentedFile {
+  /// The file-level comment if it exists.
+  public let fileLevel: LowLevelCommentInfo?
+
+  /// The comment at the given start index of a symbol
+  public let symbolComments: [SourceFile.Index: LowLevelCommentInfo]
+}
+
+public protocol CommentParser {
+  /// Returns the comments extracted from the source file if there are no errors and reports any issues in the diagnostics parameter
+  func parse(sourceFile: SourceFile, diagnostics: inout DiagnosticSet) -> DocumentedFile?
+}
+
 /// A structure representing a source file with associated comments.
-public struct CommentedFile {
+public struct RealCommentParser<LLCommentParser: LowLevelCommentParser>: CommentParser {
+  private let lowLevelCommentParser: LLCommentParser
 
+  public init(lowLevelCommentParser: LLCommentParser) {
+    self.lowLevelCommentParser = lowLevelCommentParser
+  }
+
+  public func parse(sourceFile: SourceFile, diagnostics: inout DiagnosticSet) -> DocumentedFile? {
+    let builder = DocumentedFileBuilder(sourceFile, lowLevelCommentParser)
+    diagnostics.formUnion(builder.diagnostics)
+
+    guard !builder.diagnostics.containsError else {
+      return nil
+    }
+    return DocumentedFile(
+      fileLevel: builder.fileComment,
+      symbolComments: builder.symbolComments
+    )
+  }
+}
+
+private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   private let source: SourceFile
-  private let commentParser: LowLevelCommentParser
+  private let commentParser: LLCommentParser
 
-  public private(set) var symbolComments: [TargetedSymbolDocInfo]
-  public private(set) var fileComment: FileLevelInfo?
+  /// A list of symbol comments associated with their target index.
+  public private(set) var symbolComments: [SourceFile.Index: LowLevelCommentInfo] = [:]
+  public private(set) var fileComment: LowLevelCommentInfo?
+  public private(set) var diagnostics: DiagnosticSet = .init()
 
   /// Initializes a `CommentedFile` with a given source file and comment parser.
   ///
   /// - Parameters:
   ///   - sourceFile: The source file to extract comments from.
   ///   - commentParser: The parser used to parse the comments.
-  public init(_ sourceFile: SourceFile, _ commentParser: LowLevelCommentParser) {
+  public init(_ sourceFile: SourceFile, _ commentParser: LLCommentParser) {
     self.source = sourceFile
     self.commentParser = commentParser
-    symbolComments = [TargetedSymbolDocInfo]()
     extractComments()
-  }
-
-  /// Retrieves the comment for a symbol at a specific start index.
-  ///
-  /// - Parameter index: The starting index of a symbol in the source file to retrieve the comment for.
-  /// - Returns: The comment source at the given index, or nil if no comment is found.
-  public func getSymbolComment(_ startIndex: SourceFile.Index) -> SymbolDocInfo? {
-    return symbolComments.first { $0.target == startIndex }?.info
   }
 
   /// Extracts all symbol & file-level comments from the source file using the comment parser.
@@ -37,12 +63,11 @@ public struct CommentedFile {
     var curIndex: SourceFile.Index = source.text.startIndex
 
     for token in tokens {
-      let tokenSite = token.site
-      processTokenRange(curIndex, tokenSite.startIndex)
-      curIndex = tokenSite.endIndex
+      processTokenRange(from: curIndex, until: token.site.startIndex)
+      curIndex = token.site.endIndex
     }
 
-    processTokenRange(curIndex, source.text.endIndex)
+    processTokenRange(from: curIndex, until: source.text.endIndex)
   }
 
   /// Processes a range of the source file to extract comments.
@@ -52,8 +77,9 @@ public struct CommentedFile {
   ///   - end: The ending index of the range.
   ///
   /// - Precondition: The range should not contain any tokens.
-  private mutating func processTokenRange(_ start: SourceFile.Index, _ end: SourceFile.Index) {
-    let content = source.text[start ..< end]
+  private mutating func processTokenRange(from start: SourceFile.Index, until end: SourceFile.Index)
+  {
+    let content = source.text[start..<end]
     let lines = content.split(separator: "\n", omittingEmptySubsequences: false)
     processLines(lines, end)
   }
@@ -64,19 +90,28 @@ public struct CommentedFile {
   ///   - lines: The lines of text to process.
   ///   - target: The target index for the comment.
   private mutating func processLines(_ lines: [Substring], _ target: SourceFile.Index) {
-    var commentLines = [String]()
+    var commentLines: [String] = []
 
     var startedComment = false
     var finishedComment = false
 
-    for i in 0 ..< lines.count {
-      let trimmed = lines[i].trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-      let isCommentLine = trimmed.hasPrefix("///")
+    // todo this is a dummy range, should be replaced with the
+    // actual range of the comment that is being processed.
+    let dummyRange = SourceRange(
+      Range(uncheckedBounds: (lower: "".startIndex, upper: "".endIndex)),
+      in: source
+    )
+
+    for line in lines {
+      let isCommentLine =
+        line
+        .trimmingPrefix { $0.isWhitespace }
+        .hasPrefix("///")
 
       if isCommentLine {
         if finishedComment {
-          addComment(commentLines, nil)
-          commentLines.removeAll()
+          addComment(lines: commentLines, origin: dummyRange, target: nil)
+          commentLines = []
           startedComment = false
           finishedComment = false
         }
@@ -85,7 +120,7 @@ public struct CommentedFile {
           startedComment = true
         }
 
-        commentLines.append(trimmed)
+        commentLines.append(String(line))
       } else {
         if startedComment && !finishedComment {
           finishedComment = true
@@ -94,7 +129,7 @@ public struct CommentedFile {
     }
 
     if startedComment {
-      addComment(commentLines, target)
+      addComment(lines: commentLines, origin: dummyRange, target: target)
     }
   }
 
@@ -103,61 +138,37 @@ public struct CommentedFile {
   /// - Parameters:
   ///   - lines: The lines of the comment.
   ///   - target: The target index for the symbol comment, if applicable.
-  private mutating func addComment(_ lines: [String], _ target: SourceFile.Index?) {
-    let info = commentParser.parse(lines)
+  private mutating func addComment(lines: [String], origin: SourceRange, target: SourceFile.Index?)
+  {
+    let result = commentParser.parse(commentLines: lines)
+    if case .failure(let error) = result {
+      diagnostics.insert(.error(error.localizedDescription, at: origin))
+    }
+    let info = try! result.get()
 
-    switch info {
-    case .FileLevel(let fileInfo):
-      if self.fileComment != nil {
-        print("ERROR: Multiple file-level comments")
+    switch info.type {
+    case .fileLevel:
+      guard self.fileComment == nil else {
+        diagnostics.insert(
+          .error("Only one file-level documentation comment is allowed.", at: origin))
         return
       }
 
-      self.fileComment = fileInfo
-    case .SymbolDoc(let symbolInfo):
-      if target == nil {
-        print("ERROR: No target for symbol comment")
+      self.fileComment = info
+    case .symbol:
+      guard target != nil else {
+        diagnostics.insert(
+          .error(
+            "Documentation comment is not related to any code"
+              + "entity, nor is it a file-level or section comment.",
+            at: origin
+          ))
         return
       }
-
-      let targetedSymbolInfo = TargetedSymbolDocInfo(symbolInfo, target!)
-      symbolComments.append(targetedSymbolInfo)
+      symbolComments[target!] = info
+    case .section:
+      fatalError("Section comments are not supported yet")
+      break
     }
   }
-}
-
-// A structure representing a symbol documentation with its associated target symbol index
-public struct TargetedSymbolDocInfo {
-  public let info: SymbolDocInfo
-  public let target: SourceFile.Index
-
-  public init(_ info: SymbolDocInfo, _ target: SourceFile.Index) {
-    self.info = info
-    self.target = target
-  }
-}
-
-public struct FileLevelInfo {
-  public let text: String
-
-  public init(_ text: String) {
-    self.text = text
-  }
-}
-
-public struct SymbolDocInfo {
-  public let text: String
-
-  public init(_ text: String) {
-    self.text = text
-  }
-}
-
-public enum LowLevelInfo {
-  case FileLevel(info: FileLevelInfo)
-  case SymbolDoc(info: SymbolDocInfo)
-}
-
-public protocol LowLevelCommentParser {
-  func parse(_ commentLines: [String]) -> LowLevelInfo
 }
