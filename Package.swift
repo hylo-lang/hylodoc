@@ -19,7 +19,7 @@ let docGenerationDependency: [Package.Dependency] =
 let package = Package(
   name: "HyloDoc",
   platforms: [
-    .macOS(.v12)
+    .macOS(.v13)
   ],
   products: [
     .executable(name: "hdc", targets: ["hdc"]),  // Hylo Documentation Compiler (hdc)
