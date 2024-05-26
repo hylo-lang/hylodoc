@@ -20,6 +20,10 @@ public struct GeneralDescriptionFields: Equatable {
 /// Documentation of a typealias declaration
 public struct TypeAliasDocumentation: IdentifiedEntity {
   public let common: GeneralDescriptionFields
+    
+    public init(common: GeneralDescriptionFields) {
+        self.common = common
+    }
 }
 
 public struct Invariant {

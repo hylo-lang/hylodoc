@@ -1,0 +1,1 @@
+typealias Vector2 = {x: Float64, y: Float64}
