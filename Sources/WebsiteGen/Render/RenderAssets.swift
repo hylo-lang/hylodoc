@@ -10,8 +10,40 @@ import Stencil
 ///   - of: source file asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID) throws -> String {
-    return ""
+public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) throws -> String {
+    // public struct SourceFileAsset: IdentifiedEntity, Asset {
+    //     public let location: URL
+
+    //     /// The optional file-level documentation for the source file.
+    //     public let generalDescription: GeneralDescriptionFields
+
+    //     /// The translation unit ID that this source file belongs to.
+    //     public let translationUnit: TranslationUnit.ID
+    // }
+    // public struct GeneralDescriptionFields {
+    //     public let summary: Block?
+    //     public let description: Block?
+    //     public let seeAlso: [Block] // probably a link but it can also be just a text referring to something
+    // }
+    var arr: [String: Any] = [:]
+
+    arr["name"] = of.name.components(separatedBy: ".").first!
+
+    // check if file has summary
+    if let summaryBlock = of.generalDescription.summary {
+        arr["summary"] = HtmlGenerator.standard.generate(block: summaryBlock)
+    }
+    // check if file has description
+    if let descriptionBlock = of.generalDescription.description {
+        arr["description"] = HtmlGenerator.standard.generate(block: descriptionBlock)
+    }
+
+    let seeAlso = of.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(block: $0) }
+    if !seeAlso.isEmpty {
+        arr["seeAlso"] = seeAlso
+    }
+
+    return try ctx.stencil.renderTemplate(name: "sourceFile_layout.html", context: arr)
 }
 
 /// Render the article page

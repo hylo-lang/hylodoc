@@ -1,6 +1,15 @@
 import Foundation
 import FrontEnd
 import DocumentationDB
+import Stencil
+
+/// Extension to the Stencil Environment struct to allow for default behavior of whitespace control
+/// Removes whitespace before a block and whitespace and a single newline after a block (from https://github.com/stencilproject/Stencil/blob/master/Sources/Stencil/TrimBehaviour.swift)
+extension Environment {
+    public init(loader: Loader?) {
+        self.init(loader: loader, trimBehaviour: .smart)
+    }
+}
 
 /// Render an arbitrary asset page
 ///
@@ -14,7 +23,8 @@ public func renderAssetPage(ctx: GenerationContext, of: AnyAssetID) throws -> St
     case .folder(let id):
         return try renderFolderPage(ctx: ctx, of: id)
     case .sourceFile(let id):
-        return try renderSourceFilePage(ctx: ctx, of: id)
+        let sourceFile = ctx.documentation.assets.sourceFiles[id]!
+        return try renderSourceFilePage(ctx: ctx, of: sourceFile)
     case .article(let id):
         return try renderArticlePage(ctx: ctx, of: id)
     case .otherFile(_):
