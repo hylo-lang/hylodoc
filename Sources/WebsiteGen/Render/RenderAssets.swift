@@ -10,8 +10,8 @@ import Stencil
 ///   - of: source file asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) -> String {
-  return ""
+public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID) throws -> String {
+    return ""
 }
 
 /// Render the article page
@@ -21,16 +21,19 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) ->
 ///   - of: article asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset) throws -> String {
+public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throws -> String {
+  let article = ctx.documentation.assets[of]!
+
   var arr: [String: Any] = [:]
 
-  if let title = of.title {
+  if let title = article.title {
     arr["name"] = title
   } else {
-    arr["name"] = of.name.components(separatedBy: ".").first!
+    arr["name"] = article.name.components(separatedBy: ".").first!
   }
 
-  arr["content"] = HtmlGenerator.standard.generate(block: of.content)
+  arr["toRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.article(of)))
+  arr["content"] = HtmlGenerator.standard.generate(block: article.content)
 
   return try ctx.stencil.renderTemplate(name: "article_layout.html", context: arr)
 }
@@ -45,18 +48,23 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset) throws -
 ///   - of: module asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderFolderPage(ctx: GenerationContext, of: FolderAsset) throws -> String {
+public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws -> String {
+  let folder = ctx.documentation.assets[of]!
+
   var arr: [String: Any] = [:]
 
-  arr["name"] = of.name
+  arr["name"] = folder.name
+  arr["toRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.folder(of)))
 
   // check if folder has documentation
-  if let overviewId = of.documentation {
+  if let overviewId = folder.documentation {
     let overviewArticle = ctx.documentation.assets.articles[overviewId]!
     arr["overview"] = HtmlGenerator.standard.generate(block: overviewArticle.content)
   }
 
-  let children = of.children.map { getAssetTitleAndUrl($0, ctx.documentation.assets) }
+  let children = folder.children.map {
+    childId in (getAssetTitle(childId, ctx.documentation.assets), ctx.urlResolver.refer(from: .asset(.folder(of)), to: .asset(childId)))
+   }
   if !children.isEmpty {
     arr["children"] = children
   }
@@ -69,30 +77,20 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset) throws -> 
 ///   - id: id of the asset
 ///   - assetsDB: database with assets
 /// - Returns: Tuple containig String representing the title of the asset and url for the link to the asset's page
-public func getAssetTitleAndUrl(_ id: AnyAssetID, _ assetsDB: AssetStore) -> (String, URL) {
+public func getAssetTitle(_ id: AnyAssetID, _ assetsDB: AssetStore) -> String {
   switch id {
   case .sourceFile(let sid):
-    return (
-      assetsDB.sourceFiles[sid]?.name ?? "SOURCE_FILE_NOT_FOUND",
-      assetsDB.url(of: id) ?? URL(string: "/URL_NOT_FOUND")!
-    )
+    return assetsDB.sourceFiles[sid]!.name
   case .article(let aid):
-    return (
-      assetsDB.articles[aid]?.title ?? "ARTICLE_NOT_FOUND",
-      assetsDB.url(of: id) ?? URL(string: "/URL_NOT_FOUND")!
-    )
+    let article = assetsDB.articles[aid]!
+    return article.title ?? String(article.name.lazy.split(separator: ".")[0])
   case .folder(let fid):
-    return (
-      assetsDB.folders[fid]?.name ?? "FOLDER_NOT_FOUND",
-      assetsDB.url(of: id) ?? URL(string: "/URL_NOT_FOUND")!
-    )
+    return assetsDB.folders[fid]!.name
   case .otherFile(let oid):
-    return (
-      assetsDB.otherFiles[oid]?.name ?? "OTHER_FILE_NOT_FOUND",
-      assetsDB.url(of: id) ?? URL(string: "/URL_NOT_FOUND")!
-    )
+    return assetsDB.otherFiles[oid]!.name
   }
 }
+
 /// Render the other-file page and return the result
 ///
 /// Other files do not show up separatly, but are always embedded into other documentation such as that of symbols or other assets.
@@ -103,6 +101,6 @@ public func getAssetTitleAndUrl(_ id: AnyAssetID, _ assetsDB: AssetStore) -> (St
 ///   - of: other file asset to render page of
 ///
 /// - Returns: the contents of the rendered local file
-public func renderOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset) -> String {
-  return ""
+public func renderOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset.ID) throws -> String {
+    return ""
 }

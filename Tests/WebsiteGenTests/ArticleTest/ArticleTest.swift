@@ -37,13 +37,6 @@ final class ArticleTest: XCTestCase {
 
     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
-    let ctx = GenerationContext(
-      documentation: db,
-      stencil: stencil,
-      typedProgram: typedProgram,
-      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
-    )
-
     let article1Id = db.assets.articles.insert(
       .init(
         location: URL(string: "root/Folder1/article1.hylodoc")!,
@@ -53,10 +46,19 @@ final class ArticleTest: XCTestCase {
             "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
           ))
       ))
+      
+      var ctx = GenerationContext(
+        documentation: db,
+        stencil: stencil,
+        typedProgram: typedProgram,
+        urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
+      )
+      
+      ctx.urlResolver.resolve(target: .asset(.article(article1Id)), filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"))
 
     var res: String = ""
     do {
-      res = try renderArticlePage(ctx: ctx, of: db.assets.articles[article1Id]!)
+      res = try renderArticlePage(ctx: ctx, of: article1Id)
     } catch {
       XCTFail("Should not throw")
     }
@@ -96,13 +98,6 @@ final class ArticleTest: XCTestCase {
 
     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
-    let ctx = GenerationContext(
-      documentation: db,
-      stencil: stencil,
-      typedProgram: typedProgram,
-      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
-    )
-
     let article1Id = db.assets.articles.insert(
       .init(
         location: URL(string: "root/Folder1/article1.hylodoc")!,
@@ -112,10 +107,19 @@ final class ArticleTest: XCTestCase {
             "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
           ))
       ))
+      
+      var ctx = GenerationContext(
+        documentation: db,
+        stencil: stencil,
+        typedProgram: typedProgram,
+        urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
+      )
+      
+      ctx.urlResolver.resolve(target: .asset(.article(article1Id)), filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"))
 
     var res: String = ""
     do {
-      res = try renderArticlePage(ctx: ctx, of: db.assets.articles[article1Id]!)
+        res = try renderArticlePage(ctx: ctx, of: article1Id)
     } catch {
       XCTFail("Should not throw")
     }

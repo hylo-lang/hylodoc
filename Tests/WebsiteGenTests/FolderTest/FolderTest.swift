@@ -44,16 +44,18 @@ final class FolderTest: XCTestCase {
 
     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
-    let ctx = GenerationContext(
+    var ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
+      
+      ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"))
 
     var res: String = ""
     do {
-      res = try renderFolderPage(ctx: ctx, of: db.assets.folders[folder1Id]!)
+      res = try renderFolderPage(ctx: ctx, of: folder1Id)
     } catch {
       XCTFail("Should not throw")
     }
@@ -107,16 +109,18 @@ final class FolderTest: XCTestCase {
 
     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
-    let ctx = GenerationContext(
+    var ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
+      
+      ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"))
 
     var res: String = ""
     do {
-      res = try renderFolderPage(ctx: ctx, of: db.assets.folders[folder1Id]!)
+      res = try renderFolderPage(ctx: ctx, of: folder1Id)
     } catch {
       XCTFail("Should not throw")
     }
@@ -197,16 +201,20 @@ final class FolderTest: XCTestCase {
 
     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
-    let ctx = GenerationContext(
+    var ctx = GenerationContext(
       documentation: db,
       stencil: stencil,
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
+      
+      ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"))
+      ctx.urlResolver.resolve(target: .asset(.folder(child2FolderId)), filePath: RelativePath(pathString: "root/Folder1/Folder2/index.html"))
+      ctx.urlResolver.resolve(target: .asset(.article(child1ArticleId)), filePath: RelativePath(pathString: "root/Folder1/child1.hylodoc"))
 
     var res: String = ""
     do {
-      res = try renderFolderPage(ctx: ctx, of: db.assets.folders[folder1Id]!)
+      res = try renderFolderPage(ctx: ctx, of: folder1Id)
     } catch {
       XCTFail("Should not throw")
     }
@@ -215,7 +223,7 @@ final class FolderTest: XCTestCase {
     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
     XCTAssertTrue(res.contains("<h2>Overview</h2>"), res)
     XCTAssertTrue(res.contains("<p>lorem ipsum</p>"), res)
-    XCTAssertTrue(res.contains("<a href=\"root/Folder1/child1.hylodoc\">Article 1</a>"), res)
-    XCTAssertTrue(res.contains("<a href=\"root/Folder1/Folder2\">Folder2</a>"), res)
+    XCTAssertTrue(res.contains("<a href=\"child1.hylodoc\">Article 1</a>"), res)
+    XCTAssertTrue(res.contains("<a href=\"Folder2/index.html\">Folder2</a>"), res)
   }
 }

@@ -42,7 +42,7 @@ public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter
   let target = ctx.urlResolver.pathToFile(target: .symbol(of))
 
   // Render and export page
-  let content = renderSymbolPage(ctx: ctx, of: of)
+  let content = try renderSymbolPage(ctx: ctx, of: of)
   try with.html(content: content, to: target)
 }
 

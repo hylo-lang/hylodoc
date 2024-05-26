@@ -87,10 +87,10 @@ private func convertAssetToPath(ctx: GenerationContext, asset: AnyAssetID) -> St
     return folder.name
   case .sourceFile(let id):
     let sourceFile = ctx.documentation.assets.sourceFiles[id]!
-    return String(sourceFile.location.lastPathComponent.lazy.split(separator: ".")[0])
+    return String(sourceFile.name.lazy.split(separator: ".")[0])
   case .article(let id):
     let article = ctx.documentation.assets.articles[id]!
-    return String(article.location.lastPathComponent.lazy.split(separator: ".")[0])
+    return String(article.name.lazy.split(separator: ".")[0])
       + ".article.html"
   case .otherFile(let id):
     let otherFile = ctx.documentation.assets.otherFiles[id]!
