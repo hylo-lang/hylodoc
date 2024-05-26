@@ -1,5 +1,14 @@
 {% extends "layout.html" %}
 
+{% block header %}
+    <div class="section">
+        <h1>{{ name }}</h1>
+        <code>
+            {{ code }}
+        </code>
+    </div>
+{% endblock %}
+
 {% block content %}
     {% if overview %}
         <div class="section">

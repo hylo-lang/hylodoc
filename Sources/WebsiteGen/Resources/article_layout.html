@@ -1,13 +1,7 @@
 {% extends "layout.html" %}
-{% block header %}
-    <div class="section">
-        <h1>{{ name }}</h1>
-    </div>
-{% endblock %}
+
 {% block content %}
-    {% if content %}
-        <div class="section">
-            {{ content }}
-        </div>
-    {% endif %}
+    <div class="section">
+        {{ content }}
+    </div>
 {% endblock %}

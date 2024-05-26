@@ -36,7 +36,24 @@ public func renderAssociatedValuePage(ctx: GenerationContext, of: AssociatedValu
 ///
 /// - Returns: contents of the rendered page
 public func renderTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl.ID, with: TypeAliasDocumentation) throws -> String {
-    return ""
+    let decl: TypeAliasDecl = ctx.typedProgram.ast[of]!
+
+    var args: [String : Any] = [:]
+    args["name"] = decl.identifier.value
+    args["code"] = decl.site.text
+    args["toRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    // Summary
+    if let summary = with.common.summary {
+        args["summary"] = HtmlGenerator.standard.generate(block: summary)
+    }
+
+    // Overview
+    if let block = with.common.description {
+        args["overview"] = HtmlGenerator.standard.generate(block: block)
+    }
+
+    return try ctx.stencil.renderTemplate(name: "symbol_layout.html", context: args)
 }
 
 /// Render the binding page
