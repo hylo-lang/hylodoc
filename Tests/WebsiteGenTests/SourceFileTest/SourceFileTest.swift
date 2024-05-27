@@ -30,7 +30,7 @@ final class SourceFileTest: XCTestCase {
                 documentation: DocumentationDatabase.init(),
                 stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
                 typedProgram: typedProgram,
-                urlResolver: URLResolver(baseUrl: AbsolutePath(url: URL(filePath: pathUrl))!)
+                urlResolver: URLResolver(baseUrl: AbsolutePath(url: URL(fileURLWithPath: pathUrl))!)
                 )
 
         var res: String = ""
@@ -106,7 +106,7 @@ final class SourceFileTest: XCTestCase {
                 documentation: db,
                 stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
                 typedProgram: typedProgram,
-                urlResolver: URLResolver(baseUrl: AbsolutePath(url: URL(filePath: pathUrl))!)
+                urlResolver: URLResolver(baseUrl: AbsolutePath(url: URL(fileURLWithPath: pathUrl))!)
                 )
 
         var res: String = ""
