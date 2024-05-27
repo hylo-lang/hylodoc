@@ -183,13 +183,15 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
 /// Scans the assets in the given modules and calls the visitor for each asset.
 public func extractDocumentation(typedProgram: TypedProgram, for modules: [InputModuleInfo]) ->  //
   Result<
-    DocumentationDatabase, DocExtractionError<DocDBBuildingAssetScanner<DummySourceFileDocumentor>>
-  >
+    DocumentationDatabase, DocExtractionError<DocDBBuildingAssetScanner<RealSourceFileDocumentor<RealCommentParser<RealLowLevelCommentParser>>>
+  >>
 {
+  let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
+  let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
   var builder = DocDBBuildingAssetScanner(
     modules: modules,
     typedProgram: typedProgram,
-    sourceFileDocumentor: DummySourceFileDocumentor()
+    sourceFileDocumentor: sourceFileDocumentor
   )
   return builder.build()
 }

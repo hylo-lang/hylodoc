@@ -1,15 +1,11 @@
 /// # File-level:
-/// This is the summary of the file.
+/// Carving up a summary for dinner, minding my own business.
 /// 
-/// Hello
-/// 
-/// world
-///  - in the 
-///  - description
+/// In storms my husband Wilbur in a jealous description. He was crazy!
+/// # See Also:
+/// - And then he ran into my first see also.
+/// - He ran into my second see also 10 times...
 
-/// Computes the factorial of `n`.
-///
-/// - Requires: `n` must be greater or equal to 0.
 fun factorial(_ n: Int) -> Int {
   if n < 2 { 1 } else { n * factorial(n - 1) }
 }

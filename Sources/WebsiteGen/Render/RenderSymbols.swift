@@ -45,12 +45,12 @@ public func renderTypeAliasPage(ctx: GenerationContext, of: TypeAliasDecl.ID, wi
 
     // Summary
     if let summary = with.common.summary {
-        args["summary"] = HtmlGenerator.standard.generate(block: summary)
+        args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
     // Overview
     if let block = with.common.description {
-        args["overview"] = HtmlGenerator.standard.generate(block: block)
+        args["overview"] = HtmlGenerator.standard.generate(doc: block)
     }
 
     return try ctx.stencil.renderTemplate(name: "symbol_layout.html", context: args)

@@ -5,6 +5,7 @@ import DocumentationDB
 import StandardLibraryCore
 import MarkdownKit
 import DocExtractor
+import PathWrangler
 
 @testable import FrontEnd
 
@@ -13,7 +14,56 @@ func assetNameIs(_ name: String, _ assets: AssetStore) -> ((AnyAssetID) -> Bool)
 }
 
 final class SourceFileTest: XCTestCase {
-    func testSourceFilePageGeneration() {
+    func unitTestSourceFilePageGeneration() {
+
+        var diagnostics = DiagnosticSet()
+
+        let ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+
+        let typedProgram = try! TypedProgram(
+            annotating: ScopedProgram(ast), inParallel: false,
+            reportingDiagnosticsTo: &diagnostics,
+            tracingInferenceIf: { (_, _) in false })
+
+        let pathUrl = "/Users/evyatarhadasi/Desktop/code/automated-documentation-generation-tool/Tests/WebsiteGenTests/SourceFileTest/TestOutput"
+        let ctx = GenerationContext(
+                documentation: DocumentationDatabase.init(),
+                stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
+                typedProgram: typedProgram,
+                urlResolver: URLResolver(baseUrl: AbsolutePath(url: URL(filePath: pathUrl))!)
+                )
+
+        var res: String = ""
+
+        let sourceFile = SourceFileAsset(
+            location: URL(string: "root/Folder1/sf.hylo")!,
+            generalDescription: GeneralDescriptionFields(
+                summary: .document([.paragraph(Text(
+                            "Carving up a summary for dinner, minding my own business."
+                        ))]),
+                description: .document([.paragraph(Text(
+                            "In storms my husband Wilbur in a jealous description. He was crazy!"
+                        ))]),
+                seeAlso: [
+                    .document([.paragraph(Text("And then he ran into my first see also."))]),
+                    .document([.paragraph(Text("He ran into my second see also 10 times..."))])
+                ]
+            ),
+            translationUnit: TranslationUnit.ID(rawValue: 2)
+        )
+        do {
+            res = try renderSourceFilePage(ctx: ctx, of: sourceFile)
+        } catch {
+            XCTFail("Should not throw")
+        }
+
+        XCTAssertTrue(res.contains("<p>Carving up a summary for dinner, minding my own business.</p>"), res)
+        XCTAssertTrue(res.contains("<p>In storms my husband Wilbur in a jealous description. He was crazy!</p>"), res)
+        XCTAssertTrue(res.contains("<p>And then he ran into my first see also.</p>"), res)
+        XCTAssertTrue(res.contains("<p>He ran into my second see also 10 times...</p>"), res)
+    }
+
+    func integrationTestSourceFilePageGeneration() {
 
         var diagnostics = DiagnosticSet()
 
@@ -51,110 +101,40 @@ final class SourceFileTest: XCTestCase {
 
         let db = try! result.get()
 
+        let pathUrl = "/Users/evyatarhadasi/Desktop/code/automated-documentation-generation-tool/Tests/WebsiteGenTests/SourceFileTest/TestOutput"
         let ctx = GenerationContext(
                 documentation: db,
                 stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
-                typedProgram: typedProgram
+                typedProgram: typedProgram,
+                urlResolver: URLResolver(baseUrl: AbsolutePath(url: URL(filePath: pathUrl))!)
                 )
 
         var res: String = ""
 
-        // guard let folder1 = db.modules[folder1Id] else {
-        //     return XCTFail("Folder1 not found")
-        // }
-
-        // guard let sfDotHylo = db.assets[folder1.rootFolder]!.children.first(where: assetNameIs("sf.hylo", db.assets)) else {
-        //     return XCTFail("Folder1 root folder should contain sf.hylo")
-        // }
-        
-        // switch sfDotHylo {
-        // case .sourceFile(let sid):
-        //     do {
-        //         res = try renderSourceFilePage(ctx: ctx, of: db.assets[sid]!)
-        //     } catch {
-        //         XCTFail("Should not throw")
-        //     }
-        // default:
-        //     XCTFail("Folder1 root folder should contain sf.hylo as a source file")
-        // }
-
-        // do {
-        // } catch {
-        //     XCTFail("Should not throw")
-        // }
-        let sourceFile = SourceFileAsset(
-            location: URL(string: "root/Folder1/sf.hylo")!,
-            generalDescription: GeneralDescriptionFields(
-                summary: Block.paragraph(Text("This is the summary")),
-                description: Block.paragraph(Text("This is the description")),
-                seeAlso: [
-                    Block.paragraph(Text("see also #1")),
-                    Block.paragraph(Text("second see also"))
-                ]
-            ),
-            // translationUnit: TranslationUnit.ID(try AnyNodeID(from: 2 as! Decoder))!
-            translationUnit: TranslationUnit.ID(rawValue: 2)
-        )
-        do {
-            res = try renderSourceFilePage(ctx: ctx, of: sourceFile)
-        } catch {
-            XCTFail("Should not throw")
+        guard let folder1 = db.modules[folder1Id] else {
+            return XCTFail("Folder1 not found")
         }
 
-        print(res)
+        guard let sfDotHylo = db.assets[folder1.rootFolder]!.children.first(where: assetNameIs("sf.hylo", db.assets)) else {
+            return XCTFail("Folder1 root folder should contain sf.hylo")
+        }
+        
+        switch sfDotHylo {
+        case .sourceFile(let sid):
+            do {
+                res = try renderSourceFilePage(ctx: ctx, of: db.assets[sid]!)
+                XCTAssertNotNil(db.assets[sid]!.generalDescription.summary, res)
+                XCTAssertNotNil(db.assets[sid]!.generalDescription.description, res)
+            } catch {
+                XCTFail("Should not throw")
+            }
+        default:
+            XCTFail("Folder1 root folder should contain sf.hylo as a source file")
+        }
+
+        XCTAssertTrue(res.contains("<p>Carving up a summary for dinner, minding my own business.</p>"), res)
+        XCTAssertTrue(res.contains("<p>In storms my husband Wilbur in a jealous description. He was crazy!</p>"), res)
+        XCTAssertTrue(res.contains("<p>And then he ran into my first see also.</p>"), res)
+        XCTAssertTrue(res.contains("<p>He ran into my second see also 10 times...</p>"), res)
     }
-
-    // func testSourceFilePageGeneration() {
-
-    //     var diagnostics = DiagnosticSet()
-
-    //     /// An instance that includes just the standard library.
-    //     var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
-
-    //     // We don't really read anything from here right now, we will the documentation database manually
-    //     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-    //         .appendingPathComponent("TestHyloSourceFile")
-
-    //     // The module whose Hylo files were given on the command-line
-    //     let _ = try! ast.makeModule(
-    //         "TestHyloSourceFile",
-    //         sourceCode: sourceFiles(in: [libraryPath]),
-    //         builtinModuleAccess: true,
-    //         diagnostics: &diagnostics
-    //     )
-
-    //     let typedProgram = try! TypedProgram(
-    //       annotating: ScopedProgram(ast), inParallel: false,
-    //       reportingDiagnosticsTo: &diagnostics,
-    //       tracingInferenceIf: { (_,_: TypedProgram) in false })
-        
-    //     var db: DocumentationDatabase = .init()
-
-
-    //     let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]));
-
-    //     let ctx = GenerationContext(
-    //         documentation: db,
-    //         stencil: stencil,
-    //         typedProgram: typedProgram
-    //     )
-
-    //     let folder1Id = db.assets.folders.insert(.init(
-    //         location: URL(string: "root/Folder1")!,
-    //         documentation: nil,
-    //         children: []
-    //     ))
-
-    //     var res: String = ""
-    //     do {
-    //         res = try renderFolderPage(ctx: ctx, of: db.assets.folders[folder1Id]!)
-    //     } catch {
-    //         XCTFail("Should not throw")
-    //     }
-
-    //     XCTAssertTrue(res.contains("<title>Documentation - Folder1</title>"), res)
-    //     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
-        
-    //     XCTAssertFalse(res.contains("<h2>Overview</h2>"), res)
-    // }
 }

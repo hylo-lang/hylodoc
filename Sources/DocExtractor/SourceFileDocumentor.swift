@@ -87,7 +87,7 @@ private func parseSummaryAndDescription(blocks: [Block], diagnostics: inout Diag
     return (nil, nil)
   }
 
-  return (firstBlock, .document(Blocks(blocks.dropFirst())))
+  return (.document([firstBlock]), .document(Blocks(blocks.dropFirst())))
 }
 
 private func parseSeeAlsoSection(

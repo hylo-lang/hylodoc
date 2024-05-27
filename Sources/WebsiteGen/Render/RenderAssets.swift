@@ -11,34 +11,20 @@ import Stencil
 ///
 /// - Returns: the contents of the rendered page
 public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) throws -> String {
-    // public struct SourceFileAsset: IdentifiedEntity, Asset {
-    //     public let location: URL
-
-    //     /// The optional file-level documentation for the source file.
-    //     public let generalDescription: GeneralDescriptionFields
-
-    //     /// The translation unit ID that this source file belongs to.
-    //     public let translationUnit: TranslationUnit.ID
-    // }
-    // public struct GeneralDescriptionFields {
-    //     public let summary: Block?
-    //     public let description: Block?
-    //     public let seeAlso: [Block] // probably a link but it can also be just a text referring to something
-    // }
     var arr: [String: Any] = [:]
 
     arr["name"] = of.name.components(separatedBy: ".").first!
 
     // check if file has summary
     if let summaryBlock = of.generalDescription.summary {
-        arr["summary"] = HtmlGenerator.standard.generate(block: summaryBlock)
+        arr["summary"] = HtmlGenerator.standard.generate(doc: summaryBlock)
     }
     // check if file has description
     if let descriptionBlock = of.generalDescription.description {
-        arr["description"] = HtmlGenerator.standard.generate(block: descriptionBlock)
+        arr["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
     }
 
-    let seeAlso = of.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(block: $0) }
+    let seeAlso = of.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
     if !seeAlso.isEmpty {
         arr["seeAlso"] = seeAlso
     }
