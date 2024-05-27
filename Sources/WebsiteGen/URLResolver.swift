@@ -34,15 +34,3 @@ public struct URLResolver {
   }
 
 }
-
-public struct URLResolvingVisitor: DocumentationVisitor {
-  private var urlResolver: URLResolver
-
-  public init(urlResolver: inout URLResolver) {
-    self.urlResolver = urlResolver
-  }
-
-  public mutating func visit(path: TargetPath) {
-    urlResolver.resolve(target: path.target(), filePath: path.url)
-  }
-}

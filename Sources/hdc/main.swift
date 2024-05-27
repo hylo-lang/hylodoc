@@ -1,0 +1,3 @@
+import CLI
+
+CLI.main()

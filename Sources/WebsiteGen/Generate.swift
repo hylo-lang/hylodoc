@@ -26,6 +26,8 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter
     let otherFile = ctx.documentation.assets.otherFiles[id]!
     try with.file(from: otherFile.location, to: target)
     return
+  } else if case .folder(_) = of {
+    try with.directory(to: target.deletingLastPathComponent())
   }
 
   // Render and export page
@@ -49,11 +51,13 @@ public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter
 public struct DefaultExporter: Exporter {
   public func file(from: URL, to: URL) throws {
     // Copy file
+    try FileManager.default.createDirectory(at: to.deletingLastPathComponent(), withIntermediateDirectories: true)
     try FileManager.default.copyItem(at: from, to: to)
   }
 
   public func html(content: String, to: URL) throws {
     // Write file
+    try FileManager.default.createDirectory(at: to.deletingLastPathComponent(), withIntermediateDirectories: true)
     try content.write(to: to, atomically: false, encoding: String.Encoding.utf8)
   }
 

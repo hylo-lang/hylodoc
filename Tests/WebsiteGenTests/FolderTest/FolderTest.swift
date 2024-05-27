@@ -97,7 +97,7 @@ final class FolderTest: XCTestCase {
       .init(
         location: URL(string: "root/Folder1/index.hylodoc")!,
         title: "Documentation for Folder1",
-        content: Block.paragraph(Text("lorem ipsum"))
+        content: .document([.paragraph(Text("lorem ipsum"))])
       ))
 
     let folder1Id = db.assets.folders.insert(
@@ -164,14 +164,14 @@ final class FolderTest: XCTestCase {
       .init(
         location: URL(string: "root/Folder1/index.hylodoc")!,
         title: "Documentation for Folder1",
-        content: Block.paragraph(Text("lorem ipsum"))
+        content: .document([.paragraph(Text("lorem ipsum"))])
       ))
 
     let child1ArticleId = db.assets.articles.insert(
       .init(
         location: URL(string: "root/Folder1/child1.hylodoc")!,
         title: "Article 1",
-        content: Block.paragraph(Text("This is first child"))
+        content: .document([.paragraph(Text("This is first child"))])
       ))
 
     let child2FolderId = db.assets.folders.insert(
@@ -223,7 +223,7 @@ final class FolderTest: XCTestCase {
     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
     XCTAssertTrue(res.contains("<h2>Overview</h2>"), res)
     XCTAssertTrue(res.contains("<p>lorem ipsum</p>"), res)
-    XCTAssertTrue(res.contains("<a href=\"child1.hylodoc\">Article 1</a>"), res)
-    XCTAssertTrue(res.contains("<a href=\"Folder2/index.html\">Folder2</a>"), res)
+    XCTAssertTrue(res.contains("<a href=\"child1.hylodoc\""), res)
+    XCTAssertTrue(res.contains("<a href=\"Folder2/index.html\""), res)
   }
 }

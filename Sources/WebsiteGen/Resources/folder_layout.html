@@ -9,8 +9,10 @@
     {% endif %}
     {% if children %}
         <div class="section">
-            <h2>Children</h2>
-            {% for childTitle,childUrl in children %}<a href="{{ childUrl }}">{{ childTitle }}</a>{% endfor %}
+            <h2>Contents</h2>
+            <ul>
+                {% for childTitle,childUrl in children %}<li><a href="{{ childUrl }}" style="color: lightblue">{{ childTitle }}</a></li>{% endfor %}
+            </ul>
         </div>
     {% endif %}
 {% endblock %}

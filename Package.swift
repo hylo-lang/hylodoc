@@ -26,7 +26,7 @@ let package = Package(
     .library(name: "FrontEnd", targets: ["DocExtractor"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.1.4"),
+    .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.4.0"),
     .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0"),
     .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.0"),
     .package(url: "https://github.com/apple/swift-format", branch: "release/5.10"),
@@ -42,8 +42,18 @@ let package = Package(
     .executableTarget(
       name: "hdc",
       dependencies: [
+        "CLI"
+      ],
+      path: "Sources/hdc",
+      swiftSettings: allTargetsSwiftSettings),
+    .target(
+      name: "CLI",
+      dependencies: [
         "DocExtractor",
         "WebsiteGen",
+        "StandardLibraryCore",
+        .product(name: "FrontEnd", package: "hylo"),
+        .product(name: "ArgumentParser", package: "swift-argument-parser")
       ],
       path: "Sources/CLI",
       exclude: ["module.md"],

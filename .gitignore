@@ -14,8 +14,11 @@ Package.resolved
 **.7z
 llvm.pc
 
+dist/
+
 # IDEs
 /.vscode
 /.swiftpm
 /.vscode/launch.json
 /.idea
+core

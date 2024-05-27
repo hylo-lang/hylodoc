@@ -3,20 +3,16 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 
-public protocol DocumentationVisitor {
-  mutating func visit(path: TargetPath)
-}
-
 /// Traverse all assets and symbols starting from a certain root node
 ///
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - root: asset to traverse
 ///   - visitor: documentation visitor to handle visits
-public func traverse(ctx: GenerationContext, root: AnyAssetID, visitor: inout DocumentationVisitor)
+public func traverse(ctx: GenerationContext, root: AnyAssetID, visitor: (TargetPath) -> Void)
 {
   var path = TargetPath(ctx: ctx)
-  traverseAssets(ctx: ctx, root: root, visitor: &visitor, path: &path)
+  traverseAssets(ctx: ctx, root: root, visitor: visitor, path: &path)
 }
 
 /// Traverse an asset and its children
@@ -27,12 +23,12 @@ public func traverse(ctx: GenerationContext, root: AnyAssetID, visitor: inout Do
 ///   - visitor: documentation visitor to handle visits
 ///   - path: call-stack path
 private func traverseAssets(
-  ctx: GenerationContext, root: AnyAssetID, visitor: inout DocumentationVisitor,
+  ctx: GenerationContext, root: AnyAssetID, visitor: (TargetPath) -> Void,
   path: inout TargetPath
 ) {
   // Visit
   path.push(asset: root)
-  visitor.visit(path: path)
+  visitor(path)
 
   // Traverse
   switch root {
@@ -40,14 +36,14 @@ private func traverseAssets(
     // Traverse children
     let folder = ctx.documentation.assets.folders[id]!
     folder.children.forEach {
-      child in traverseAssets(ctx: ctx, root: child, visitor: &visitor, path: &path)
+      child in traverseAssets(ctx: ctx, root: child, visitor: visitor, path: &path)
     }
     break
   case .sourceFile(let id):
     // Traverse children
     let sourceFile = ctx.documentation.assets.sourceFiles[id]!
     ctx.typedProgram.ast[sourceFile.translationUnit]!.decls.forEach {
-      child in traverseSymbols(ctx: ctx, root: child, visitor: &visitor, path: &path)
+      child in traverseSymbols(ctx: ctx, root: child, visitor: visitor, path: &path)
     }
     break
   default:
@@ -66,12 +62,12 @@ private func traverseAssets(
 ///   - visitor: documentation visitor to handle visits
 ///   - path: call-stack path
 private func traverseSymbols(
-  ctx: GenerationContext, root: AnyDeclID, visitor: inout DocumentationVisitor,
+  ctx: GenerationContext, root: AnyDeclID, visitor: (TargetPath) -> Void,
   path: inout TargetPath
 ) {
   // Visit
   path.push(decl: root)
-  visitor.visit(path: path)
+  visitor(path)
 
   // Traverse
   switch root.kind {
@@ -92,7 +88,7 @@ private func traverseSymbols(
 
     // Traverse children
     decl.impls.forEach {
-      child in traverseSymbols(ctx: ctx, root: AnyDeclID(child), visitor: &visitor, path: &path)
+      child in traverseSymbols(ctx: ctx, root: AnyDeclID(child), visitor: visitor, path: &path)
     }
     break
   case SubscriptDecl.self:
@@ -101,7 +97,7 @@ private func traverseSymbols(
 
     // Traverse children
     decl.impls.forEach {
-      child in traverseSymbols(ctx: ctx, root: AnyDeclID(child), visitor: &visitor, path: &path)
+      child in traverseSymbols(ctx: ctx, root: AnyDeclID(child), visitor: visitor, path: &path)
     }
     break
   case TraitDecl.self:
@@ -110,7 +106,7 @@ private func traverseSymbols(
 
     // Traverse children
     decl.members.forEach {
-      child in traverseSymbols(ctx: ctx, root: child, visitor: &visitor, path: &path)
+      child in traverseSymbols(ctx: ctx, root: child, visitor: visitor, path: &path)
     }
     break
   case ProductTypeDecl.self:
@@ -119,7 +115,7 @@ private func traverseSymbols(
 
     // Traverse children
     decl.members.forEach {
-      child in traverseSymbols(ctx: ctx, root: child, visitor: &visitor, path: &path)
+      child in traverseSymbols(ctx: ctx, root: child, visitor: visitor, path: &path)
     }
     break
   default:

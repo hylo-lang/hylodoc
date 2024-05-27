@@ -33,7 +33,7 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throw
   }
 
   arr["toRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.article(of)))
-  arr["content"] = HtmlGenerator.standard.generate(block: article.content)
+  arr["content"] = HtmlGenerator.standard.generate(doc: article.content)
 
   return try ctx.stencil.renderTemplate(name: "article_layout.html", context: arr)
 }
@@ -58,8 +58,8 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws 
 
   // check if folder has documentation
   if let overviewId = folder.documentation {
-    let overviewArticle = ctx.documentation.assets.articles[overviewId]!
-    arr["overview"] = HtmlGenerator.standard.generate(block: overviewArticle.content)
+    let overviewArticle = ctx.documentation.assets[overviewId]!
+    arr["overview"] = HtmlGenerator.standard.generate(doc: overviewArticle.content)
   }
 
   let children = folder.children.map {

@@ -32,39 +32,37 @@ public func generateDocumentation(
   )
 
   // Resolve URL's
-  var resolvingVisitor: DocumentationVisitor = URLResolvingVisitor(urlResolver: &ctx.urlResolver)
+  //var resolvingVisitor: DocumentationVisitor = URLResolvingVisitor(urlResolver: &ctx.urlResolver)
   documentation.modules.forEach {
-    module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: &resolvingVisitor)
+    module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: {
+        (path: TargetPath) in ctx.urlResolver.resolve(target: path.target(), filePath: path.url)
+    })
   }
 
   // Generate assets and symbols
-  struct GeneratingVisitor: DocumentationVisitor {
-    private let ctx: GenerationContext
-    private let exporter: Exporter
-
-    public init(ctx: GenerationContext, exporter: Exporter) {
-      self.ctx = ctx
-      self.exporter = exporter
-    }
-
-    public mutating func visit(path: TargetPath) {
-      do {
-        switch path.target() {
-        case .asset(let id):
-          try generateAsset(ctx: ctx, of: id, with: exporter)
-        case .symbol(let id):
-          try generateSymbol(ctx: ctx, of: id, with: exporter)
-        }
-      } catch (let error) {
-        print(error)
-      }
-    }
-  }
-  var generatingVisitor: DocumentationVisitor = GeneratingVisitor(
-    ctx: ctx, exporter: DefaultExporter())
+  let exporter: DefaultExporter = .init()
   documentation.modules.forEach {
-    module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: &generatingVisitor)
+    module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: {
+        (path: TargetPath) in switch path.target() {
+            case .asset(let id):
+                try! generateAsset(ctx: ctx, of: id, with: exporter)
+            case .symbol(let id):
+                try! generateSymbol(ctx: ctx, of: id, with: exporter)
+        }
+    })
   }
 
-  // Copy assets to target
+  // Create asset directorty
+  let assetDir = URL(fileURLWithPath: "assets", relativeTo: target)
+  try! FileManager.default.createDirectory(at: assetDir, withIntermediateDirectories: true)
+
+  // Copy assets (everything but html templates) to asset directory
+  let bundledAssets = try! FileManager.default.contentsOfDirectory(at: Bundle.module.bundleURL, includingPropertiesForKeys: nil)
+  for bundledAsset in bundledAssets {
+    if bundledAsset.lastPathComponent.hasSuffix(".html") {
+        continue
+    }
+
+    try! FileManager.default.copyItem(at: bundledAsset, to: URL(fileURLWithPath: "assets/"+bundledAsset.lastPathComponent, relativeTo: assetDir))
+  }
 }
