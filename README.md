@@ -1,6 +1,23 @@
 # HyloDoc - Automatic Documentation Generation Tool
 
 ## Getting Started
+To use HyloDoc for generating websites, you can use its command line interface or use it as a library in your project
+to gain more control and customization.
+
+To get started, clone the repository and run the `hdc` target:
+```shell
+swift run hdc --help
+
+# Outputs documentation of one module to ./dist
+swift run hdc PATH_TO_MODULE
+
+# Process multiple modules
+swift run hdc PATH_TO_MODULE_1 PATH_TO_MODULE_2 ...
+
+# Specify output directory
+swift run hdc PATH_TO_MODULE --output OUTPUT_DIRECTORY
+```
+## Development Environment Setup
 ### Windows
 - Install docker and WSL2
 - Clone the repo into a WSL folder
@@ -10,11 +27,18 @@
 - Once you open up a devcontainer, there should be a run configuration called "Debug Tests" in the run and debug tab.
 - Additionally, you should be able to debug individual tests cases and test methods by clicking on the green arrow next 
   to them. If you right-click the arrow, you will have the option to debug the particular test.
- 
 
 ### Mac
 - Set up Swift
 - CLone the repository
+
+## Running the Tests
+To run all tests, you can use the following command:
+```shell
+swift test
+```
+Alternatively, in VSCode after the first full build of the project, you should be able to see green arrows next to the 
+test cases, which you can click to run them individually, and to debug them.
 
 ### Formatting
 
