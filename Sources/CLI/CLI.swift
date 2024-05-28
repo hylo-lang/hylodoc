@@ -71,6 +71,6 @@ public struct CLI: ParsableCommand {
             }
     })
 
-      print("Documentation successfully generated at \(outputPath) in \(duration.formatted(.units(allowed: [.seconds, .milliseconds], width: .narrow))).")
+      print("Documentation successfully generated at \(outputPath) in \(duration).")
   }
 }
