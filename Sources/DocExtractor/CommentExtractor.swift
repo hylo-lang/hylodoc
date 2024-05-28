@@ -42,7 +42,8 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   private let commentParser: LLCommentParser
 
   /// A list of symbol comments associated with their target index.
-  public private(set) var symbolComments: [SourceFile.Index: SourceRepresentable<LowLevelCommentInfo>] = [:]
+  public private(set) var symbolComments:
+    [SourceFile.Index: SourceRepresentable<LowLevelCommentInfo>] = [:]
   public private(set) var fileComment: SourceRepresentable<LowLevelCommentInfo>?
   public private(set) var diagnostics: DiagnosticSet = .init()
 
@@ -67,7 +68,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
       curIndex = token.site.endIndex
     }
 
-    processTokenRange(from: curIndex, until: source.text.endIndex)
+    processTokenRange(from: curIndex, until: nil)
   }
 
   /// Processes a range of the source file to extract comments.
@@ -77,9 +78,10 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   ///   - end: The ending index of the range.
   ///
   /// - Precondition: The range should not contain any tokens.
-  private mutating func processTokenRange(from start: SourceFile.Index, until end: SourceFile.Index)
-  {
-    let content = source.text[start ..< end]
+  private mutating func processTokenRange(
+    from start: SourceFile.Index, until end: SourceFile.Index?
+  ) {
+    let content = source.text[start..<(end != nil ? end! : source.text.endIndex)]
     let lines = content.split(separator: "\n", omittingEmptySubsequences: false)
     processLines(lines, end)
   }
@@ -89,7 +91,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   /// - Parameters:
   ///   - lines: The lines of text to process.
   ///   - target: The target index for the comment.
-  private mutating func processLines(_ lines: [Substring], _ target: SourceFile.Index) {
+  private mutating func processLines(_ lines: [Substring], _ target: SourceFile.Index?) {
     var commentLines: [String] = []
 
     var startedComment = false
