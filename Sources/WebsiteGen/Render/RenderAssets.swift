@@ -15,18 +15,18 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
 
   var arr: [String: Any] = [:]
 
-  arr["name"] = sourceFilename.components(separatedBy: ".").first!
+  arr["name"] = sourceFile.name.components(separatedBy: ".").first!
 
   // check if file has summary
-  if let summaryBlock = sourceFilegeneralDescription.summary {
+  if let summaryBlock = sourceFile.generalDescription.summary {
       arr["summary"] = HtmlGenerator.standard.generate(doc: summaryBlock)
   }
   // check if file has description
-  if let descriptionBlock = sourceFilegeneralDescription.description {
+  if let descriptionBlock = sourceFile.generalDescription.description {
       arr["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
   }
 
-  let seeAlso = sourceFilegeneralDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  let seeAlso = sourceFile.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   if !seeAlso.isEmpty {
       arr["seeAlso"] = seeAlso
   }

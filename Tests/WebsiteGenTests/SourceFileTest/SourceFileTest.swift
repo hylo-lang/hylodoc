@@ -14,6 +14,8 @@ func assetNameIs(_ name: String, _ assets: AssetStore) -> ((AnyAssetID) -> Bool)
 }
 
 final class SourceFileTest: XCTestCase {
+
+    // check renderSourceFilePage function using SourceFileAsset created manually
     func unitTestSourceFilePageGeneration() {
 
         var diagnostics = DiagnosticSet()
@@ -24,16 +26,8 @@ final class SourceFileTest: XCTestCase {
             annotating: ScopedProgram(ast), inParallel: false,
             reportingDiagnosticsTo: &diagnostics,
             tracingInferenceIf: { (_, _) in false })
-
-        let pathUrl = "/Users/evyatarhadasi/Desktop/code/automated-documentation-generation-tool/Tests/WebsiteGenTests/SourceFileTest/TestOutput"
-        let ctx = GenerationContext(
-                documentation: DocumentationDatabase.init(),
-                stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
-                typedProgram: typedProgram,
-                urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: pathUrl))
-                )
-
-        var res: String = ""
+        
+        let translationUnit = TranslationUnit.ID(rawValue: 2)
 
         let sourceFile = SourceFileAsset(
             location: URL(string: "root/Folder1/sf.hylo")!,
@@ -49,10 +43,25 @@ final class SourceFileTest: XCTestCase {
                     .document([.paragraph(Text("He ran into my second see also 10 times..."))])
                 ]
             ),
-            translationUnit: TranslationUnit.ID(rawValue: 2)
+            translationUnit: translationUnit
         )
+
+        let pathUrl = "/Users/evyatarhadasi/Desktop/code/automated-documentation-generation-tool/Tests/WebsiteGenTests/SourceFileTest/TestOutput"
+        var db = DocumentationDatabase.init()
+        let sourceFileID =  db.assets.sourceFiles.insert(sourceFile, for: translationUnit)
+        let ctx = GenerationContext(
+                // documentation: DocumentationDatabase.init(),
+                documentation: db,
+                stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
+                typedProgram: typedProgram,
+                urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: pathUrl))
+                )
+
+        var res: String = ""
+
         do {
-            res = try renderSourceFilePage(ctx: ctx, of: sourceFile)
+            // res = try renderSourceFilePage(ctx: ctx, of: sourceFile.ID)
+            res = try renderSourceFilePage(ctx: ctx, of: sourceFileID)
         } catch {
             XCTFail("Should not throw")
         }
@@ -63,6 +72,7 @@ final class SourceFileTest: XCTestCase {
         XCTAssertTrue(res.contains("<p>He ran into my second see also 10 times...</p>"), res)
     }
 
+    // check renderSourceFilePage function using SourceFileAsset created from hylo file
     func integrationTestSourceFilePageGeneration() {
 
         var diagnostics = DiagnosticSet()
@@ -122,7 +132,7 @@ final class SourceFileTest: XCTestCase {
         switch sfDotHylo {
         case .sourceFile(let sid):
             do {
-                res = try renderSourceFilePage(ctx: ctx, of: db.assets[sid]!)
+                res = try renderSourceFilePage(ctx: ctx, of: sid)
                 XCTAssertNotNil(db.assets[sid]!.generalDescription.summary, res)
                 XCTAssertNotNil(db.assets[sid]!.generalDescription.description, res)
             } catch {

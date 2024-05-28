@@ -23,8 +23,7 @@ public func renderAssetPage(ctx: GenerationContext, of: AnyAssetID) throws -> St
     case .folder(let id):
         return try renderFolderPage(ctx: ctx, of: id)
     case .sourceFile(let id):
-        let sourceFile = ctx.documentation.assets.sourceFiles[id]!
-        return try renderSourceFilePage(ctx: ctx, of: sourceFile)
+        return try renderSourceFilePage(ctx: ctx, of: id)
     case .article(let id):
         return try renderArticlePage(ctx: ctx, of: id)
     case .otherFile(_):
