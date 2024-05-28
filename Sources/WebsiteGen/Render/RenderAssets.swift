@@ -10,26 +10,28 @@ import Stencil
 ///   - of: source file asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset) throws -> String {
-    var arr: [String: Any] = [:]
+public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID) throws -> String {
+  let sourceFile = ctx.documentation.assets[of]!
 
-    arr["name"] = of.name.components(separatedBy: ".").first!
+  var arr: [String: Any] = [:]
 
-    // check if file has summary
-    if let summaryBlock = of.generalDescription.summary {
-        arr["summary"] = HtmlGenerator.standard.generate(doc: summaryBlock)
-    }
-    // check if file has description
-    if let descriptionBlock = of.generalDescription.description {
-        arr["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
-    }
+  arr["name"] = sourceFilename.components(separatedBy: ".").first!
 
-    let seeAlso = of.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
-    if !seeAlso.isEmpty {
-        arr["seeAlso"] = seeAlso
-    }
+  // check if file has summary
+  if let summaryBlock = sourceFilegeneralDescription.summary {
+      arr["summary"] = HtmlGenerator.standard.generate(doc: summaryBlock)
+  }
+  // check if file has description
+  if let descriptionBlock = sourceFilegeneralDescription.description {
+      arr["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
+  }
 
-    return try ctx.stencil.renderTemplate(name: "sourceFile_layout.html", context: arr)
+  let seeAlso = sourceFilegeneralDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if !seeAlso.isEmpty {
+      arr["seeAlso"] = seeAlso
+  }
+
+  return try ctx.stencil.renderTemplate(name: "sourceFile_layout.html", context: arr)
 }
 
 /// Render the article page
