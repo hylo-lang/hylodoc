@@ -106,7 +106,7 @@ final class SourceFileTest: XCTestCase {
                 documentation: db,
                 stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
                 typedProgram: typedProgram,
-                urlResolver: URLResolver(baseUrl: AbsolutePath(url: URL(fileURLWithPath: pathUrl))!)
+                urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: pathUrl))
                 )
 
         var res: String = ""
