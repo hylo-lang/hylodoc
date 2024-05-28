@@ -81,7 +81,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   private mutating func processTokenRange(
     from start: SourceFile.Index, until end: SourceFile.Index?
   ) {
-    let content = source.text[start..<(end != nil ? end! : source.text.endIndex)]
+    let content = source.text[start ..< (end != nil ? end! : source.text.endIndex)]
     let lines = content.split(separator: "\n", omittingEmptySubsequences: false)
     processLines(lines, end)
   }
