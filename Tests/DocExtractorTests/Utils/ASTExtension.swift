@@ -44,7 +44,6 @@ extension AST {
     return walker.result
   }
 
-
   /// - Parameter name: file name without extension
   func resolveTranslationUnit(by name: String) -> TranslationUnit.ID? {
     precondition(!name.hasSuffix(".hylo"), "Name should be passed without extension.")
@@ -74,6 +73,19 @@ extension AST {
     let sourceFile = fromSingleSourceFile
     let _ = try! makeModule(
       "RootModule",
+      sourceCode: [sourceFile],
+      builtinModuleAccess: true,
+      diagnostics: &diagnostics
+    )
+  }
+
+  mutating func addModule(
+    fromSingleSourceFile: SourceFile, diagnostics: inout DiagnosticSet,
+    moduleName: String = "RootModule"
+  ) throws -> ModuleDecl.ID {
+    let sourceFile = fromSingleSourceFile
+    return try makeModule(
+      moduleName,
       sourceCode: [sourceFile],
       builtinModuleAccess: true,
       diagnostics: &diagnostics
