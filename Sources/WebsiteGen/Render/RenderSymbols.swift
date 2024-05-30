@@ -89,7 +89,50 @@ public func renderOperatorPage(ctx: GenerationContext, of: OperatorDecl.ID, with
 ///
 /// - Returns: contents of the rendered page
 public func renderFunctionPage(ctx: GenerationContext, of: FunctionDecl.ID, with: FunctionDocumentation) throws -> String {
-    return ""
+    let decl: FunctionDecl = ctx.typedProgram.ast[of]!
+
+    var args: [String : Any] = [:]
+
+    args["name"] = decl.identifier?.value
+    args["code"] = decl.site.text
+    args["toRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    // Summary
+    if let summary = with.documentation.common.summary {
+        args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+    }
+
+    // Overview
+    if let block = with.documentation.common.description {
+        args["overview"] = HtmlGenerator.standard.generate(doc: block)
+    }
+
+    args["preconditions"] = with.documentation.preconditions.map { HtmlGenerator.standard.generate(doc: $0.description) }
+    args["postconditions"] = with.documentation.postconditions.map { HtmlGenerator.standard.generate(doc: $0.description) }
+
+    if let returns = with.documentation.returns {
+        switch returns {
+        case .always(let block):
+            args["returns"] = [HtmlGenerator.standard.generate(doc: block)]
+        case .cases(let blocks):
+            args["returns"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
+        }
+    }
+    if let throwsInfo = with.documentation.throwsInfo {
+        switch throwsInfo {
+        case .generally(let block):
+            args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
+        case .cases(let blocks):
+            args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
+        }
+    }
+
+    args["parameters"] = with.documentation.parameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }
+    args["genericParameters"] = with.documentation.genericParameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }
+    
+    args["seeAlso"] = with.documentation.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+
+    return try ctx.stencil.renderTemplate(name: "function_layout.html", context: args)
 }
 
 /// Render the method page

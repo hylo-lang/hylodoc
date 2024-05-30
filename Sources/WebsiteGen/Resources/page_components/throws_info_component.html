@@ -1,0 +1,16 @@
+{% if throwsInfo %}
+    <div class="section">
+        <h2>Throws Info</h2>
+        {% if throwsInfo.count == 1 %}
+            {{ throwsInfo[0] }}
+        {% else %}
+            <ul>
+            {% for el in throwsInfo %}
+                <li>
+                {{ el }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}

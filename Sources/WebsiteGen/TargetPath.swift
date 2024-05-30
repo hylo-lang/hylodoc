@@ -33,7 +33,7 @@ public struct TargetPath {
       index += 1
     }
 
-    if index + 1 < stack.count {
+    if index + 1 <= stack.count {
       // symbol name as part of url?
       // counter for symbols
       url = url / "symbol-\(symbolCounter).html"

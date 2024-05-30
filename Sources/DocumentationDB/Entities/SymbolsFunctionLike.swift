@@ -3,6 +3,10 @@ import MarkdownKit
 /// Documentation of a free function declaration (not a method) or a static function declaration.
 public struct FunctionDocumentation: IdentifiedEntity {
   public let documentation: CommonFunctionDocumentation
+
+  public init(documentation: CommonFunctionDocumentation) {
+    self.documentation = documentation
+  }
 }
 
 /// A method declaration within a product type or trait
@@ -31,6 +35,24 @@ public struct CommonFunctionDocumentation {
   public let throwsInfo: ThrowsInfo?
   public let parameters: ParameterDocumentations
   public let genericParameters: GenericParameterDocumentations
+
+  public init(
+    common: GeneralDescriptionFields,
+    preconditions: [Precondition],
+    postconditions: [Postcondition],
+    returns: ReturnsInfo?,
+    throwsInfo: ThrowsInfo?,
+    parameters: ParameterDocumentations,
+    genericParameters: GenericParameterDocumentations
+  ) {
+    self.common = common
+    self.preconditions = preconditions
+    self.postconditions = postconditions
+    self.returns = returns
+    self.throwsInfo = throwsInfo
+    self.parameters = parameters
+    self.genericParameters = genericParameters
+  }
 }
 
 /// Type initializer (e.g. init or memberwise init)

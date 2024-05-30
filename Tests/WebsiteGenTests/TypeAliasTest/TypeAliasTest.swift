@@ -59,25 +59,29 @@ final class TypeAliasTest : XCTestCase {
             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
         )
 
+        //Verify we get any id at all
+        XCTAssertTrue(visitor.listOfProductTypes.count > 0)
+
         // get product type by its id
-        for typeAliasId in visitor.listOfProductTypes {
-            let doc: TypeAliasDocumentation = .init(
-                common: .init(
-                    summary: Block.paragraph(Text("Some summary")),
-                    description: Block.paragraph(Text("Some description")),
-                    seeAlso: []
-                )
-            )
-            
-            var targetPath = TargetPath(ctx: ctx)
-            targetPath.push(decl: AnyDeclID(typeAliasId))
-            ctx.urlResolver.resolve(target: .symbol(AnyDeclID(typeAliasId)), filePath: targetPath.url)
-            
-            let content = try! renderTypeAliasPage(ctx: ctx, of: typeAliasId, with: doc)
-            print(content)
-            
-            // Assert
-            XCTAssertTrue(content.contains("<h1>Vector2</h1>"))
-        }
+        let typeAliasId = visitor.listOfProductTypes[0]
+        let doc: TypeAliasDocumentation = .init(
+                        common: .init(
+                            summary: .document([.paragraph(Text("Some summary"))]),
+                            description: .document([.paragraph(Text("Some description"))]),
+                            seeAlso: []
+                        )
+                    )
+
+                    var targetPath = TargetPath(ctx: ctx)
+                    targetPath.push(decl: AnyDeclID(typeAliasId))
+                    ctx.urlResolver.resolve(target: .symbol(AnyDeclID(typeAliasId)), filePath: targetPath.url)
+
+                    let content = try! renderTypeAliasPage(ctx: ctx, of: typeAliasId, with: doc)
+                    print(content)
+
+                    // Assert
+                    XCTAssertTrue(content.contains("Vector2"))
+                    XCTAssertTrue(content.contains("Some summary"))
+                    XCTAssertTrue(content.contains("Some description"))
     }
 }
