@@ -35,7 +35,7 @@ public func generateDocumentation(
   //var resolvingVisitor: DocumentationVisitor = URLResolvingVisitor(urlResolver: &ctx.urlResolver)
   documentation.modules.forEach {
     module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: {
-        (path: TargetPath) in ctx.urlResolver.resolve(target: path.target(), filePath: path.url)
+        (path: TargetPath) in ctx.urlResolver.resolve(target: path.target, filePath: path.url, parent: path.parent)
     })
   }
 
@@ -43,7 +43,7 @@ public func generateDocumentation(
   let exporter: DefaultExporter = .init()
   documentation.modules.forEach {
     module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: {
-        (path: TargetPath) in switch path.target() {
+        (path: TargetPath) in switch path.target {
             case .asset(let id):
                 try! generateAsset(ctx: ctx, of: id, with: exporter)
             case .symbol(let id):

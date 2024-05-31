@@ -74,7 +74,7 @@ final class TypeAliasTest : XCTestCase {
 
                     var targetPath = TargetPath(ctx: ctx)
                     targetPath.push(decl: AnyDeclID(typeAliasId))
-                    ctx.urlResolver.resolve(target: .symbol(AnyDeclID(typeAliasId)), filePath: targetPath.url)
+                    ctx.urlResolver.resolve(target: .symbol(AnyDeclID(typeAliasId)), filePath: targetPath.url, parent: nil)
 
                     let content = try! renderTypeAliasPage(ctx: ctx, of: typeAliasId, with: doc)
                     print(content)

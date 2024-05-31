@@ -50,8 +50,10 @@ final class FolderTest: XCTestCase {
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
-      
-      ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"))
+
+    ctx.urlResolver.resolve(
+      target: .asset(.folder(folder1Id)),
+      filePath: RelativePath(pathString: "root/Folder1/index.html"), parent: nil)
 
     var res: String = ""
     do {
@@ -115,8 +117,10 @@ final class FolderTest: XCTestCase {
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
-      
-      ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"))
+
+    ctx.urlResolver.resolve(
+      target: .asset(.folder(folder1Id)),
+      filePath: RelativePath(pathString: "root/Folder1/index.html"), parent: nil)
 
     var res: String = ""
     do {
@@ -207,10 +211,16 @@ final class FolderTest: XCTestCase {
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
-      
-      ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"))
-      ctx.urlResolver.resolve(target: .asset(.folder(child2FolderId)), filePath: RelativePath(pathString: "root/Folder1/Folder2/index.html"))
-      ctx.urlResolver.resolve(target: .asset(.article(child1ArticleId)), filePath: RelativePath(pathString: "root/Folder1/child1.hylodoc"))
+
+    ctx.urlResolver.resolve(
+      target: .asset(.folder(folder1Id)),
+      filePath: RelativePath(pathString: "root/Folder1/index.html"), parent: nil)
+    ctx.urlResolver.resolve(
+      target: .asset(.folder(child2FolderId)),
+      filePath: RelativePath(pathString: "root/Folder1/Folder2/index.html"), parent: nil)
+    ctx.urlResolver.resolve(
+      target: .asset(.article(child1ArticleId)),
+      filePath: RelativePath(pathString: "root/Folder1/child1.hylodoc"), parent: nil)
 
     var res: String = ""
     do {

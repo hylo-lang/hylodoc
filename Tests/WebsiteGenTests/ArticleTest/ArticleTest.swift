@@ -43,9 +43,9 @@ final class ArticleTest: XCTestCase {
         title: "I betcha you would have done the same",
         content: .document([
           .paragraph(
-          Text(
-            "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
-          ))
+            Text(
+              "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
+            ))
         ])
       ))
 
@@ -58,7 +58,8 @@ final class ArticleTest: XCTestCase {
 
     ctx.urlResolver.resolve(
       target: .asset(.article(article1Id)),
-      filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"))
+      filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"),
+      parent: nil)
 
     var res: String = ""
     do {
@@ -124,7 +125,8 @@ final class ArticleTest: XCTestCase {
 
     ctx.urlResolver.resolve(
       target: .asset(.article(article1Id)),
-      filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"))
+      filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"),
+      parent: nil)
 
     var res: String = ""
     do {

@@ -92,7 +92,7 @@ final class FunctionTest : XCTestCase {
         
         var targetPath = TargetPath(ctx: ctx)
         targetPath.push(decl: AnyDeclID(functionId))
-        ctx.urlResolver.resolve(target: .symbol(AnyDeclID(functionId)), filePath: targetPath.url)
+        ctx.urlResolver.resolve(target: .symbol(AnyDeclID(functionId)), filePath: targetPath.url, parent: nil)
         
         let res = try! renderFunctionPage(ctx: ctx, of: functionId, with: fDoc)
         

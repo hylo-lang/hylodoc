@@ -18,7 +18,10 @@ public protocol Exporter {
 ///   - of: asset to render page of
 ///   - with: exporter, used to handle file writes and directory creation
 public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter) throws {
-  let target = ctx.urlResolver.pathToFile(target: .asset(of))
+    guard let target = ctx.urlResolver.pathToFile(target: .asset(of)) else {
+        //TODO throw exception
+        return
+    }
 
   // Handle other file
   if case .otherFile(let id) = of {
@@ -41,7 +44,10 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: symbol to render page of
 public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter) throws {
-  let target = ctx.urlResolver.pathToFile(target: .symbol(of))
+  guard let target = ctx.urlResolver.pathToFile(target: .symbol(of)) else {
+      //TODO throw exception
+      return
+  }
 
   // Render and export page
   let content = try renderSymbolPage(ctx: ctx, of: of)

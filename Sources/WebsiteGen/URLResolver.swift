@@ -1,8 +1,9 @@
 import Foundation
 import PathWrangler
+import DequeModule
 
 public struct URLResolver {
-  private var references: [AnyTargetID: RelativePath] = [:]
+  private var references: [AnyTargetID: (RelativePath, AnyTargetID?)] = [:]
   private let baseUrl: AbsolutePath
 
   public init(baseUrl: AbsolutePath) {
@@ -10,27 +11,53 @@ public struct URLResolver {
   }
 
   // Resolve the reference to a target
-  public mutating func resolve(target: AnyTargetID, filePath: RelativePath) {
-    references[target] = filePath
+  public mutating func resolve(target: AnyTargetID, filePath: RelativePath, parent: AnyTargetID?) {
+    references[target] = (filePath, parent)
   }
 
   // Get the file path of the target
-  public func pathToFile(target: AnyTargetID) -> URL {
-    return URL(path: references[target]!.absolute(in: baseUrl))
+  public func pathToFile(target: AnyTargetID) -> URL? {
+    guard let targetRef = references[target]?.0 else {
+      return nil
+    }
+
+    return URL(path: targetRef.absolute(in: baseUrl))
   }
 
   // Get the relative path of the target to the root
-  public func pathToRoot(target: AnyTargetID) -> RelativePath {
-    let depth = references[target]!.pathString.filter { $0 == "/" }.count
+  public func pathToRoot(target: AnyTargetID) -> RelativePath? {
+    guard let targetRef = references[target]?.0 else {
+      return nil
+    }
+
+    let depth = targetRef.pathString.filter { $0 == "/" }.count
     return RelativePath(pathString: String(repeating: "../", count: depth))
   }
 
   // Get a url referencing from one target to another
-  public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath {
-    let fromUrl = references[from]!
-    let toUrl = references[to]!
+  public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath? {
+    guard let fromUrl = references[from]?.0 else {
+      return nil
+    }
+
+    guard let toUrl = references[to]?.0 else {
+      return nil
+    }
 
     return fromUrl.refer(to: toUrl)
+  }
+
+  // Get the call stack from a target
+  public func pathStack(target: AnyTargetID) -> [AnyTargetID] {
+    var stack: [AnyTargetID] = []
+    var cursor: AnyTargetID? = target
+    while let id = cursor {
+      stack.insert(id, at: 0)
+
+      cursor = references[id]?.1
+    }
+
+    return stack
   }
 
 }
