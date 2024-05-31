@@ -1,7 +1,7 @@
 import Foundation
 import FrontEnd
 
-protocol SymbolDeclRenderer {
+public protocol SymbolDeclRenderer {
   func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String
   func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String
   func renderBindingDecl(_ n: BindingDecl.ID) -> String
@@ -10,138 +10,152 @@ protocol SymbolDeclRenderer {
   func renderSubscriptDecl(_ n: SubscriptDecl.ID) -> String
 }
 
-struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
+public struct SymbolDeclRenderers {
+  public let simple: SimpleSymbolDecRenderer
+  public let navigation: NavigationSymbolDecRenderer
+  public let inline: DetailedInlineSymbolDeclRenderer
+  public let block: DetailedBlockSymbolDeclRenderer
+
+  public init(program: TypedProgram, resolver: URLResolver) {
+    simple = .init(program, resolver)
+    navigation = .init(program, resolver)
+    inline = .init(program, resolver)
+    block = .init(program, resolver)
+  }
+}
+
+public struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
   private let program: TypedProgram
   private let resolver: URLResolver
 
-  public init(program: TypedProgram, resolver: URLResolver) {
+  public init(_ program: TypedProgram, _ resolver: URLResolver) {
     self.program = program
     self.resolver = resolver
   }
 
-  func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
+  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
     return renderSimpleTypeAlias(program, n, true)
   }
 
-  func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
+  public func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
     return renderSimpleProductType(program, n, true)
   }
 
-  func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
+  public func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
     return renderSimpleBinding(program, n, true)
   }
 
-  func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
+  public func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
     return renderSimpleInitializer(program, n, true)
   }
 
-  func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
+  public func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
     return renderSimpleFunction(program, n, true)
   }
 
-  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
     return renderSimpleSubscript(program, n, true)
   }
 }
 
-struct NavigationSymbolDecRenderer: SymbolDeclRenderer {
+public struct NavigationSymbolDecRenderer: SymbolDeclRenderer {
   private let program: TypedProgram
   private let resolver: URLResolver
 
-  public init(program: TypedProgram, resolver: URLResolver) {
+  public init(_ program: TypedProgram, _ resolver: URLResolver) {
     self.program = program
     self.resolver = resolver
   }
 
-  func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
+  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
     return renderSimpleTypeAlias(program, n, false)
   }
 
-  func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
+  public func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
     return renderSimpleProductType(program, n, false)
   }
 
-  func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
+  public func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
     return renderSimpleBinding(program, n, false)
   }
 
-  func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
+  public func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
     return renderSimpleInitializer(program, n, false)
   }
 
-  func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
+  public func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
     return renderSimpleFunction(program, n, false)
   }
 
-  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
     return renderSimpleSubscript(program, n, false)
   }
 }
 
-struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
+public struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
   private let program: TypedProgram
   private let resolver: URLResolver
 
-  public init(program: TypedProgram, resolver: URLResolver) {
+  public init(_ program: TypedProgram, _ resolver: URLResolver) {
     self.program = program
     self.resolver = resolver
   }
 
-  func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
+  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
     return renderDetailedTypeAlias(program, n, true)
   }
 
-  func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
+  public func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
     return renderDetailedProductType(program, n, true)
   }
 
-  func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
+  public func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
     return renderDetailedBinding(program, n, true)
   }
 
-  func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
+  public func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
     return renderDetailedInitializer(program, n, true)
   }
 
-  func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
+  public func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
     return renderDetailedFunction(program, n, true)
   }
 
-  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
     return renderDetailedSubscript(program, n, true)
   }
 }
 
-struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
+public struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
   private let program: TypedProgram
   private let resolver: URLResolver
 
-  public init(program: TypedProgram, resolver: URLResolver) {
+  public init(_ program: TypedProgram, _ resolver: URLResolver) {
     self.program = program
     self.resolver = resolver
   }
 
-  func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
+  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
     return renderDetailedTypeAlias(program, n, false)
   }
 
-  func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String {
+  public func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String {
     return renderDetailedProductType(program, n, false)
   }
 
-  func renderBindingDecl(_ n: BindingDecl.ID) -> String {
+  public func renderBindingDecl(_ n: BindingDecl.ID) -> String {
     return renderDetailedBinding(program, n, false)
   }
 
-  func renderInitializerDecl(_ n: InitializerDecl.ID) -> String {
+  public func renderInitializerDecl(_ n: InitializerDecl.ID) -> String {
     return renderDetailedInitializer(program, n, false)
   }
 
-  func renderFunctionDecl(_ n: FunctionDecl.ID) -> String {
+  public func renderFunctionDecl(_ n: FunctionDecl.ID) -> String {
     return renderDetailedFunction(program, n, false)
   }
 
-  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
     return renderDetailedSubscript(program, n, false)
   }
 }

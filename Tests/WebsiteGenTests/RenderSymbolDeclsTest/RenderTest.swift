@@ -62,13 +62,7 @@ final class RenderSymbolDeclsTest: XCTestCase {
 
     for d in visitor.listOfProductTypes {
 
-      let simpleRenderer = SimpleSymbolDecRenderer.init(
-        program: ctx.typedProgram, resolver: ctx.urlResolver)
-      let navigationRenderer = NavigationSymbolDecRenderer.init(
-        program: ctx.typedProgram, resolver: ctx.urlResolver)
-      let inlineRender = DetailedInlineSymbolDeclRenderer.init(
-        program: ctx.typedProgram, resolver: ctx.urlResolver)
-      let blockRender = DetailedBlockSymbolDeclRenderer.init(
+      let renderers: SymbolDeclRenderers = .init(
         program: ctx.typedProgram, resolver: ctx.urlResolver)
 
       let productType: ProductTypeDecl = ctx.typedProgram.ast[d]
@@ -77,78 +71,78 @@ final class RenderSymbolDeclsTest: XCTestCase {
         if let d = SubscriptDecl.ID(m) {
           print("<h1>[SUBSCRIPT]</h1>")
           print("<h3>simple:</h3>")
-          print(simpleRenderer.renderSubscriptDecl(d))
+          print(renderers.simple.renderSubscriptDecl(d))
           print("<h3>navigation:</h3>")
-          print(navigationRenderer.renderSubscriptDecl(d))
+          print(renderers.navigation.renderSubscriptDecl(d))
           print("<h3>inline:</h3>")
-          print(inlineRender.renderSubscriptDecl(d))
+          print(renderers.inline.renderSubscriptDecl(d))
           print("<h3>block:</h3>")
-          print(blockRender.renderSubscriptDecl(d))
+          print(renderers.block.renderSubscriptDecl(d))
           print("<hr>")
         }
 
         if let d = TypeAliasDecl.ID(m) {
           print("<h1>[TYPE ALIAS]</h1>")
           print("<h3>simple:</h3>")
-          print(simpleRenderer.renderTypeAliasDecl(d))
+          print(renderers.simple.renderTypeAliasDecl(d))
           print("<h3>navigation:</h3>")
-          print(navigationRenderer.renderTypeAliasDecl(d))
+          print(renderers.navigation.renderTypeAliasDecl(d))
           print("<h3>inline:</h3>")
-          print(inlineRender.renderTypeAliasDecl(d))
+          print(renderers.inline.renderTypeAliasDecl(d))
           print("<h3>block:</h3>")
-          print(blockRender.renderTypeAliasDecl(d))
+          print(renderers.block.renderTypeAliasDecl(d))
           print("<hr>")
         }
 
         if let d = BindingDecl.ID(m) {
           print("<h1>[BINDING]</h1>")
           print("<h3>simple:</h3>")
-          print(simpleRenderer.renderBindingDecl(d))
+          print(renderers.simple.renderBindingDecl(d))
           print("<h3>navigation:</h3>")
-          print(navigationRenderer.renderBindingDecl(d))
+          print(renderers.navigation.renderBindingDecl(d))
           print("<h3>inline:</h3>")
-          print(inlineRender.renderBindingDecl(d))
+          print(renderers.inline.renderBindingDecl(d))
           print("<h3>block:</h3>")
-          print(blockRender.renderBindingDecl(d))
+          print(renderers.block.renderBindingDecl(d))
           print("<hr>")
         }
 
         if let d = InitializerDecl.ID(m) {
           print("<h1>[INITIALIZER]</h1>")
           print("<h3>simple:</h3>")
-          print(simpleRenderer.renderInitializerDecl(d))
+          print(renderers.simple.renderInitializerDecl(d))
           print("<h3>navigation:</h3>")
-          print(navigationRenderer.renderInitializerDecl(d))
+          print(renderers.navigation.renderInitializerDecl(d))
           print("<h3>inline:</h3>")
-          print(inlineRender.renderInitializerDecl(d))
+          print(renderers.inline.renderInitializerDecl(d))
           print("<h3>block:</h3>")
-          print(blockRender.renderInitializerDecl(d))
+          print(renderers.block.renderInitializerDecl(d))
           print("<hr>")
         }
 
         if let d = FunctionDecl.ID(m) {
           print("<h1>[FUNCTION]</h1>")
           print("<h3>simple:</h3>")
-          print(simpleRenderer.renderFunctionDecl(d))
+          print(renderers.simple.renderFunctionDecl(d))
           print("<h3>navigation:</h3>")
-          print(navigationRenderer.renderFunctionDecl(d))
+          print(renderers.navigation.renderFunctionDecl(d))
           print("<h3>inline:</h3>")
-          print(inlineRender.renderFunctionDecl(d))
+          print(renderers.inline.renderFunctionDecl(d))
           print("<h3>block:</h3>")
-          print(blockRender.renderFunctionDecl(d))
+          print(renderers.block.renderFunctionDecl(d))
           print("<hr>")
         }
       }
 
       print("<h1>[PRODUCT TYPE]</h1>")
       print("<h3>simple:</h3>")
-      print(simpleRenderer.renderProductTypeDecl(d))
+      print(renderers.simple.renderProductTypeDecl(d))
       print("<h3>navigation:</h3>")
-      print(navigationRenderer.renderProductTypeDecl(d))
+      print(renderers.navigation.renderProductTypeDecl(d))
       print("<h3>inline:</h3>")
-      print(inlineRender.renderProductTypeDecl(d))
+      print(renderers.inline.renderProductTypeDecl(d))
       print("<h3>block:</h3>")
-      print(blockRender.renderProductTypeDecl(d))
+      print(renderers.block.renderProductTypeDecl(d))
       print("<hr>")
 
       print("=========")
