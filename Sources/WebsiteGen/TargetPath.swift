@@ -22,7 +22,7 @@ public struct TargetPath {
     self.ctx = ctx
   }
 
-  // Generate the url belonging to the current stack
+  /// Generate the url belonging to the current stack
   var url: RelativePath {
     var url = RelativePath(pathString: "")
 
@@ -49,6 +49,20 @@ public struct TargetPath {
 
     return url
   }
+    
+    /// Get the parent of the current target
+    var parent: AnyTargetID? {
+        if stack.count < 2 {
+            return nil
+        }
+        
+        return stack[stack.count - 2]
+    }
+    
+    /// Get the current target
+      var target: AnyTargetID {
+        return stack.last!
+    }
 
   /// Push asset onto stack
   public mutating func push(asset: AnyAssetID) {
@@ -71,11 +85,6 @@ public struct TargetPath {
   /// Pop top-item on the stack
   public mutating func pop() {
     let _ = stack.popLast()
-  }
-
-  /// Get the current target
-  public func target() -> AnyTargetID {
-    return stack.last!
   }
 
 }
