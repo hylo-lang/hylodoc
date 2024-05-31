@@ -74,6 +74,19 @@ final class RenderSymbolDeclsTest: XCTestCase {
       let productType: ProductTypeDecl = ctx.typedProgram.ast[d]
 
       for m in productType.members {
+        if let d = SubscriptDecl.ID(m) {
+          print("<h1>[TYPE ALIAS]</h1>")
+          print("<h3>simple:</h3>")
+          print(simpleRenderer.renderSubscriptDecl(d))
+          print("<h3>navigation:</h3>")
+          print(navigationRenderer.renderSubscriptDecl(d))
+          print("<h3>inline:</h3>")
+          print(inlineRender.renderSubscriptDecl(d))
+          print("<h3>block:</h3>")
+          print(blockRender.renderSubscriptDecl(d))
+          print("<hr>")
+        }
+
         if let d = TypeAliasDecl.ID(m) {
           print("<h1>[TYPE ALIAS]</h1>")
           print("<h3>simple:</h3>")

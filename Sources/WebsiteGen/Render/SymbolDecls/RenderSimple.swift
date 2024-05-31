@@ -78,6 +78,29 @@ func renderSimpleFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ raw: 
   return result
 }
 
+func renderSimpleSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ raw: Bool) -> String {
+  let sub: SubscriptDecl = program.ast[n]
+
+  var result = ""
+
+  if sub.isStatic {
+    result += raw ? "static" : wrapKeyword("static")
+    result += " "
+  }
+
+  result += raw ? "subscript" : wrapKeyword("subscript")
+
+  var tail = ""
+  if let identifier = sub.identifier {
+    tail += " \(identifier.value)"
+  }
+
+  tail += "(\(renderSimpleParams(program, sub.parameters)))"
+  result += raw ? tail : wrapName(tail)
+
+  return result
+}
+
 func renderSimpleParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID])
   -> String
 {

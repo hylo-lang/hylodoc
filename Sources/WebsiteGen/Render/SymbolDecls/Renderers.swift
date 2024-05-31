@@ -7,6 +7,7 @@ protocol SymbolDeclRenderer {
   func renderBindingDecl(_ n: BindingDecl.ID) -> String
   func renderInitializerDecl(_ n: InitializerDecl.ID) -> String
   func renderFunctionDecl(_ n: FunctionDecl.ID) -> String
+  func renderSubscriptDecl(_ n: SubscriptDecl.ID) -> String
 }
 
 struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
@@ -36,6 +37,10 @@ struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
 
   func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
     return renderSimpleFunction(program, n, true)
+  }
+
+  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+    return renderSimpleSubscript(program, n, true)
   }
 }
 
@@ -67,6 +72,10 @@ struct NavigationSymbolDecRenderer: SymbolDeclRenderer {
   func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
     return renderSimpleFunction(program, n, false)
   }
+
+  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+    return renderSimpleSubscript(program, n, false)
+  }
 }
 
 struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
@@ -97,6 +106,10 @@ struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
   func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
     return renderDetailedFunction(program, n, true)
   }
+
+  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+    return ""
+  }
 }
 
 struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
@@ -126,5 +139,9 @@ struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
 
   func renderFunctionDecl(_ n: FunctionDecl.ID) -> String {
     return renderDetailedFunction(program, n, false)
+  }
+
+  func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
+    return ""
   }
 }
