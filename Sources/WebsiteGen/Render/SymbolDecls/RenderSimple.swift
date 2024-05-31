@@ -23,3 +23,23 @@ func renderSimpleProductType(_ program: TypedProgram, _ n: ProductTypeDecl.ID, _
   result += raw ? productType.baseName : wrapName(productType.baseName)
   return result
 }
+
+func renderSimpleBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ raw: Bool) -> String {
+  let binding = program.ast[n]
+  let bindingPattern = program.ast[binding.pattern]
+
+  let subpattern = program.ast[NamePattern.ID(bindingPattern.subpattern)]!
+  let variable = program.ast[subpattern.decl]
+  let introducer = String(describing: bindingPattern.introducer.value)
+
+  var result = ""
+  if binding.isStatic {
+    result += raw ? "static" : wrapKeyword("static")
+    result += " "
+  }
+  result += raw ? introducer : wrapKeyword(introducer)
+  result += " "
+  result += raw ? variable.baseName : wrapName(variable.baseName)
+
+  return result
+}
