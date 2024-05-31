@@ -1,0 +1,16 @@
+trait TraitA {}
+trait TraitB {}
+
+type MyType : TraitA, TraitB {
+  public typealias Element = Float64
+
+  public var member1: Float64
+  public let member2 = "What"
+  public static let member3: Int
+
+  public init(first m1: Float64, _ m2: Int) {}
+
+  public fun functionLarge(hello hello: Int, _ world: Float64) inout -> Int {}
+  public fun functionSmall(_ world: Float64) -> Int {}
+  public static fun functionTiny() {}
+}
