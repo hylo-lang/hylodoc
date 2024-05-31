@@ -10,17 +10,17 @@ type MyType : TraitA, TraitB {
 
   // public init(first m1: Float64, _ m2: Int) {}
 
-  public static subscript(_ n: Int): Float64 {}
-  public subscript nice(what n: Int): Int {}
+  // public static subscript(_ n: Int): Float64 {}
+  // public subscript nice(what n: Int): Int {}
 
-  public subscript min_inout(_ x: inout Int, y: inout Int): Int {
-    inout { if y > x { &x } else { &y } }
-  }
+  // public subscript min_inout(_ x: inout Int, y: inout Int): Int {
+  //   inout { if y > x { &x } else { &y } }
+  // }
 
-  public subscript min(_ x: yielded Int, _ y: yielded Int): Int {
-    let   { if y > x { x } else { y } }
-    inout { if y > x { &x } else { &y } }
-  }
+  // public subscript min(_ x: yielded Int, _ y: yielded Int): Int {
+  //   let   { if y > x { x } else { y } }
+  //   inout { if y > x { &x } else { &y } }
+  // }
 
   // public subscript min(_ x: yielded Int, _ y: yielded Int): Int {
   //   inout { if y > x { &x } else { &y } }
@@ -30,4 +30,10 @@ type MyType : TraitA, TraitB {
   // public fun functionLarge(hello hello: Int, _ world: Float64) inout -> Int {}
   // public fun functionSmall(_ world: Float64) -> Int {}
   // public static fun functionTiny() {}
+
+  public fun foo(_ x: Self, n: Int) -> Float64 {
+    let   { }
+    sink  { }
+    inout { }
+  }
 }

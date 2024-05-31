@@ -78,6 +78,22 @@ func renderSimpleFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ raw: 
   return result
 }
 
+func renderSimpleMethod(_ program: TypedProgram, _ n: MethodDecl.ID, _ raw: Bool)
+  -> String
+{
+  let method = program.ast[n]
+  let identifier = method.identifier.value
+
+  var result = ""
+
+  result += raw ? "fun" : wrapKeyword("fun")
+  result += " "
+  let tail = "\(identifier)(\(renderSimpleParams(program, method.parameters)))"
+  result += raw ? tail : wrapName(tail)
+
+  return result
+}
+
 func renderSimpleSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ raw: Bool) -> String {
   let sub: SubscriptDecl = program.ast[n]
 

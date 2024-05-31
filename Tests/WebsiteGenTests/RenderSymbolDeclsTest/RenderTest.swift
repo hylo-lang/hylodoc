@@ -132,6 +132,19 @@ final class RenderSymbolDeclsTest: XCTestCase {
           print(renderers.block.renderFunctionDecl(d))
           print("<hr>")
         }
+
+        if let d = MethodDecl.ID(m) {
+          print("<h1>[METHOD]</h1>")
+          print("<h3>simple:</h3>")
+          print(renderers.simple.renderMethodDecl(d))
+          print("<h3>navigation:</h3>")
+          print(renderers.navigation.renderMethodDecl(d))
+          print("<h3>inline:</h3>")
+          print(renderers.inline.renderMethodDecl(d))
+          print("<h3>block:</h3>")
+          print(renderers.block.renderMethodDecl(d))
+          print("<hr>")
+        }
       }
 
       print("<h1>[PRODUCT TYPE]</h1>")

@@ -90,7 +90,7 @@ func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inl
   result += "(\(renderDetailedParams(program, function.parameters, inline)))"
 
   if let output = getOutput(program, function.output) {
-    result += " → \(wrapType(output))"
+    result += " -> \(wrapType(output))"
   }
 
   let effect =
@@ -99,6 +99,12 @@ func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inl
   result += " { \(wrapKeyword(effect)) }"
 
   return inline ? result : wrapCodeBlock(result)
+}
+
+func renderDetailedMethod(_ program: TypedProgram, _ n: MethodDecl.ID, _ inline: Bool)
+  -> String
+{
+  return ""
 }
 
 func renderDetailedSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ inline: Bool)
