@@ -95,6 +95,6 @@ struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
   }
 
   func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
-    return ""
+    return renderDetailedFunction(program, n, true)
   }
 }

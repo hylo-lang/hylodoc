@@ -82,6 +82,41 @@ func renderDetailedInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID,
   return inline ? result : wrapCodeBlock(result)
 }
 
+func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inline: Bool)
+  -> String
+{
+  let function = program.ast[n]
+  let identifier = function.identifier!.value
+  var result = ""
+
+  if function.isStatic {
+    result += "\(wrapKeyword("static")) "
+  }
+
+  result += "\(wrapKeyword("fun")) \(identifier)("
+  result += renderDetailedParams(program, function.parameters, inline)
+
+  if !inline && function.parameters.count > 1 {
+    result += "\n"
+  }
+
+  result += ")"
+
+  if function.output != nil, let d = NameExpr.ID(function.output!) {
+    let nameExpr = program.ast[d]
+    let name = nameExpr.name.value.stem
+
+    result += " → \(wrapType(name))"
+  }
+
+  let effect =
+    function.receiverEffect != nil ? String(describing: function.receiverEffect!.value) : "let"
+
+  result += " { \(wrapKeyword(effect)) }"
+
+  return inline ? result : wrapCodeBlock(result)
+}
+
 func renderDetailedParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID], _ inline: Bool)
   -> String
 {
