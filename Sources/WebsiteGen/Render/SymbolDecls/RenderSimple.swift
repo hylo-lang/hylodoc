@@ -57,6 +57,27 @@ func renderSimpleInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID, _
   return result
 }
 
+func renderSimpleFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ raw: Bool)
+  -> String
+{
+  let function = program.ast[n]
+  let identifier = function.identifier!.value
+
+  var result = ""
+
+  if function.isStatic {
+    result += raw ? "static" : wrapKeyword("static")
+    result += " "
+  }
+
+  result += raw ? "fun" : wrapKeyword("fun")
+  result += " "
+  let tail = "\(identifier)(\(renderSimpleParams(program, function.parameters)))"
+  result += raw ? tail : wrapName(tail)
+
+  return result
+}
+
 func renderSimpleParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID])
   -> String
 {

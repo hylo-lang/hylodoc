@@ -6,6 +6,7 @@ protocol SymbolDeclRenderer {
   func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String
   func renderBindingDecl(_ n: BindingDecl.ID) -> String
   func renderInitializerDecl(_ n: InitializerDecl.ID) -> String
+  func renderFunctionDecl(_ n: FunctionDecl.ID) -> String
 }
 
 struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
@@ -31,5 +32,9 @@ struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
 
   func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
     return renderSimpleInitializer(program, n, true)
+  }
+
+  func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
+    return renderSimpleFunction(program, n, true)
   }
 }
