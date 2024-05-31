@@ -43,3 +43,34 @@ func renderSimpleBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ raw: Bo
 
   return result
 }
+
+func renderSimpleInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID, _ raw: Bool)
+  -> String
+{
+  let initializer = program.ast[n]
+  let params = renderSimpleParams(program, initializer.parameters)
+
+  var result = raw ? "init" : wrapKeyword("init")
+  let tail = "(\(params))"
+  result += raw ? tail : wrapName(tail)
+
+  return result
+}
+
+func renderSimpleParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID])
+  -> String
+{
+  var result = ""
+
+  for p in ns {
+    result += renderSimpleParam(program, p)
+  }
+
+  return result
+}
+
+func renderSimpleParam(_ program: TypedProgram, _ n: ParameterDecl.ID) -> String {
+  let parameter = program.ast[n]
+  let label = getParamLabel(parameter)
+  return "\(label):"
+}

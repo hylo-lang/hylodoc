@@ -1,6 +1,16 @@
 import Foundation
 import FrontEnd
 
+func getParamLabel(_ parameter: ParameterDecl) -> String {
+  return parameter.label != nil ? parameter.label!.value : "_"
+}
+
+func getParamType(_ program: TypedProgram, _ parameter: ParameterDecl) -> String {
+  let paramType = program.ast[parameter.annotation!]
+  let nameExpr = program.ast[NameExpr.ID(paramType.bareType)]!
+  return nameExpr.name.value.stem
+}
+
 func wrapIndentation(_ count: Int) -> String {
   return wrap("span", "indentation", String(repeating: " ", count: count))
 }
