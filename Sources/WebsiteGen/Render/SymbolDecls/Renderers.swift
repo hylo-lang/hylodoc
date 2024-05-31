@@ -87,7 +87,7 @@ struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
   }
 
   func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
-    return ""
+    return renderDetailedBinding(program, n, true)
   }
 
   func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {

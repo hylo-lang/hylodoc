@@ -39,3 +39,28 @@ func renderDetailedProductType(_ program: TypedProgram, _ n: ProductTypeDecl.ID,
 
   return inline ? result : wrapCodeBlock(result)
 }
+
+func renderDetailedBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ inline: Bool) -> String {
+  let binding = program.ast[n]
+  let bindingPattern = program.ast[binding.pattern]
+
+  let subpattern = program.ast[NamePattern.ID(bindingPattern.subpattern)]!
+  let variable = program.ast[subpattern.decl]
+
+  let introducer = String(describing: bindingPattern.introducer.value)
+  var result = ""
+
+  if binding.isStatic {
+    result += "\(wrapKeyword("static")) "
+  }
+
+  result += "\(wrapKeyword(introducer)) \(variable.baseName)"
+
+  if bindingPattern.annotation != nil, let d = NameExpr.ID(bindingPattern.annotation!) {
+    let nameExpr = program.ast[d]
+    let name = String(describing: nameExpr.name.value)
+    result += ": \(wrapType(name))"
+  }
+
+  return inline ? result : wrapCodeBlock(result)
+}
