@@ -98,3 +98,33 @@ struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
     return renderDetailedFunction(program, n, true)
   }
 }
+
+struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
+  private let program: TypedProgram
+  private let resolver: URLResolver
+
+  public init(program: TypedProgram, resolver: URLResolver) {
+    self.program = program
+    self.resolver = resolver
+  }
+
+  func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
+    return renderDetailedTypeAlias(program, n, false)
+  }
+
+  func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String {
+    return renderDetailedProductType(program, n, false)
+  }
+
+  func renderBindingDecl(_ n: BindingDecl.ID) -> String {
+    return renderDetailedBinding(program, n, false)
+  }
+
+  func renderInitializerDecl(_ n: InitializerDecl.ID) -> String {
+    return renderDetailedInitializer(program, n, false)
+  }
+
+  func renderFunctionDecl(_ n: FunctionDecl.ID) -> String {
+    return renderDetailedFunction(program, n, false)
+  }
+}
