@@ -41,6 +41,19 @@ final class RenderSymbolDeclsTest: XCTestCase {
 
       mutating func willEnter(_ n: AnyNodeID, in ast: AST) -> Bool {
 
+        if let d = TraitDecl.ID(n) {
+          print("<h1>[TRAIT]</h1>")
+          print("<h3>simple:</h3>")
+          print(renderers.simple.renderTraitDecl(d))
+          print("<h3>navigation:</h3>")
+          print(renderers.navigation.renderTraitDecl(d))
+          print("<h3>inline:</h3>")
+          print(renderers.inline.renderTraitDecl(d))
+          print("<h3>block:</h3>")
+          print(renderers.block.renderTraitDecl(d))
+          print("<hr>")
+        }
+
         if let d = SubscriptDecl.ID(n) {
           print("<h1>[SUBSCRIPT]</h1>")
           print("<h3>simple:</h3>")

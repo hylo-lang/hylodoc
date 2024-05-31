@@ -1,6 +1,17 @@
 import Foundation
 import FrontEnd
 
+func renderDetailedTrait(_ program: TypedProgram, _ n: TraitDecl.ID, _ inline: Bool)
+  -> String
+{
+  let trait = program.ast[n]
+  let identifier = trait.identifier.value
+
+  let result = "\(wrapKeyword("trait")) \(identifier)"
+
+  return inline ? result : wrapCodeBlock(result)
+}
+
 func renderDetailedTypeAlias(_ program: TypedProgram, _ n: TypeAliasDecl.ID, _ inline: Bool)
   -> String
 {

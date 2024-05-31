@@ -1,6 +1,19 @@
 import Foundation
 import FrontEnd
 
+func renderSimpleTrait(_ program: TypedProgram, _ n: TraitDecl.ID, _ raw: Bool)
+  -> String
+{
+  let trait = program.ast[n]
+  let identifier = trait.identifier.value
+
+  var result = raw ? "trait" : wrapKeyword("trait")
+  result += " "
+  result += raw ? identifier : wrapName(identifier)
+
+  return result
+}
+
 func renderSimpleTypeAlias(_ program: TypedProgram, _ n: TypeAliasDecl.ID, _ raw: Bool)
   -> String
 {

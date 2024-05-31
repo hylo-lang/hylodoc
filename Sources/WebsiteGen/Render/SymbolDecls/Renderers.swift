@@ -2,6 +2,7 @@ import Foundation
 import FrontEnd
 
 public protocol SymbolDeclRenderer {
+  func renderTraitDecl(_ n: TraitDecl.ID) -> String
   func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String
   func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String
   func renderBindingDecl(_ n: BindingDecl.ID) -> String
@@ -32,6 +33,10 @@ public struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
   public init(_ program: TypedProgram, _ resolver: URLResolver) {
     self.program = program
     self.resolver = resolver
+  }
+
+  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
+    return renderSimpleTrait(program, n, true)
   }
 
   public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
@@ -72,6 +77,10 @@ public struct NavigationSymbolDecRenderer: SymbolDeclRenderer {
     self.resolver = resolver
   }
 
+  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
+    return renderSimpleTrait(program, n, false)
+  }
+
   public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
     return renderSimpleTypeAlias(program, n, false)
   }
@@ -110,6 +119,10 @@ public struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
     self.resolver = resolver
   }
 
+  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
+    return renderDetailedTrait(program, n, true)
+  }
+
   public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
     return renderDetailedTypeAlias(program, n, true)
   }
@@ -146,6 +159,10 @@ public struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
   public init(_ program: TypedProgram, _ resolver: URLResolver) {
     self.program = program
     self.resolver = resolver
+  }
+
+  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
+    return renderDetailedTrait(program, n, false)
   }
 
   public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
