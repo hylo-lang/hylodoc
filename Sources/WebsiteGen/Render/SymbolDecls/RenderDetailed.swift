@@ -64,3 +64,59 @@ func renderDetailedBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ inlin
 
   return inline ? result : wrapCodeBlock(result)
 }
+
+func renderDetailedInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID, _ inline: Bool)
+  -> String
+{
+  let initializer = program.ast[n]
+  var result = wrapKeyword("init") + "("
+
+  result += renderDetailedParams(program, initializer.parameters, inline)
+
+  if !inline && initializer.parameters.count > 1 {
+    result += "\n"
+  }
+
+  result += ")"
+
+  return inline ? result : wrapCodeBlock(result)
+}
+
+func renderDetailedParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID], _ inline: Bool)
+  -> String
+{
+  var result = ""
+
+  for (i, p) in ns.enumerated() {
+    if !inline && ns.count > 1 {
+      result += "\n\(wrapIndentation(3))"
+    }
+
+    result += renderDetailedParam(program, p)
+
+    if i < ns.count - 1 {
+      result += ","
+
+      if inline && i < ns.count - 1 {
+        result += " "
+      }
+    }
+  }
+
+  return result
+}
+
+func renderDetailedParam(_ program: TypedProgram, _ n: ParameterDecl.ID) -> String {
+  let parameter = program.ast[n]
+  let label = getParamLabel(parameter)
+  let name = parameter.baseName
+  let type = getParamType(program, parameter)
+
+  var result = label
+  if name != label {
+    result += " \(wrapName(name))"
+  }
+
+  result += ": \(wrapType(type))"
+  return result
+}
