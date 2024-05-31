@@ -104,7 +104,30 @@ func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inl
 func renderDetailedMethod(_ program: TypedProgram, _ n: MethodDecl.ID, _ inline: Bool)
   -> String
 {
-  return ""
+  let method = program.ast[n]
+  let identifier = method.identifier.value
+  var result = ""
+
+  result += "\(wrapKeyword("fun")) \(identifier)"
+  result += "(\(renderDetailedParams(program, method.parameters, inline)))"
+
+  if let output = getOutput(program, method.output) {
+    result += " -> \(wrapType(output))"
+  }
+
+  result += " { "
+
+  for (i, impl) in method.impls.enumerated() {
+    let implementation = program.ast[impl]
+    let effect = String(describing: implementation.introducer.value)
+
+    result += wrapKeyword(effect)
+    result += i < method.impls.count - 1 ? ", " : " "
+  }
+
+  result += "}"
+
+  return inline ? result : wrapCodeBlock(result)
 }
 
 func renderDetailedSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ inline: Bool)
