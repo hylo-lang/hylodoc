@@ -134,20 +134,21 @@ func renderDetailedSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ i
   -> String
 {
   let sub: SubscriptDecl = program.ast[n]
-
   var result = ""
 
   if sub.isStatic {
     result += "\(wrapKeyword("static")) "
   }
 
-  result += wrapKeyword("subscript")
+  result += wrapKeyword(String(describing: sub.introducer.value))
 
   if let identifier = sub.identifier {
     result += " \(identifier.value)"
   }
 
-  result += "(\(renderDetailedParams(program, sub.parameters, inline)))"
+  if sub.introducer.value == SubscriptDecl.Introducer.subscript {
+    result += "(\(renderDetailedParams(program, sub.parameters, inline)))"
+  }
 
   if let output = getOutput(program, sub.output) {
     result += ": \(wrapType(output))"

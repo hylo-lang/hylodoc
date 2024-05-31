@@ -96,7 +96,6 @@ func renderSimpleMethod(_ program: TypedProgram, _ n: MethodDecl.ID, _ raw: Bool
 
 func renderSimpleSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ raw: Bool) -> String {
   let sub: SubscriptDecl = program.ast[n]
-
   var result = ""
 
   if sub.isStatic {
@@ -104,14 +103,18 @@ func renderSimpleSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ raw
     result += " "
   }
 
-  result += raw ? "subscript" : wrapKeyword("subscript")
+  let introducer = String(describing: sub.introducer.value)
+  result += raw ? introducer : wrapKeyword(introducer)
 
   var tail = ""
   if let identifier = sub.identifier {
     tail += " \(identifier.value)"
   }
 
-  tail += "(\(renderSimpleParams(program, sub.parameters)))"
+  if sub.introducer.value == SubscriptDecl.Introducer.subscript {
+    tail += "(\(renderSimpleParams(program, sub.parameters)))"
+  }
+
   result += raw ? tail : wrapName(tail)
 
   return result
