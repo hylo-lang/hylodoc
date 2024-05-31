@@ -29,46 +29,19 @@ final class RenderSymbolDeclsTest: XCTestCase {
     )
 
     struct ASTWalkingVisitor: ASTWalkObserver {
-      var listOfProductTypes: [ProductTypeDecl.ID] = []
+      let program: TypedProgram
+      let urlResolver: URLResolver
+      let renderers: SymbolDeclRenderers
+
+      init(_ program: TypedProgram, _ urlResolver: URLResolver, _ renderers: SymbolDeclRenderers) {
+        self.program = program
+        self.urlResolver = urlResolver
+        self.renderers = renderers
+      }
 
       mutating func willEnter(_ n: AnyNodeID, in ast: AST) -> Bool {
-        if let d = ProductTypeDecl.ID(n) {
-          listOfProductTypes.append(d)
-        }
-        return true
-      }
-    }
-    var visitor = ASTWalkingVisitor()
-    ast.walk(moduleId, notifying: &visitor)
 
-    print("=========")
-
-    let typedProgram = try! TypedProgram(
-      annotating: ScopedProgram(ast),
-      inParallel: false,
-      reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _) in false }
-    )
-
-    let db: DocumentationDatabase = .init()
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
-
-    let ctx = GenerationContext(
-      documentation: db,
-      stencil: stencil,
-      typedProgram: typedProgram,
-      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
-    )
-
-    for d in visitor.listOfProductTypes {
-
-      let renderers: SymbolDeclRenderers = .init(
-        program: ctx.typedProgram, resolver: ctx.urlResolver)
-
-      let productType: ProductTypeDecl = ctx.typedProgram.ast[d]
-
-      for m in productType.members {
-        if let d = SubscriptDecl.ID(m) {
+        if let d = SubscriptDecl.ID(n) {
           print("<h1>[SUBSCRIPT]</h1>")
           print("<h3>simple:</h3>")
           print(renderers.simple.renderSubscriptDecl(d))
@@ -81,7 +54,7 @@ final class RenderSymbolDeclsTest: XCTestCase {
           print("<hr>")
         }
 
-        if let d = TypeAliasDecl.ID(m) {
+        if let d = TypeAliasDecl.ID(n) {
           print("<h1>[TYPE ALIAS]</h1>")
           print("<h3>simple:</h3>")
           print(renderers.simple.renderTypeAliasDecl(d))
@@ -94,7 +67,7 @@ final class RenderSymbolDeclsTest: XCTestCase {
           print("<hr>")
         }
 
-        if let d = BindingDecl.ID(m) {
+        if let d = BindingDecl.ID(n) {
           print("<h1>[BINDING]</h1>")
           print("<h3>simple:</h3>")
           print(renderers.simple.renderBindingDecl(d))
@@ -107,7 +80,7 @@ final class RenderSymbolDeclsTest: XCTestCase {
           print("<hr>")
         }
 
-        if let d = InitializerDecl.ID(m) {
+        if let d = InitializerDecl.ID(n) {
           print("<h1>[INITIALIZER]</h1>")
           print("<h3>simple:</h3>")
           print(renderers.simple.renderInitializerDecl(d))
@@ -120,7 +93,7 @@ final class RenderSymbolDeclsTest: XCTestCase {
           print("<hr>")
         }
 
-        if let d = FunctionDecl.ID(m) {
+        if let d = FunctionDecl.ID(n) {
           print("<h1>[FUNCTION]</h1>")
           print("<h3>simple:</h3>")
           print(renderers.simple.renderFunctionDecl(d))
@@ -133,7 +106,7 @@ final class RenderSymbolDeclsTest: XCTestCase {
           print("<hr>")
         }
 
-        if let d = MethodDecl.ID(m) {
+        if let d = MethodDecl.ID(n) {
           print("<h1>[METHOD]</h1>")
           print("<h3>simple:</h3>")
           print(renderers.simple.renderMethodDecl(d))
@@ -145,20 +118,40 @@ final class RenderSymbolDeclsTest: XCTestCase {
           print(renderers.block.renderMethodDecl(d))
           print("<hr>")
         }
+
+        if let d = ProductTypeDecl.ID(n) {
+          print("<h1>[PRODUCT TYPE]</h1>")
+          print("<h3>simple:</h3>")
+          print(renderers.simple.renderProductTypeDecl(d))
+          print("<h3>navigation:</h3>")
+          print(renderers.navigation.renderProductTypeDecl(d))
+          print("<h3>inline:</h3>")
+          print(renderers.inline.renderProductTypeDecl(d))
+          print("<h3>block:</h3>")
+          print(renderers.block.renderProductTypeDecl(d))
+          print("<hr>")
+        }
+
+        return true
       }
-
-      print("<h1>[PRODUCT TYPE]</h1>")
-      print("<h3>simple:</h3>")
-      print(renderers.simple.renderProductTypeDecl(d))
-      print("<h3>navigation:</h3>")
-      print(renderers.navigation.renderProductTypeDecl(d))
-      print("<h3>inline:</h3>")
-      print(renderers.inline.renderProductTypeDecl(d))
-      print("<h3>block:</h3>")
-      print(renderers.block.renderProductTypeDecl(d))
-      print("<hr>")
-
-      print("=========")
     }
+
+    let typedProgram = try! TypedProgram(
+      annotating: ScopedProgram(ast),
+      inParallel: false,
+      reportingDiagnosticsTo: &diagnostics,
+      tracingInferenceIf: { (_, _) in false }
+    )
+
+    let urlResolver = URLResolver(baseUrl: AbsolutePath(pathString: ""))
+
+    let renderers: SymbolDeclRenderers = .init(
+      program: typedProgram, resolver: urlResolver)
+
+    var visitor = ASTWalkingVisitor(typedProgram, urlResolver, renderers)
+
+    print("=========")
+    ast.walk(moduleId, notifying: &visitor)
+    print("=========")
   }
 }

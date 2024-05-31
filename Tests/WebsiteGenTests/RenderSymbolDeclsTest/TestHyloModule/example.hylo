@@ -38,13 +38,7 @@ type MyType : TraitA, TraitB {
   // }
 
   public property degrees: Float64 {
-    let {
-      radians * 180.0 / Float64.pi()
-    }
-    inout {
-      var d = radians * 180.0 / Float64.pi()
-      yield &d
-      radians = d * Float64.pi() / 180.0
-    }
+    let { }
+    inout { }
   }
 }
