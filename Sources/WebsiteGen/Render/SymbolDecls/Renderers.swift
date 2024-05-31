@@ -68,3 +68,33 @@ struct NavigationSymbolDecRenderer: SymbolDeclRenderer {
     return renderSimpleFunction(program, n, false)
   }
 }
+
+struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
+  private let program: TypedProgram
+  private let resolver: URLResolver
+
+  public init(program: TypedProgram, resolver: URLResolver) {
+    self.program = program
+    self.resolver = resolver
+  }
+
+  func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
+    return renderDetailedTypeAlias(program, n, true)
+  }
+
+  func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
+    return ""
+  }
+
+  func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
+    return ""
+  }
+
+  func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
+    return ""
+  }
+
+  func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
+    return ""
+  }
+}
