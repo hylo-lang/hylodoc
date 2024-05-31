@@ -3,6 +3,7 @@ import FrontEnd
 
 protocol SymbolDeclRenderer {
   func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String
+  func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String
 }
 
 struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
@@ -16,5 +17,9 @@ struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
 
   func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
     return renderSimpleTypeAlias(program, n, true)
+  }
+
+  func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
+    return renderSimpleProductType(program, n, true)
   }
 }
