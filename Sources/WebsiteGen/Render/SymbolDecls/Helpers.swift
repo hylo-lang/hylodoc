@@ -11,6 +11,11 @@ func getParamType(_ program: TypedProgram, _ parameter: ParameterDecl) -> String
   return nameExpr.name.value.stem
 }
 
+func getParamConvention(_ program: TypedProgram, _ parameter: ParameterDecl) -> AccessEffect {
+  let paramType = program.ast[parameter.annotation!]
+  return paramType.convention.value
+}
+
 func getOutput(_ program: TypedProgram, _ output: AnyExprID?) -> String? {
   if output == nil {
     return nil

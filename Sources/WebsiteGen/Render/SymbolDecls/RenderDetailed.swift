@@ -70,7 +70,7 @@ func renderDetailedInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID,
 {
   let initializer = program.ast[n]
   var result = wrapKeyword("init")
-  result += "(\(renderDetailedParams(program, initializer.parameters, inline))"
+  result += "(\(renderDetailedParams(program, initializer.parameters, inline)))"
 
   return inline ? result : wrapCodeBlock(result)
 }
@@ -172,12 +172,19 @@ func renderDetailedParam(_ program: TypedProgram, _ n: ParameterDecl.ID) -> Stri
   let label = getParamLabel(parameter)
   let name = parameter.baseName
   let type = getParamType(program, parameter)
+  let convention = getParamConvention(program, parameter)
 
   var result = label
   if name != label {
     result += " \(wrapName(name))"
   }
 
-  result += ": \(wrapType(type))"
+  result += ":"
+
+  if convention != AccessEffect.let {
+    result += " \(wrapKeyword(String(describing: convention)))"
+  }
+
+  result += " \(wrapType(type))"
   return result
 }
