@@ -108,7 +108,7 @@ struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
   }
 
   func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
-    return ""
+    return renderDetailedSubscript(program, n, true)
   }
 }
 
@@ -142,6 +142,6 @@ struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
   }
 
   func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
-    return ""
+    return renderDetailedSubscript(program, n, false)
   }
 }

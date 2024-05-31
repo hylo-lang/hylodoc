@@ -75,7 +75,7 @@ final class RenderSymbolDeclsTest: XCTestCase {
 
       for m in productType.members {
         if let d = SubscriptDecl.ID(m) {
-          print("<h1>[TYPE ALIAS]</h1>")
+          print("<h1>[SUBSCRIPT]</h1>")
           print("<h3>simple:</h3>")
           print(simpleRenderer.renderSubscriptDecl(d))
           print("<h3>navigation:</h3>")

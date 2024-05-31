@@ -69,15 +69,8 @@ func renderDetailedInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID,
   -> String
 {
   let initializer = program.ast[n]
-  var result = wrapKeyword("init") + "("
-
-  result += renderDetailedParams(program, initializer.parameters, inline)
-
-  if !inline && initializer.parameters.count > 1 {
-    result += "\n"
-  }
-
-  result += ")"
+  var result = wrapKeyword("init")
+  result += "(\(renderDetailedParams(program, initializer.parameters, inline))"
 
   return inline ? result : wrapCodeBlock(result)
 }
@@ -93,26 +86,55 @@ func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inl
     result += "\(wrapKeyword("static")) "
   }
 
-  result += "\(wrapKeyword("fun")) \(identifier)("
-  result += renderDetailedParams(program, function.parameters, inline)
+  result += "\(wrapKeyword("fun")) \(identifier)"
+  result += "(\(renderDetailedParams(program, function.parameters, inline)))"
 
-  if !inline && function.parameters.count > 1 {
-    result += "\n"
-  }
-
-  result += ")"
-
-  if function.output != nil, let d = NameExpr.ID(function.output!) {
-    let nameExpr = program.ast[d]
-    let name = nameExpr.name.value.stem
-
-    result += " → \(wrapType(name))"
+  if let output = getOutput(program, function.output) {
+    result += " → \(wrapType(output))"
   }
 
   let effect =
     function.receiverEffect != nil ? String(describing: function.receiverEffect!.value) : "let"
 
   result += " { \(wrapKeyword(effect)) }"
+
+  return inline ? result : wrapCodeBlock(result)
+}
+
+func renderDetailedSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ inline: Bool)
+  -> String
+{
+  let sub: SubscriptDecl = program.ast[n]
+
+  var result = ""
+
+  if sub.isStatic {
+    result += "\(wrapKeyword("static")) "
+  }
+
+  result += wrapKeyword("subscript")
+
+  if let identifier = sub.identifier {
+    result += " \(identifier.value)"
+  }
+
+  result += "(\(renderDetailedParams(program, sub.parameters, inline)))"
+
+  if let output = getOutput(program, sub.output) {
+    result += ": \(wrapType(output))"
+  }
+
+  result += " { "
+
+  for (i, impl) in sub.impls.enumerated() {
+    let implementation = program.ast[impl]
+    let effect = String(describing: implementation.introducer.value)
+
+    result += wrapKeyword(effect)
+    result += i < sub.impls.count - 1 ? ", " : " "
+  }
+
+  result += "}"
 
   return inline ? result : wrapCodeBlock(result)
 }
@@ -136,6 +158,10 @@ func renderDetailedParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID], _ i
         result += " "
       }
     }
+  }
+
+  if !inline && ns.count > 1 {
+    result += "\n"
   }
 
   return result

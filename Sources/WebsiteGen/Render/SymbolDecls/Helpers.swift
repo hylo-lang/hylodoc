@@ -11,6 +11,16 @@ func getParamType(_ program: TypedProgram, _ parameter: ParameterDecl) -> String
   return nameExpr.name.value.stem
 }
 
+func getOutput(_ program: TypedProgram, _ output: AnyExprID?) -> String? {
+  if output == nil {
+    return nil
+  }
+
+  let d = NameExpr.ID(output!)
+  let nameExpr = program.ast[d]!
+  return nameExpr.name.value.stem
+}
+
 func wrapIndentation(_ count: Int) -> String {
   return wrap("span", "indentation", String(repeating: " ", count: count))
 }
