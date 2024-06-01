@@ -1,0 +1,52 @@
+.page-header {
+  // Colors
+  $header-background: #161616;
+
+  @apply flex flex-row;
+  background-color: $header-background;
+  border-bottom: 1px solid $thin-divider;
+
+  .header-title {
+    @apply w-80 flex-none flex flex-row p-3 gap-2;
+    color: $text-primary;
+
+    img {
+      @apply h-6 content-center;
+    }
+
+    h1 {
+      @apply content-center ml-1.5 align-middle;
+    }
+  }
+
+  .header-breadcrumb {
+    @apply flex flex-row flex-nowrap content-center gap-2 pl-4;
+    color: $text-secondary;
+
+    a {
+      @apply content-center align-middle transition-colors duration-500 inline-block;
+      font-size: $h3-size;
+      font-weight: $p-weight;
+      font-style: $p-style;
+
+      code {
+        @apply inline-block;
+      }
+
+      &:not(:first-child):before {
+        @apply text-sm;
+        content: url(icons/arrow.svg);
+        margin-right: 0.5rem;
+      }
+
+      &:last-child {
+        color: $text-primary;
+      }
+
+      &:hover {
+        @apply cursor-pointer;
+        color: $text-primary;
+      }
+    }
+  }
+}

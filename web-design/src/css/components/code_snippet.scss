@@ -1,0 +1,26 @@
+// Colors
+$snippet-background: #232323;
+
+.code-snippet {
+  @apply relative px-5 py-4 z-0 rounded-md overflow-hidden;
+  background-color: $snippet-background;
+  border: 1px solid $thin-divider;
+
+  // Icon overlay
+  & > .options {
+    @apply fixed top-2 right-2 flex flex-row gap-2.5 z-10 opacity-0 transition-opacity duration-500;
+  }
+
+  & > .body {
+    @apply overflow-x-auto w-full;
+  }
+
+  // Hover effect
+  &:hover > .options {
+    @apply opacity-100;
+
+    a:hover {
+      color: var(--text-primary);
+    }
+  }
+}

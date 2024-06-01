@@ -1,0 +1,50 @@
+$content-offset: 3rem;
+
+// General layout [header, content]
+.page {
+  @apply flex flex-col gap-0 w-screen h-screen;
+
+  .page-header {
+    @apply flex-initial h-fit;
+  }
+
+  .page-body {
+    @apply flex-1;
+  }
+}
+
+// Body layout [Navigation, Content, Table of Contents
+.page-body {
+  @apply grid gap-8 overflow-auto;
+  grid-template-areas: "tree content toc";
+  grid-template-columns: 20rem minmax(0,1fr) max-content;
+
+  .page-content-container {
+    grid-area: content;
+    margin-top: $content-offset;
+
+    & > .page-content {
+      max-width: 800px;
+      margin: auto;
+    }
+  }
+
+  .page-navigation {
+    @apply contents;
+
+    .page-navigation-sticky {
+      @apply sticky top-0;
+      height: calc(100vh - 49px);
+    }
+
+    .page-tree {
+      @apply self-start h-full w-80;
+      grid-area: tree;
+    }
+
+    .page-toc {
+      grid-area: toc;
+      margin-top: $content-offset;
+    }
+  }
+}

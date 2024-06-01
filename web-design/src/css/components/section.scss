@@ -1,0 +1,58 @@
+.page-content {
+  @apply flex flex-col gap-6;
+
+  & > div {
+    @apply scroll-m-4;
+  }
+}
+
+.content-nested-section {
+  @apply flex flex-col gap-4;
+
+  & > div {
+    @apply scroll-m-4;
+  }
+}
+
+.content-section {
+  h1, h2 {
+    @apply mb-2;
+  }
+
+  p {
+    @apply mb-3;
+
+    a {
+      @apply underline;
+      color: $text-secondary-accent;
+
+      &:hover {
+        @apply cursor-pointer;
+      }
+    }
+  }
+
+  ul {
+    @apply list-disc ml-7;
+    color: $text-primary;
+  }
+
+  .tag {
+    @apply px-1.5 pb-0.5 m-0 rounded-lg font-mono inline-block;
+    border: 1px solid $thin-divider;
+    background-color: $snippet-background;
+  }
+
+  .declaration {
+    @apply py-2.5;
+    border-top: 1px solid $thin-divider;
+
+    &:last-child {
+      border-bottom: 1px solid $thin-divider;
+    }
+
+    * {
+      @apply m-0 p-0;
+    }
+  }
+}

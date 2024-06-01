@@ -1,0 +1,159 @@
+.page-tree {
+  // Colors
+  $background: #161616;
+
+  @apply p-3;
+  background-color: $background;
+
+  .search {
+    // Colors
+    $background: #0F0F0F;
+    $placeholder: #717171;
+    $text: $text-secondary;
+    $focus: #F25FB7;
+
+    @apply relative z-0 w-full py-0 pr-0 pl-8 mb-3 rounded-md overflow-hidden;
+    border: 1px solid $thin-divider;
+
+    & > input {
+      @apply w-full py-2 px-2 pl-0 text-sm m-0 text-center outline-none;
+      background-color: var(--navigation-input-background);
+      color: $text;
+
+      &::placeholder {
+        color: $placeholder;
+      }
+    }
+
+    &:focus-within {
+      border-color: $focus;
+    }
+
+    &:has(> input:not(:placeholder-shown)):before {
+      @apply hidden;
+    }
+
+    &:before {
+      @apply absolute w-5 h-6 rounded-md z-10 border-2;
+      top: calc(50% - 0.7rem);
+      left: calc(50% - 0.85rem);
+      content: '‎';
+      border-color: $thin-divider;
+    }
+
+    &:after {
+      @apply absolute w-4 h-4 z-10;
+      content: '‎';
+      background-image: url(icons/search.svg);
+      background-size: cover;
+      background-repeat: no-repeat;
+      top: calc(50% - 0.45rem);
+      left: 0.5rem;
+    }
+  }
+
+  & > ul {
+    @apply relative;
+  }
+
+  ul {
+    // Colors
+    $item-active-background: #331020;
+    $item-active-color: $text-primary;
+    $item-hover-background: #1C1C1C;
+    $item-hover-color: $text-primary;
+    $item-inactive-color: $text-secondary;
+    $item-inactive-background: transparent;
+
+    @apply z-0 pl-5 list-none;
+
+    & > li {
+      @apply transition-colors duration-300;
+      color: $item-inactive-color;
+      background-color: $item-inactive-background;
+
+      & > ul {
+        @apply hidden;
+      }
+
+      &:has(> :checked), &.active, &:hover {
+        color: $item-hover-color;
+      }
+
+      &:before {
+        @apply transition-opacity duration-300 ease-in-out opacity-0 absolute left-0 w-full -z-10 rounded-md;
+        margin-top: 0.2rem;
+        content: '‎';
+        background-color: $item-hover-background;
+      }
+
+      &.active:before {
+        @apply opacity-100;
+        background-color: $item-active-background;
+      }
+
+      // hovering on the element itself and not the nested list
+      &:hover:not(:has(> ul:hover)):before {
+        @apply opacity-100;
+      }
+
+      & > input[type="checkbox"] {
+        @apply relative invisible m-0 -ml-4;
+        width: 0.75rem;
+        height: 1.1rem;
+
+        &:before {
+          @apply absolute -left-2.5 visible -rotate-90;
+          width: 1.15rem;
+          height: 1.15rem;
+          top: -0.33rem;
+          content: url(icons/arrow_solid.svg);
+        }
+
+        &:checked {
+          &:before {
+            @apply rotate-0;
+            left: 0.05rem;
+            top: -0.35rem;
+          }
+
+          & ~ ul {
+            @apply block;
+          }
+        }
+      }
+
+      & > a {
+        @apply cursor-pointer inline-block;
+
+        code {
+          @apply inline-block;
+        }
+
+        &.folder, &.file {
+          @apply relative;
+          padding-left: 1.4rem;
+
+          &:before {
+            @apply absolute left-0 top-0.5 bg-cover bg-no-repeat;
+            content: '‎';
+          }
+        }
+
+        &.folder:before {
+          @apply w-4 h-3.5;
+          background-image: url(icons/folder.svg);
+        }
+
+        &.file:before {
+          @apply w-4 h-4;
+          background-image: url(icons/file.svg);
+        }
+
+        &:not(.file):not(.folder) {
+          @apply ml-0.5;
+        }
+      }
+    }
+  }
+}

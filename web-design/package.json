@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0"
+    "typescript": "^5.4.5",
+    "vite": "^5.2.12"
   },
   "dependencies": {
     "@csstools/postcss-sass": "^5.1.1",
@@ -20,6 +20,6 @@
     "postcss-import": "^16.1.0",
     "postcss-mixins": "^10.0.1",
     "postcss-nested": "^6.0.1",
-    "tailwindcss": "^3.4.3"
+    "tailwindcss": "^3.4.4"
   }
 }

@@ -1,0 +1,53 @@
+// Colors
+$text-primary: #e8e8e8;
+$text-secondary: #A6A6A6;
+$text-secondary-accent: #21E5E5;
+
+// Style
+$h1-size: 1.5rem;
+$h1-weight: 700;
+$h1-style: normal;
+
+$h2-size: 1.125rem;
+$h2-weight: 600;
+$h2-style: normal;
+
+$h3-size: 1rem;
+$h3-weight: 400;
+$h3-style: normal;
+
+$p-size: 0.95rem;
+$p-weight: 300;
+$p-style: normal;
+
+h1 {
+  @apply font-inter;
+  font-size: $h1-size;
+  font-weight: $h1-weight;
+  font-style: $h1-style;
+  color: $text-primary;
+}
+
+h2 {
+  @apply font-inter;
+  font-size: $h2-size;
+  font-weight: $h2-weight;
+  font-style: $h2-style;
+  color: $text-primary;
+}
+
+h3 {
+  @apply font-inter;
+  font-size: $h3-size;
+  font-weight: $h3-weight;
+  font-style: $h3-style;
+  color: $text-primary;
+}
+
+p, a {
+  @apply font-inter;
+  font-size: $p-size;
+  font-weight: $p-weight;
+  font-style: $p-style;
+  color: $text-secondary;
+}

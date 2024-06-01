@@ -1,0 +1,39 @@
+.page-toc {
+  @apply p-0 m-0;
+  min-width: fit-content;
+
+  & > ul {
+    @apply relative pr-8 z-0 border-l-2;
+    border-color: $thin-divider;
+  }
+
+  ul {
+    @apply w-full pl-4;
+
+    & > li {
+      @apply transition-colors duration-300;
+      color: $text-secondary;
+
+      &:before {
+        @apply absolute h-6 w-full -z-10 border-l-2;
+        content: '‎';
+        border-color: $thin-divider;
+        background-color: transparent;
+        left: -2px;
+      }
+
+      a:hover {
+        @apply cursor-pointer;
+      }
+
+      // hovering on the element itself and not the nested list
+      &:hover:not(:has(> ul:hover)), &.active {
+        color: $text-secondary-accent;
+
+        &:before {
+          border-color: $text-secondary-accent;
+        }
+      }
+    }
+  }
+}

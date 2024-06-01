@@ -1,0 +1,62 @@
+// Colors
+$keyword: #F25FB7;
+$number-literal: #CCB5FF;
+$string-literal: #DAD168;
+$type: #21E5E5;
+
+// Text Style
+$font-weight: 200;
+$inline-font-style: italic;
+$block-font-style: normal;
+
+code {
+  @apply relative contents w-fit bg-none whitespace-pre p-0 m-0;
+  -webkit-overflow-scrolling: touch;
+
+
+  // Make sure everything is using the monospace font
+  &, * {
+    @apply font-mono;
+    color: $text-primary;
+    font-weight: $font-weight;
+  }
+
+  // Reference
+  a {
+    @apply no-underline;
+
+    &:hover {
+      @apply cursor-pointer underline;
+    }
+  }
+
+  // Code Types
+  &.inline {
+    font-style: $inline-font-style;
+  }
+
+  &.block {
+    font-style: $block-font-style;
+  }
+
+  // Token Types
+  .keyword {
+    color: $keyword;
+  }
+
+  .string-literal {
+    color: $string-literal;
+  }
+
+  .number-literal {
+    color: $number-literal;
+  }
+
+  .type {
+    color: $type;
+  }
+
+  .comment {
+    color: $text-secondary;
+  }
+}
