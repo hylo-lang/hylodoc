@@ -34,22 +34,30 @@ public func generateDocumentation(
   // Resolve URL's
   //var resolvingVisitor: DocumentationVisitor = URLResolvingVisitor(urlResolver: &ctx.urlResolver)
   documentation.modules.forEach {
-    module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: {
-        (path: TargetPath) in ctx.urlResolver.resolve(target: path.target, filePath: path.url, parent: path.parent)
-    })
+    module in
+    traverse(
+      ctx: ctx, root: .folder(module.rootFolder),
+      visitor: {
+        (path: TargetPath) in
+        ctx.urlResolver.resolve(target: path.target, filePath: path.url, parent: path.parent)
+      })
   }
 
   // Generate assets and symbols
   let exporter: DefaultExporter = .init()
   documentation.modules.forEach {
-    module in traverse(ctx: ctx, root: .folder(module.rootFolder), visitor: {
-        (path: TargetPath) in switch path.target {
-            case .asset(let id):
-                try! generateAsset(ctx: ctx, of: id, with: exporter)
-            case .symbol(let id):
-                try! generateSymbol(ctx: ctx, of: id, with: exporter)
+    module in
+    traverse(
+      ctx: ctx, root: .folder(module.rootFolder),
+      visitor: {
+        (path: TargetPath) in
+        switch path.target {
+        case .asset(let id):
+          try! generateAsset(ctx: ctx, of: id, with: exporter)
+        case .symbol(let id):
+          try! generateSymbol(ctx: ctx, of: id, with: exporter)
         }
-    })
+      })
   }
 
   // Create asset directorty
@@ -57,12 +65,15 @@ public func generateDocumentation(
   try! FileManager.default.createDirectory(at: assetDir, withIntermediateDirectories: true)
 
   // Copy assets (everything but html templates) to asset directory
-  let bundledAssets = try! FileManager.default.contentsOfDirectory(at: Bundle.module.bundleURL, includingPropertiesForKeys: nil)
+  let bundledAssets = try! FileManager.default.contentsOfDirectory(
+    at: Bundle.module.bundleURL, includingPropertiesForKeys: nil)
   for bundledAsset in bundledAssets {
     if bundledAsset.lastPathComponent.hasSuffix(".html") {
-        continue
+      continue
     }
 
-    try! FileManager.default.copyItem(at: bundledAsset, to: URL(fileURLWithPath: "assets/"+bundledAsset.lastPathComponent, relativeTo: assetDir))
+    try! FileManager.default.copyItem(
+      at: bundledAsset,
+      to: URL(fileURLWithPath: "assets/" + bundledAsset.lastPathComponent, relativeTo: assetDir))
   }
 }

@@ -1,6 +1,6 @@
+import DequeModule
 import Foundation
 import PathWrangler
-import DequeModule
 
 public struct URLResolver {
   private var references: [AnyTargetID: (RelativePath, AnyTargetID?)] = [:]

@@ -49,20 +49,20 @@ public struct TargetPath {
 
     return url
   }
-    
-    /// Get the parent of the current target
-    var parent: AnyTargetID? {
-        if stack.count < 2 {
-            return nil
-        }
-        
-        return stack[stack.count - 2]
+
+  /// Get the parent of the current target
+  var parent: AnyTargetID? {
+    if stack.count < 2 {
+      return nil
     }
-    
-    /// Get the current target
-      var target: AnyTargetID {
-        return stack.last!
-    }
+
+    return stack[stack.count - 2]
+  }
+
+  /// Get the current target
+  var target: AnyTargetID {
+    return stack.last!
+  }
 
   /// Push asset onto stack
   public mutating func push(asset: AnyAssetID) {

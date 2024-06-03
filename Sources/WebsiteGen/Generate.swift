@@ -18,10 +18,10 @@ public protocol Exporter {
 ///   - of: asset to render page of
 ///   - with: exporter, used to handle file writes and directory creation
 public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter) throws {
-    guard let target = ctx.urlResolver.pathToFile(target: .asset(of)) else {
-        //TODO throw exception
-        return
-    }
+  guard let target = ctx.urlResolver.pathToFile(target: .asset(of)) else {
+    //TODO throw exception
+    return
+  }
 
   // Handle other file
   if case .otherFile(let id) = of {
@@ -45,8 +45,8 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter
 ///   - of: symbol to render page of
 public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter) throws {
   guard let target = ctx.urlResolver.pathToFile(target: .symbol(of)) else {
-      //TODO throw exception
-      return
+    //TODO throw exception
+    return
   }
 
   // Render and export page
@@ -57,13 +57,15 @@ public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter
 public struct DefaultExporter: Exporter {
   public func file(from: URL, to: URL) throws {
     // Copy file
-    try FileManager.default.createDirectory(at: to.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(
+      at: to.deletingLastPathComponent(), withIntermediateDirectories: true)
     try FileManager.default.copyItem(at: from, to: to)
   }
 
   public func html(content: String, to: URL) throws {
     // Write file
-    try FileManager.default.createDirectory(at: to.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(
+      at: to.deletingLastPathComponent(), withIntermediateDirectories: true)
     try content.write(to: to, atomically: false, encoding: String.Encoding.utf8)
   }
 

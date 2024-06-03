@@ -19,16 +19,18 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
 
   // check if file has summary
   if let summaryBlock = sourceFile.generalDescription.summary {
-      arr["summary"] = HtmlGenerator.standard.generate(doc: summaryBlock)
+    arr["summary"] = HtmlGenerator.standard.generate(doc: summaryBlock)
   }
   // check if file has description
   if let descriptionBlock = sourceFile.generalDescription.description {
-      arr["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
+    arr["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
   }
 
-  let seeAlso = sourceFile.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  let seeAlso = sourceFile.generalDescription.seeAlso.map {
+    HtmlGenerator.standard.generate(doc: $0)
+  }
   if !seeAlso.isEmpty {
-      arr["seeAlso"] = seeAlso
+    arr["seeAlso"] = seeAlso
   }
 
   return try ctx.stencil.renderTemplate(name: "sourceFile_layout.html", context: arr)
@@ -83,8 +85,12 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws 
   }
 
   let children = folder.children.map {
-    childId in (getAssetTitle(childId, ctx.documentation.assets), ctx.urlResolver.refer(from: .asset(.folder(of)), to: .asset(childId)))
-   }
+    childId in
+    (
+      getAssetTitle(childId, ctx.documentation.assets),
+      ctx.urlResolver.refer(from: .asset(.folder(of)), to: .asset(childId))
+    )
+  }
   if !children.isEmpty {
     arr["children"] = children
   }
@@ -121,6 +127,7 @@ public func getAssetTitle(_ id: AnyAssetID, _ assetsDB: AssetStore) -> String {
 ///   - of: other file asset to render page of
 ///
 /// - Returns: the contents of the rendered local file
-public func renderOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset.ID) throws -> String {
-    return ""
+public func renderOtherFilePage(ctx: GenerationContext, of: OtherLocalFileAsset.ID) throws -> String
+{
+  return ""
 }

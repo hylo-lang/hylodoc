@@ -13,16 +13,14 @@ final class SimpleFullPipelineTest: XCTestCase {
   func test() {
     let fileManager = FileManager.default
 
-    
     let sourceURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
       .appendingPathComponent("ExampleModule")
-      
+
     let outputURL = URL(fileURLWithPath: "./dist")
 
     if fileManager.fileExists(atPath: outputURL.path) {
       try! fileManager.removeItem(at: outputURL)
     }
-
 
     var diagnostics = DiagnosticSet()
     var ast = loadStandardLibraryCore(diagnostics: &diagnostics)

@@ -9,8 +9,7 @@ import FrontEnd
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - root: asset to traverse
 ///   - visitor: documentation visitor to handle visits
-public func traverse(ctx: GenerationContext, root: AnyAssetID, visitor: (TargetPath) -> Void)
-{
+public func traverse(ctx: GenerationContext, root: AnyAssetID, visitor: (TargetPath) -> Void) {
   var path = TargetPath(ctx: ctx)
   traverseAssets(ctx: ctx, root: root, visitor: visitor, path: &path)
 }
