@@ -55,3 +55,4 @@ ENV PATH="/swift-format/.build/release:$PATH"
 
 # Tool for coverage reports inside Gitlab
 RUN pip3 install lcov_cobertura
+RUN pip3 install pycobertura
