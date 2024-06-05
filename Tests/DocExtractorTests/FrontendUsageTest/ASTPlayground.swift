@@ -14,13 +14,16 @@ final class ASTPlayground: XCTestCase {
       let _ = try? ast.addModule(
         fromSingleSourceFile: .init(
           synthesizedText: """
-              public type Vector2 {
-                var value: Int
-                fun scaled() {
-                  &value = 3
+              type Vector: Deinitializable {
+                var x: Int
+                fun myMethod(m: Int) {
+                  inout {
+                    &x += m
+                  }
                 }
               }
-            """, named: "hello.hylo"), diagnostics: &diagnostics)
+
+            """, named: "hello.hylo"), diagnostics: &diagnostics, moduleName: "hello")
     else {
       XCTFail("Failed to add module")
       print(diagnostics)

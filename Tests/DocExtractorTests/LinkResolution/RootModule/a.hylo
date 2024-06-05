@@ -21,4 +21,24 @@ type Vector: Deinitializable {
       &x += dx
     }
   }
+
+  typealias Innerlijke = Inner
+
+  fun myMethod(m: Int) {
+    inout {
+      &x += m
+    }
+  }  
+}
+
+trait Collapsible {
+  fun collapse()
+}
+
+namespace BASE_NS {
+  type string {}
+
+  namespace INNER_NS {
+    type Flower {}
+  }
 }
