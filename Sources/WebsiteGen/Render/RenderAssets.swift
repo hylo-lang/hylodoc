@@ -2,6 +2,7 @@ import DocumentationDB
 import Foundation
 import MarkdownKit
 import Stencil
+import FrontEnd
 
 /// Render the source-file page
 ///
@@ -11,7 +12,7 @@ import Stencil
 ///
 /// - Returns: the contents of the rendered page
 public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID) throws -> String {
-  let sourceFile = ctx.documentation.assets[of]!
+  let sourceFile: SourceFileAsset = ctx.documentation.assets[of]!
 
   var env: [String: Any] = [:]
 
@@ -29,13 +30,12 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
     env["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
   }
 
-  let seeAlso = sourceFile.generalDescription.seeAlso.map {
+  env["seeAlso"] = sourceFile.generalDescription.seeAlso.map {
     HtmlGenerator.standard.generate(doc: $0)
   }
-  if !seeAlso.isEmpty {
-    env["seeAlso"] = seeAlso
-  }
 
+  let translationUnit = ctx.typedProgram.ast[sourceFile.translationUnit]
+  env["members"] = prepareMembersData(referringFrom: .asset(AnyAssetID(from: of)), decls: translationUnit.decls, ctx: ctx)
   return try ctx.stencil.renderTemplate(name: "source_file_layout.html", context: env)
 }
 

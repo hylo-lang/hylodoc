@@ -3,6 +3,18 @@ import Foundation
 import FrontEnd
 import MarkdownKit
 
+func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: GenerationContext) -> [(name: String, url: String)] {
+  decls.map { declId in 
+    return (
+      getMembers(ctx: ctx, of: declId).name,
+      ctx.urlResolver.refer(
+        from: referringFrom,
+        to: .symbol(AnyDeclID(declId))
+      )?.description ?? ""
+    )
+  }
+}
+
 /// Render the associated-type page
 ///
 /// - Parameters:
@@ -494,7 +506,7 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
       args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
     }
 
-    args["members"] = decl.members.map { member in getMembers(ctx: ctx, of: member) }
+    args["members"] = prepareMembersData(referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
     return try ctx.stencil.renderTemplate(name: "trait_layout.html", context: args)
 }
@@ -527,18 +539,16 @@ public func renderProductTypePage(ctx: GenerationContext, of: ProductTypeDecl.ID
       if let block = doc.generalDescription.description {
           args["details"] = HtmlGenerator.standard.generate(doc: block)
       }
-
       args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
-
-      args["members"] = decl.members.map { member in getMembers(ctx: ctx, of: member) }
-
       args["seeAlso"] = doc.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
     }
     
+    args["members"] = prepareMembersData(referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
+
     return try ctx.stencil.renderTemplate(name: "product_type_layout.html", context: args)
 }
 
-func getMembers(ctx: GenerationContext, of: AnyDeclID) -> (String, Block?) {
+func getMembers(ctx: GenerationContext, of: AnyDeclID) -> (name: String, summary: Block?) {
     switch of.kind {
     case AssociatedTypeDecl.self:
         let astDecl = ctx.typedProgram.ast[of]! as! AssociatedTypeDecl
