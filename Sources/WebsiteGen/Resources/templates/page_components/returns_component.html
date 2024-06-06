@@ -1,0 +1,16 @@
+{% if returns %}
+    <div class="content-section">
+        <h1>Returns</h1>
+        {% if returns.count == 1 %}
+            {{ returns[0] }}
+        {% else %}
+            <ul>
+            {% for el in returns %}
+                <li>
+                {{ el }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}

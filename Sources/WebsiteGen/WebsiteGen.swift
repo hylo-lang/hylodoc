@@ -11,6 +11,18 @@ public struct GenerationContext {
   public var urlResolver: URLResolver
 }
 
+extension FileSystemLoader {
+  public convenience init(path: URL) {
+    self.init(paths: [.init(path.fileSystemPath)])
+  }
+}
+
+public func createFileSystemTemplateLoader() -> FileSystemLoader {
+  return FileSystemLoader(path: Bundle.module.bundleURL.appendingPathComponent("Resources/templates"))
+}
+public func createDefaultStencilEnvironment() -> Environment {
+  return Environment(loader: createFileSystemTemplateLoader())
+}
 /// Render the full documentation website
 ///
 /// - Parameters:
@@ -23,7 +35,7 @@ public func generateDocumentation(
   target: URL
 ) {
   // Setup Context
-  let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
+  let stencil = createDefaultStencilEnvironment()
   var ctx = GenerationContext(
     documentation: documentation,
     stencil: stencil,
@@ -60,20 +72,11 @@ public func generateDocumentation(
       })
   }
 
-  // Create asset directorty
-  let assetDir = URL(fileURLWithPath: "assets", relativeTo: target)
-  try! FileManager.default.createDirectory(at: assetDir, withIntermediateDirectories: true)
-
-  // Copy assets (everything but html templates) to asset directory
-  let bundledAssets = try! FileManager.default.contentsOfDirectory(
-    at: Bundle.module.bundleURL, includingPropertiesForKeys: nil)
-  for bundledAsset in bundledAssets {
-    if bundledAsset.lastPathComponent.hasSuffix(".html") {
-      continue
-    }
-
-    try! FileManager.default.copyItem(
-      at: bundledAsset,
-      to: URL(fileURLWithPath: "assets/" + bundledAsset.lastPathComponent, relativeTo: assetDir))
-  }
+  // Copy public website assets
+  // assuming target directory exists already
+  let assetsSourceLocation = Bundle.module.bundleURL.appendingPathComponent("Resources").appendingPathComponent("assets")
+  try! FileManager.default.copyItem(
+    at: assetsSourceLocation,
+    to: URL(fileURLWithPath: "assets", relativeTo: target)
+  )  
 }

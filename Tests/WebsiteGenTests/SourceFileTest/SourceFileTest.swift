@@ -13,14 +13,10 @@ func assetNameIs(_ name: String, _ assets: AssetStore) -> ((AnyAssetID) -> Bool)
   { assets[$0]?.location.lastPathComponent == name }
 }
 
-/// Check if the given string contains the given regex pattern
-/// - Parameters:
-///   - patternToMatch: Regex pattern to match in the string
-///   - res: The string to check the pattern in
-/// - Returns: True if the pattern is found in the string, false otherwise
-func matchPattern(match patternToMatch: [String], in res: String) -> Bool {
+/// Check if the given string contains the given strings only separated by whitespaces
+func matchWithWhitespacesInBetween(pattern: [String], in res: String) -> Bool {
   do {
-    let pattern = patternToMatch.map { NSRegularExpression.escapedPattern(for: $0) }.joined(
+    let pattern = pattern.map { NSRegularExpression.escapedPattern(for: $0) }.joined(
       separator: "\\s*")
     let adjustedPattern = "(?s)" + pattern
     let regex = try NSRegularExpression(pattern: adjustedPattern)
@@ -81,9 +77,8 @@ final class SourceFileTest: XCTestCase {
     var db = DocumentationDatabase.init()
     let sourceFileID = db.assets.sourceFiles.insert(sourceFile, for: translationUnit)
     let ctx = GenerationContext(
-      // documentation: DocumentationDatabase.init(),
       documentation: db,
-      stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: pathUrl))
     )
@@ -111,7 +106,7 @@ final class SourceFileTest: XCTestCase {
       "</li>",
       "</ul>",
     ]
-    XCTAssertTrue(matchPattern(match: match, in: res), res)
+    XCTAssertTrue(matchWithWhitespacesInBetween(pattern: match, in: res), res)
   }
 
   // check renderSourceFilePage function using SourceFileAsset created from hylo file
@@ -155,13 +150,11 @@ final class SourceFileTest: XCTestCase {
 
     let db = try! result.get()
 
-    let pathUrl =
-      "/Users/evyatarhadasi/Desktop/code/automated-documentation-generation-tool/Tests/WebsiteGenTests/SourceFileTest/TestOutput"
     let ctx = GenerationContext(
       documentation: db,
-      stencil: Environment(loader: FileSystemLoader(bundle: [Bundle.module])),
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
-      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: pathUrl))
+      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "/"))
     )
 
     var res: String = ""

@@ -1,0 +1,12 @@
+{% if postconditions %}
+    <div class="content-section">
+        <h1>Postconditions</h1>
+        <ul>
+        {% for el in postconditions %}
+            <li>
+            {{ el }}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}

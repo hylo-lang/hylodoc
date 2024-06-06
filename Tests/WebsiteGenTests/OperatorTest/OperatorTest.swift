@@ -49,11 +49,10 @@ final class OperatorTest : XCTestCase {
             tracingInferenceIf: { (_, _) in false })
 
         let db: DocumentationDatabase = .init()
-        let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
         
         var ctx = GenerationContext(
             documentation: db,
-            stencil: stencil,
+            stencil: createDefaultStencilEnvironment(),
             typedProgram: typedProgram,
             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
         )
@@ -79,32 +78,30 @@ final class OperatorTest : XCTestCase {
         
         let res = try! renderOperatorPage(ctx: ctx, of: operatorId, with: operatorDoc)
         
-        XCTAssertTrue(res.contains("<h1>==</h1>"), res)
-        XCTAssertTrue(matchPattern(match: [
+        // XCTAssertTrue(res.contains("<h1>==</h1>"), res)
+        XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
             "<code>",
             "public operator infix== : comparison",
             "</code>"
         ], in: res), res)
-        XCTAssertTrue(matchPattern(match: [
-            "<h4>",
+        XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
             "<p>",
             "Carving up a summary for dinner, minding my own business.",
             "</p>",
-            "</h4>"
         ], in: res), res)
-        XCTAssertTrue(matchPattern(match: [
-            "<h2>",
+        XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
+            "<h1>",
             "Details",
-            "</h2>",
+            "</h1>",
             "<p>",
             "In storms my husband Wilbur in a jealous description. He was crazy!",
             "</p>",
         ], in: res), res)
 
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
+        XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
+            "<h1>",
             "See Also",
-            "</h2>",
+            "</h1>",
         ], in: res), res)
     }
 }

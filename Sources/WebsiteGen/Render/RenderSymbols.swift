@@ -18,9 +18,12 @@ public func renderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeD
 
     // TODO address the case where the function has no name
     args["name"] = decl.identifier.value
-    args["code"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
+    args["pageTitle"] = decl.identifier.value
+    args["pageType"] = "Associated Type"
+    args["declarationPreview"] = decl.site.text // todo
+    
     // Summary
     if let summary = with.common.summary {
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
@@ -51,10 +54,12 @@ public func renderAssociatedValuePage(
 
     var args: [String : Any] = [:]
 
-    // TODO address the case where the function has no name
     args["name"] = decl.identifier.value
-    args["code"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    args["pageTitle"] = decl.identifier.value
+    args["pageType"] = "Associated Value"
+    args["declarationPreview"] = decl.site.text // todo
 
     // Summary
     if let summary = with.common.summary {
@@ -86,8 +91,11 @@ public func renderTypeAliasPage(
 
   var args: [String: Any] = [:]
   args["name"] = decl.identifier.value
-  args["code"] = decl.site.text
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+  args["pageTitle"] = decl.identifier.value // todo
+  args["pageType"] = "Type Alias"
+  args["declarationPreview"] = decl.site.text // todo
 
   // Summary
   if let summary = with.common.summary {
@@ -99,7 +107,7 @@ public func renderTypeAliasPage(
     args["details"] = HtmlGenerator.standard.generate(doc: block)
   }
 
-  return try ctx.stencil.renderTemplate(name: "symbol_layout.html", context: args)
+  return try ctx.stencil.renderTemplate(name: "type_alias_layout.html", context: args)
 }
 
 /// Render the binding page
@@ -116,12 +124,15 @@ public func renderBindingPage(ctx: GenerationContext, of: BindingDecl.ID, with: 
     var args: [String : Any] = [:]
 
     args["name"] = "binding"
-    args["code"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
     if let summary = with.common.summary {
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
+
+    args["pageTitle"] = decl.site.text // todo
+    args["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
+    args["declarationPreview"] = decl.site.text // todo
 
     if let block = with.common.description {
         args["details"] = HtmlGenerator.standard.generate(doc: block)
@@ -131,7 +142,7 @@ public func renderBindingPage(ctx: GenerationContext, of: BindingDecl.ID, with: 
 
     args["seeAlso"] = with.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
 
-    return try ctx.stencil.renderTemplate(name: "trait_layout.html", context: args)
+    return try ctx.stencil.renderTemplate(name: "binding_layout.html", context: args)
 }
 
 /// Render the operator page
@@ -149,8 +160,11 @@ public func renderOperatorPage(ctx: GenerationContext, of: OperatorDecl.ID, with
 
     // TODO address the case where the function has no name
     args["name"] = decl.name.value
-    args["code"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    args["pageTitle"] = decl.site.text // todo
+    args["pageType"] = "Operator Introducer"
+    args["declarationPreview"] = decl.site.text // todo
 
     // Summary
     if let summary = with.documentation.summary {
@@ -182,10 +196,12 @@ public func renderFunctionPage(
 
   var args: [String: Any] = [:]
 
-    // TODO address the case where the function has no name
-    args["name"] = decl.identifier?.value
-    args["code"] = decl.site.text
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["name"] = decl.site.text
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+  args["pageTitle"] = decl.site.text // todo
+  args["pageType"] = "Function"
+  args["declarationPreview"] = decl.site.text // todo
 
   // Summary
   if let summary = with.documentation.common.summary {
@@ -250,8 +266,11 @@ public func renderMethodPage(ctx: GenerationContext, of: MethodDecl.ID, with: Me
 
     // TODO address the case where the function has no name
     args["name"] = decl.identifier.value
-    args["code"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    args["pageTitle"] = decl.site.text // todo
+    args["pageType"] = "Method"
+    args["declarationPreview"] = decl.site.text // todo
 
     // Summary
     if let summary = with.documentation.common.summary {
@@ -320,9 +339,13 @@ public func renderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl.ID, wi
 
     var args: [String : Any] = [:]
 
-    args["name"] = decl.identifier?.value ?? "subscript(_:)"
-    args["code"] = decl.site.text
+    args["name"] = decl.site.text
+    
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    args["pageTitle"] = decl.site.text // todo
+    args["pageType"] = "Subscript" // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
+    args["declarationPreview"] = decl.site.text // todo
 
     // Summary
     if let summary = with.documentation.generalDescription.summary {
@@ -389,9 +412,12 @@ public func renderInitializerPage(ctx: GenerationContext, of: InitializerDecl.ID
     var args: [String : Any] = [:]
 
     // TODO address the case where the function has no name
-    args["name"] = "init()"
-    args["code"] = decl.site.text
+    args["name"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+    
+    args["pageTitle"] = decl.site.text // todo
+    args["pageType"] = "Initializer"
+    args["declarationPreview"] = decl.site.text // todo
 
     // Summary
     if let summary = with.common.summary {
@@ -437,8 +463,11 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with: Trai
     var args: [String : Any] = [:]
 
     args["name"] = decl.identifier.value
-    args["code"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    args["pageTitle"] = decl.site.text // todo
+    args["pageType"] = "Trait"
+    args["declarationPreview"] = decl.site.text // todo
 
     if let summary = with.common.summary {
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
@@ -471,8 +500,11 @@ public func renderProductTypePage(ctx: GenerationContext, of: ProductTypeDecl.ID
     var args: [String : Any] = [:]
 
     args["name"] = decl.identifier.value
-    args["code"] = decl.site.text
     args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+
+    args["pageTitle"] = decl.site.text // todo
+    args["pageType"] = "Product Type"
+    args["declarationPreview"] = decl.site.text // todo
 
     if let summary = with.generalDescription.summary {
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)

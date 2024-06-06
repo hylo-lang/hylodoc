@@ -17,7 +17,7 @@ public protocol Exporter {
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: asset to render page of
 ///   - with: exporter, used to handle file writes and directory creation
-public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter) throws {
+public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with exporter: Exporter) throws {
   guard let target = ctx.urlResolver.pathToFile(target: .asset(of)) else {
     //TODO throw exception
     return
@@ -27,15 +27,15 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with: Exporter
   if case .otherFile(let id) = of {
     // Copy file to target
     let otherFile = ctx.documentation.assets.otherFiles[id]!
-    try with.file(from: otherFile.location, to: target)
+    try exporter.file(from: otherFile.location, to: target)
     return
   } else if case .folder(_) = of {
-    try with.directory(to: target.deletingLastPathComponent())
+    try exporter.directory(to: target.deletingLastPathComponent())
   }
 
   // Render and export page
   let content = try renderAssetPage(ctx: ctx, of: of)
-  try with.html(content: content, to: target)
+  try exporter.html(content: content, to: target)
 }
 
 /// Render and export an arbitrary symbol page

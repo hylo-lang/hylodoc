@@ -74,11 +74,10 @@ final class TargetPathTest: XCTestCase {
         children: [AnyAssetID.article(child1ArticleId), AnyAssetID.folder(child2FolderId)]
       ))
 
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
     let ctx = GenerationContext(
       documentation: db,
-      stencil: stencil,
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )

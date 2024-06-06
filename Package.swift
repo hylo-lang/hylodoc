@@ -85,7 +85,7 @@ let package = Package(
         .product(name: "PathWrangler", package: "path-wrangler"),
       ],
       exclude: ["module.md"],
-      resources: [.process("Resources/")],
+      resources: [.copy("Resources/")],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "WebsiteGenTests",

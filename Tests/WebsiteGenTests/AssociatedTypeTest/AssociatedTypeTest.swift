@@ -49,11 +49,10 @@ final class AssociatedTypeTest : XCTestCase {
             tracingInferenceIf: { (_, _) in false })
 
         let db: DocumentationDatabase = .init()
-        let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
         
         var ctx = GenerationContext(
             documentation: db,
-            stencil: stencil,
+            stencil: createDefaultStencilEnvironment(),
             typedProgram: typedProgram,
             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
         )
@@ -82,31 +81,31 @@ final class AssociatedTypeTest : XCTestCase {
         let res = try! renderAssociatedTypePage(ctx: ctx, of: associatedTypeId, with: associatedTypeDoc)
         
         XCTAssertTrue(res.contains("<h1>Element</h1>"), res)
-        XCTAssertTrue(matchPattern(match: [
+        XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
             "<code>",
+            "<pre>",
             "type Element: Copyable",
+            "</pre>",
             "</code>"
         ], in: res), res)
-        XCTAssertTrue(matchPattern(match: [
-            "<h4>",
+        XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
             "<p>",
             "Carving up a summary for dinner, minding my own business.",
             "</p>",
-            "</h4>"
         ], in: res), res)
-        XCTAssertTrue(matchPattern(match: [
-            "<h2>",
+        XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
+            "<h1>",
             "Details",
-            "</h2>",
+            "</h1>",
             "<p>",
             "In storms my husband Wilbur in a jealous description. He was crazy!",
             "</p>",
         ], in: res), res)
 
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
+        XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
+            "<h1>",
             "See Also",
-            "</h2>",
+            "</h1>",
         ], in: res), res)
     }
 }

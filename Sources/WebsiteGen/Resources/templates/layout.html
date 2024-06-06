@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="{{ pathToRoot }}/assets/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ name }}</title>
+  <link rel="stylesheet" crossorigin href="{{ pathToRoot }}/assets/index-DSezNRbW.css">
+</head>
+
+<body class="page">
+
+  <div class="page-header">
+    <div class="header-title">
+      <img src="{{ pathToRoot }}/assets/logo.svg">
+      <h3>Documentation</h3>
+    </div>
+
+    <div class="header-breadcrumb">
+      <a>Hylo</a>
+      <a>Standard Library</a>
+      <a>Geometry</a>
+      <a>Vector.hylo</a>
+      <a><code class="inline"><pre>type Vector2</pre></code></a>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="page-navigation">
+      <div class="page-navigation-sticky">
+        <aside class="page-tree">
+          <div class="search">
+            <!-- Only show search if JS is enabled -->
+            <input type="text" name="search" placeholder="Press   /   for Search" style="display: none">
+            <script>document.getElementsByName("search").forEach(value => value.style.display = 'block')</script>
+          </div>
+
+          <!-- Navigation -->
+          <ul>
+            <li>
+              <input type="checkbox" checked>
+              <a class="folder">Standard Library</a>
+              <ul>
+                <li>
+                  <input type="checkbox" checked>
+                  <a class="folder">Geometry</a>
+                  <ul>
+                    <li>
+                      <input type="checkbox" checked>
+                      <a class="file">Vector.hylo</a>
+                      <ul>
+                        <li class="active"><a><code
+                              class="inline"><pre><span class="keyword">type</span> Vector2</pre></code></a></li>
+                        <li><a><code class="inline"><pre><span class="keyword">fun</span> min(_:_:)</pre></code></a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><a><code class="inline"><pre><span class="keyword">trait</span> Comparable</pre></code></a></li>
+                  </ul>
+                </li>
+                <li>
+                  <input type="checkbox">
+                  <a class="folder">Concurrency</a>
+                  <ul>
+                    <li><a class="file">Item #1</a></li>
+                    <li><a class="file">Item #2</a></li>
+                    <li><a class="file">Item #3</a></li>
+                    <li>
+                      <input type="checkbox">
+                      <a class="folder">Some Folder</a>
+                      <ul>
+                        <li><a class="file">Item #1</a></li>
+                        <li><a class="file">Item #2</a></li>
+                        <li><a class="file">Item #3</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <input type="checkbox" checked>
+                  <a class="folder">Core</a>
+                  <ul>
+                    <li><a class="file">Numbers</a></li>
+                    <li><a class="file">Bool</a></li>
+                    <li><a class="file">Assert</a></li>
+                    <li><a class="file">Collection</a></li>
+                    <li>
+                      <input type="checkbox" checked>
+                      <a class="folder">Comparable</a>
+                      <ul>
+                        <li><a><code class="inline"><pre><span class="keyword">trait</span> Comparable</pre></code></a>
+                        </li>
+                        <li><a><code class="inline"><pre><span class="keyword">fun</span> min(_:_:)</pre></code></a>
+                        </li>
+                        <li><a><code class="inline"><pre><span class="keyword">fun</span> max(_:_:)</pre></code></a>
+                        </li>
+                        <li><a><code class="inline"><pre><span class="keyword">typealias</span> Result</pre></code></a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><a class="file">Comparisons</a></li>
+                    <li><a class="file">Collection Examples</a></li>
+                    <li><a class="file">RegExp</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <input type="checkbox">
+              <a class="folder">Module B</a>
+              <ul>
+                <li><a class="file">Item #1</a></li>
+              </ul>
+            </li>
+            <li>
+              <input type="checkbox">
+              <a class="folder">Module C</a>
+              <ul>
+                <li><a class="file">Item #1</a></li>
+                <li><a class="file">Item #2</a></li>
+              </ul>
+            </li>
+          </ul>
+        </aside>
+      </div>
+
+      <div class="page-navigation-sticky">
+        <aside class="page-toc">
+          <h2>On this page</h2>
+          <ul>
+            <li><a href="#summary">Summary</a></li>
+            <li><a href="#details">Details</a></li>
+            <li><a href="#invariants">Invariants</a></li>
+            <li>
+              <a href="#members">Members</a>
+              <ul>
+                <li><a href="#stored-properties">Stored Properties</a></li>
+                <li><a href="#initializers">Initializers</a></li>
+                <li><a href="#subscripts">Subscripts</a></li>
+                <li><a href="#methods">Methods</a></li>
+                <li><a href="#static-variables">Static Variables</a></li>
+                <li><a href="#types">Types</a></li>
+              </ul>
+            </li>
+            <li><a href="#conformance">Conformance</a></li>
+            <li><a href="#see-also">See Also</a></li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <div class="page-content-container">
+      <div class="page-content">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+  </div>
+  <script type="module" crossorigin src="{{ pathToRoot }}/assets/index-UOv0lzLm.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{% if members %}
+    <div class="content-section">
+        <h1>Members</h1>
+        <ul>
+        {% for el in members %}
+            <li>
+            {{ el }}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}

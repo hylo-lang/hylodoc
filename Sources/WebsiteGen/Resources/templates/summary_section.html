@@ -1,0 +1,26 @@
+<!--
+  Parameters:
+   - pageType: String - The type of the page (e.g. "Function", "Type", "Class", etc.)
+   - pageTitle: String - The title of the page
+   - summary: String? - An optional brief summary of the page
+   - declarationPreview: String? - An optional preview of the declaration of the symbol in HTML format
+-->
+<div class="content-section">
+  <h2 style="color: #F25FB7">{{ pageType }}</h2>
+  <h1>{{ pageTitle }}</h1>
+  
+  <!-- Summary -->
+  {% if summary %}
+    {{ summary }}
+  {% endif %}
+  
+  <!-- Symbol Declaration Preview (if applicable) -->
+  {% if declarationPreview %}
+    <div class="code-snippet">
+      <span class="options">
+        <a class="github">Declaration</a><!-- todo rename css class -->
+      </span>
+      <code><pre>{{ declarationPreview }}</pre></code>
+    </div>
+  {% endif %}
+</div>

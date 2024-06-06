@@ -48,12 +48,9 @@ final class FunctionTest: XCTestCase {
       reportingDiagnosticsTo: &diagnostics,
       tracingInferenceIf: { (_, _) in false })
 
-    let db: DocumentationDatabase = .init()
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
-
     var ctx = GenerationContext(
-      documentation: db,
-      stencil: stencil,
+      documentation: .init(),
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
@@ -109,19 +106,19 @@ final class FunctionTest: XCTestCase {
 
     let res = try! renderFunctionPage(ctx: ctx, of: functionId, with: fDoc)
 
-    XCTAssertTrue(res.contains("<h1>examleFunction</h1>"), res)
+    XCTAssertTrue(res.contains("fun exampleFunction"), res)
     XCTAssertTrue(
-      matchPattern(
-        match: [
-          "<code>",
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<pre>",
           "public fun examleFunction() {",
           "return",
           "}",
-          "</code>",
+          "</pre>",
         ], in: res), res)
     XCTAssertTrue(
-      matchPattern(
-        match: [
+      matchWithWhitespacesInBetween(
+        pattern: [
           "<h4>",
           "<p>",
           "Carving up a summary for dinner, minding my own business.",
@@ -129,62 +126,76 @@ final class FunctionTest: XCTestCase {
           "</h4>",
         ], in: res), res)
     XCTAssertTrue(
-      matchPattern(
-        match: [
-          "<h2>",
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
           "Details",
-          "</h2>",
+          "</h1>",
           "<p>",
           "In storms my husband Wilbur in a jealous description. He was crazy!",
           "</p>",
         ], in: res), res)
-        XCTAssertTrue(matchPattern(match: [
-            "<h2>",
-            "See Also",
-            "</h2>",
-            "<ul>",
-            "<li>",
-            "<p>",
-            "And then he ran into my first see also.",
-            "</p>",
-            "</li>",
-            "<li>",
-            "<p>",
-            "He ran into my second see also 10 times...",
-            "</p>",
-            "</li>",
-            "</ul>",
+    XCTAssertTrue(
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
+          "See Also",
+          "</h1>",
+          "<ul>",
+          "<li>",
+          "<p>",
+          "And then he ran into my first see also.",
+          "</p>",
+          "</li>",
+          "<li>",
+          "<p>",
+          "He ran into my second see also 10 times...",
+          "</p>",
+          "</li>",
+          "</ul>",
         ], in: res), res)
 
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
-            "Preconditions",
-            "</h2>",
+    XCTAssertFalse(
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
+          "Preconditions",
+          "</h1>",
         ], in: res), res)
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
-            "Postconditions",
-            "</h2>",
+    XCTAssertFalse(
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
+          "Postconditions",
+          "</h1>",
         ], in: res), res)
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
-            "Returns",
-            "</h2>",
+    XCTAssertFalse(
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
+          "Returns",
+          "</h1>",
         ], in: res), res)
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
-            "Throws Info",
-            "</h2>",
+    XCTAssertFalse(
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
+          "Throws Info",
+          "</h1>",
         ], in: res), res)
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
-            "Parameters",
-            "</h2>",
+    XCTAssertFalse(
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
+          "Parameters",
+          "</h1>",
         ], in: res), res)
-        XCTAssertFalse(matchPattern(match: [
-            "<h2>",
-            "Generic Parameters",
-            "</h2>",
+    XCTAssertFalse(
+      matchWithWhitespacesInBetween(
+        pattern: [
+          "<h1>",
+          "Generic Parameters",
+          "</h1>",
         ], in: res), res)
   }
 }

@@ -35,7 +35,7 @@ final class ArticleTest: XCTestCase {
 
     var db: DocumentationDatabase = .init()
 
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
+    let stencil = Environment(loader: createFileSystemTemplateLoader())
 
     let article1Id = db.assets.articles.insert(
       .init(
@@ -61,13 +61,7 @@ final class ArticleTest: XCTestCase {
       filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"),
       parent: nil)
 
-    var res: String = ""
-    do {
-      res = try renderArticlePage(ctx: ctx, of: article1Id)
-    } catch {
-      XCTFail("Should not throw")
-    }
-
+    let res = try! renderArticlePage(ctx: ctx, of: article1Id)
     XCTAssertTrue(res.contains("<h1>I betcha you would have done the same</h1>"), res)
     XCTAssertTrue(
       res.contains(
@@ -101,8 +95,6 @@ final class ArticleTest: XCTestCase {
 
     var db: DocumentationDatabase = .init()
 
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
-
     let article1Id = db.assets.articles.insert(
       .init(
         location: URL(string: "root/Folder1/article1.hylodoc")!,
@@ -118,7 +110,7 @@ final class ArticleTest: XCTestCase {
 
     var ctx = GenerationContext(
       documentation: db,
-      stencil: stencil,
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
@@ -128,12 +120,7 @@ final class ArticleTest: XCTestCase {
       filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"),
       parent: nil)
 
-    var res: String = ""
-    do {
-      res = try renderArticlePage(ctx: ctx, of: article1Id)
-    } catch {
-      XCTFail("Should not throw")
-    }
+    let res = try! renderArticlePage(ctx: ctx, of: article1Id)  
 
     XCTAssertTrue(res.contains("<h1>article1</h1>"), res)
     XCTAssertTrue(

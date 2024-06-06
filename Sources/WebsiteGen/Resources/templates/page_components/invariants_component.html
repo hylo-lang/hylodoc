@@ -1,0 +1,12 @@
+{% if invariants %}
+    <div class="content-section">
+        <h1>Invariants</h1>
+        <ul>
+        {% for el in invariants %}
+            <li>
+            {{ el }}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}

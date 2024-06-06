@@ -1,0 +1,28 @@
+<!--
+  Parameters: 
+   - pageTitle: String - The title of the page
+   - pageType: String - should be Folder
+   - children: [(title: String, url: String)] - the children of the folder
+   - articleContent: String? - the html content of the index article associated with the folder
+-->
+{% extends "layout.html" %}
+
+{% block content %}
+    {% include "summary_section.html" %}
+
+    {% if articleContent %}
+    <div class="content-section">
+        {{ articleContent }}
+    </div>
+    {% endif %}
+    {% if children %}
+        <div class="content-section">
+            <h1>Contents</h1>
+            <ul>
+                {% for childTitle,childUrl in children %}
+                <li><a href="{{ childUrl }}" style="color: lightblue">{{ childTitle }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}

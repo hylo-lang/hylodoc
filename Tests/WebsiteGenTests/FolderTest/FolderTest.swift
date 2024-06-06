@@ -42,11 +42,10 @@ final class FolderTest: XCTestCase {
         children: []
       ))
 
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
     var ctx = GenerationContext(
       documentation: db,
-      stencil: stencil,
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
@@ -62,7 +61,7 @@ final class FolderTest: XCTestCase {
       XCTFail("Should not throw")
     }
 
-    XCTAssertTrue(res.contains("<title>Documentation - Folder1</title>"), res)
+    XCTAssertTrue(res.contains("<title>Folder1</title>"), res)
     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
 
     XCTAssertFalse(res.contains("<h2>Details</h2>"), res)
@@ -109,11 +108,9 @@ final class FolderTest: XCTestCase {
         children: []
       ))
 
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
-
     var ctx = GenerationContext(
       documentation: db,
-      stencil: stencil,
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
@@ -129,8 +126,9 @@ final class FolderTest: XCTestCase {
       XCTFail("Should not throw")
     }
 
-    XCTAssertTrue(res.contains("<title>Documentation - Folder1</title>"), res)
-    XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
+
+    XCTAssertTrue(res.contains("<title>Documentation for Folder1</title>"), res)
+    XCTAssertTrue(res.contains("<h1>Documentation for Folder1</h1>"), res)
     XCTAssertTrue(res.contains("<h2>Details</h2>"), res)
     XCTAssertTrue(res.contains("<p>lorem ipsum</p>"), res)
 
@@ -203,11 +201,10 @@ final class FolderTest: XCTestCase {
         children: [AnyAssetID.article(child1ArticleId), AnyAssetID.folder(child2FolderId)]
       ))
 
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
     var ctx = GenerationContext(
       documentation: db,
-      stencil: stencil,
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
@@ -229,7 +226,7 @@ final class FolderTest: XCTestCase {
       XCTFail("Should not throw")
     }
 
-    XCTAssertTrue(res.contains("<title>Documentation - Folder1</title>"), res)
+    XCTAssertTrue(res.contains("<title>Folder1</title>"), res)
     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
     XCTAssertTrue(res.contains("<h2>Details</h2>"), res)
     XCTAssertTrue(res.contains("<p>lorem ipsum</p>"), res)

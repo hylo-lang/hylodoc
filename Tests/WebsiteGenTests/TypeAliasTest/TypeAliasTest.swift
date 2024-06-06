@@ -50,11 +50,10 @@ final class TypeAliasTest: XCTestCase {
     )
 
     let db: DocumentationDatabase = .init()
-    let stencil = Environment(loader: FileSystemLoader(bundle: [Bundle.module]))
 
     var ctx = GenerationContext(
       documentation: db,
-      stencil: stencil,
+      stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
     )
@@ -84,7 +83,7 @@ final class TypeAliasTest: XCTestCase {
     XCTAssertTrue(res.contains("Some summary"), res)
     XCTAssertTrue(res.contains("Some description"), res)
 
-    XCTAssertFalse(matchPattern(match: [
+    XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
             "<h2>",
             "See Also",
             "</h2>",

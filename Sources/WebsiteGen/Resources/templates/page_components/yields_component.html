@@ -1,0 +1,14 @@
+{% if yields %}
+    <div class="content-section">
+        <h1>Yields</h1>
+        {% if yields.count == 1 %}
+            {{ yields[0] }}
+        {% else %}
+            <ul>
+            {% for el in yields %}
+                <li>{{ el }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}

@@ -1,0 +1,12 @@
+{% if seeAlso %}
+    <div class="content-section">
+        <h1>See Also</h1>
+        <ul>
+        {% for el in seeAlso %}
+            <li>
+            {{ el }}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}

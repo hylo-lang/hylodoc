@@ -1,0 +1,12 @@
+{% if preconditions %}
+<div class="content-section">
+    <h1>Preconditions</h1>
+    <ul>
+    {% for el in preconditions %}
+        <li>
+        {{ el }}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}

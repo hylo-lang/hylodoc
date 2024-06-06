@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% include "summary_section.html" %}    
+    {% if description %}
+        <div class="content-section"><!-- todo migrate to use component -->
+            <h1>Details</h1>
+            {{ description }}
+        </div>
+    {% endif %}
+    {% if seeAlso %}
+        <div class="content-section"> <!-- todo migrate to use component -->
+            <h1>See Also</h1>
+            <ul>
+            {% for el in seeAlso %}
+                <li>
+                {{ el }}
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}
