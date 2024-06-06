@@ -45,79 +45,79 @@ public func renderSymbolPage(ctx: GenerationContext, of: AnyDeclID) throws -> St
     let id = AssociatedTypeDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.associatedTypeDocs[id]!
+    let declDoc = ctx.documentation.symbols.associatedTypeDocs[id]
     return try renderAssociatedTypePage(ctx: ctx, of: id, with: declDoc)
   case AssociatedValueDecl.self:
     let id = AssociatedValueDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.associatedValueDocs[id]!
+    let declDoc = ctx.documentation.symbols.associatedValueDocs[id]
     return try renderAssociatedValuePage(ctx: ctx, of: id, with: declDoc)
   case TypeAliasDecl.self:
     let id = TypeAliasDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.typeAliasDocs[id]!
+    let declDoc = ctx.documentation.symbols.typeAliasDocs[id]
     return try renderTypeAliasPage(ctx: ctx, of: id, with: declDoc)
   case BindingDecl.self:
     let id = BindingDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.bindingDocs[id]!
+    let declDoc = ctx.documentation.symbols.bindingDocs[id]
     return try renderBindingPage(ctx: ctx, of: id, with: declDoc)
   case OperatorDecl.self:
     let id = OperatorDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.operatorDocs[id]!
+    let declDoc = ctx.documentation.symbols.operatorDocs[id]
     return try renderOperatorPage(ctx: ctx, of: id, with: declDoc)
   case FunctionDecl.self:
     let id = FunctionDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.functionDocs[id]!
+    let declDoc = ctx.documentation.symbols.functionDocs[id]
     return try renderFunctionPage(ctx: ctx, of: id, with: declDoc)
   case MethodDecl.self:
     let id = MethodDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.methodDeclDocs[id]!
+    let declDoc = ctx.documentation.symbols.methodDeclDocs[id]
     return try renderMethodPage(ctx: ctx, of: id, with: declDoc)
   case MethodImpl.self:
     let id = MethodImpl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.methodImplDocs[id]!
+    let declDoc = ctx.documentation.symbols.methodImplDocs[id]
     return try renderMethodImplementationPage(ctx: ctx, of: id, with: declDoc)
   case SubscriptDecl.self:
     let id = SubscriptDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.subscriptDeclDocs[id]!
+    let declDoc = ctx.documentation.symbols.subscriptDeclDocs[id]
     return try renderSubscriptPage(ctx: ctx, of: id, with: declDoc)
   case SubscriptImpl.self:
     let id = SubscriptImpl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.subscriptImplDocs[id]!
+    let declDoc = ctx.documentation.symbols.subscriptImplDocs[id]
     return try renderSubscriptImplementationPage(ctx: ctx, of: id, with: declDoc)
   case InitializerDecl.self:
     let id = InitializerDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.initializerDocs[id]!
+    let declDoc = ctx.documentation.symbols.initializerDocs[id]
     return try renderInitializerPage(ctx: ctx, of: id, with: declDoc)
   case TraitDecl.self:
     let id = TraitDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.traitDocs[id]!
+    let declDoc = ctx.documentation.symbols.traitDocs[id]
     return try renderTraitPage(ctx: ctx, of: id, with: declDoc)
   case ProductTypeDecl.self:
     let id = ProductTypeDecl.ID(of)!
 
     // Render page
-    let declDoc = ctx.documentation.symbols.productTypeDocs[id]!
+    let declDoc = ctx.documentation.symbols.productTypeDocs[id]
     return try renderProductTypePage(ctx: ctx, of: id, with: declDoc)
   default:
     return ""
