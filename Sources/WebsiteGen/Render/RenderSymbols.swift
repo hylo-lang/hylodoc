@@ -26,7 +26,7 @@ public func renderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeD
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    // Overview
+    // Details
     if let block = with.common.description {
         args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
@@ -61,7 +61,7 @@ public func renderAssociatedValuePage(
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    // Overview
+    // Details
     if let block = with.common.description {
         args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
@@ -94,7 +94,7 @@ public func renderTypeAliasPage(
     args["summary"] = HtmlGenerator.standard.generate(doc: summary)
   }
 
-  // Overview
+  // Details
   if let block = with.common.description {
     args["details"] = HtmlGenerator.standard.generate(doc: block)
   }
@@ -157,7 +157,7 @@ public func renderOperatorPage(ctx: GenerationContext, of: OperatorDecl.ID, with
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    // Overview
+    // Details
     if let block = with.documentation.description {
         args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
@@ -192,7 +192,7 @@ public func renderFunctionPage(
     args["summary"] = HtmlGenerator.standard.generate(doc: summary)
   }
 
-  // Overview
+  // Details
   if let block = with.documentation.common.description {
     args["details"] = HtmlGenerator.standard.generate(doc: block)
   }
@@ -258,7 +258,7 @@ public func renderMethodPage(ctx: GenerationContext, of: MethodDecl.ID, with: Me
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    // Overview
+    // Details
     if let block = with.documentation.common.description {
         args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
@@ -329,7 +329,7 @@ public func renderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl.ID, wi
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    // Overview
+    // Details
     if let block = with.documentation.generalDescription.description {
         args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
@@ -398,7 +398,7 @@ public func renderInitializerPage(ctx: GenerationContext, of: InitializerDecl.ID
         args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    // Overview
+    // Details
     if let block = with.common.description {
         args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
