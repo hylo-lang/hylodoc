@@ -16,6 +16,9 @@ swift run hdc PATH_TO_MODULE_1 PATH_TO_MODULE_2 ...
 
 # Specify output directory
 swift run hdc PATH_TO_MODULE --output OUTPUT_DIRECTORY
+
+# open up the generated website in a web server
+swift run hdc PATH_TO_MODULE && python3 -m http.server 8080 -d dist
 ```
 ## Development Environment Setup
 ### Windows
