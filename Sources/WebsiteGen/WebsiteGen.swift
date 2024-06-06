@@ -9,6 +9,7 @@ public struct GenerationContext {
   public let stencil: Environment
   public let typedProgram: TypedProgram
   public var urlResolver: URLResolver
+  public let renderers: SymbolDeclRenderers
 }
 
 extension FileSystemLoader {
@@ -18,7 +19,8 @@ extension FileSystemLoader {
 }
 
 public func createFileSystemTemplateLoader() -> FileSystemLoader {
-  return FileSystemLoader(path: Bundle.module.bundleURL.appendingPathComponent("Resources/templates"))
+  return FileSystemLoader(
+    path: Bundle.module.bundleURL.appendingPathComponent("Resources/templates"))
 }
 public func createDefaultStencilEnvironment() -> Environment {
   return Environment(loader: createFileSystemTemplateLoader())
@@ -36,11 +38,14 @@ public func generateDocumentation(
 ) {
   // Setup Context
   let stencil = createDefaultStencilEnvironment()
+  let resolver = URLResolver(baseUrl: AbsolutePath(url: target)!)
   var ctx = GenerationContext(
     documentation: documentation,
     stencil: stencil,
     typedProgram: typedProgram,
-    urlResolver: URLResolver(baseUrl: AbsolutePath(url: target)!)
+    urlResolver: resolver,
+    renderers: .init(
+      program: typedProgram, resolver: resolver)
   )
 
   // Resolve URL's
@@ -74,9 +79,10 @@ public func generateDocumentation(
 
   // Copy public website assets
   // assuming target directory exists already
-  let assetsSourceLocation = Bundle.module.bundleURL.appendingPathComponent("Resources").appendingPathComponent("assets")
+  let assetsSourceLocation = Bundle.module.bundleURL.appendingPathComponent("Resources")
+    .appendingPathComponent("assets")
   try! FileManager.default.copyItem(
     at: assetsSourceLocation,
     to: URL(fileURLWithPath: "assets", relativeTo: target)
-  )  
+  )
 }
