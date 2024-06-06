@@ -79,9 +79,9 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws 
   arr["toRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.folder(of)))
 
   // check if folder has documentation
-  if let overviewId = folder.documentation {
-    let overviewArticle = ctx.documentation.assets[overviewId]!
-    arr["overview"] = HtmlGenerator.standard.generate(doc: overviewArticle.content)
+  if let detailsId = folder.documentation {
+    let detailsArticle = ctx.documentation.assets[detailsId]!
+    arr["details"] = HtmlGenerator.standard.generate(doc: detailsArticle.content)
   }
 
   let children = folder.children.map {

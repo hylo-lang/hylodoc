@@ -9,7 +9,7 @@ import XCTest
 @testable import WebsiteGen
 
 final class TargetPathTest: XCTestCase {
-  func testFolderPageGenerationWithOverviewWithChildren() {
+  func testFolderPageGenerationWithDetailsWithChildren() {
     var diagnostics = DiagnosticSet()
 
     /// An instance that includes just the standard library.

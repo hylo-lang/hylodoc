@@ -1,0 +1,8 @@
+subscript min<T: Comparable>(_ a: T, _ b: T): T {
+  let { yield if a > b { b } else { a } }
+}
+
+fun main() {
+  let (x, y) = (2, 3)
+  let z = min[x, y] // 'z' projects both 'x' and 'y'
+}

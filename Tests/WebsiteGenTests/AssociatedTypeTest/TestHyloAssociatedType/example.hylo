@@ -1,0 +1,4 @@
+trait Generator {
+  type Element: Copyable
+  fun next() -> Element
+}

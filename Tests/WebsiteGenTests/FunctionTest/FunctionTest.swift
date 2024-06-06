@@ -132,11 +132,59 @@ final class FunctionTest: XCTestCase {
       matchPattern(
         match: [
           "<h2>",
-          "Overview",
+          "Details",
           "</h2>",
           "<p>",
           "In storms my husband Wilbur in a jealous description. He was crazy!",
           "</p>",
+        ], in: res), res)
+        XCTAssertTrue(matchPattern(match: [
+            "<h2>",
+            "See Also",
+            "</h2>",
+            "<ul>",
+            "<li>",
+            "<p>",
+            "And then he ran into my first see also.",
+            "</p>",
+            "</li>",
+            "<li>",
+            "<p>",
+            "He ran into my second see also 10 times...",
+            "</p>",
+            "</li>",
+            "</ul>",
+        ], in: res), res)
+
+        XCTAssertFalse(matchPattern(match: [
+            "<h2>",
+            "Preconditions",
+            "</h2>",
+        ], in: res), res)
+        XCTAssertFalse(matchPattern(match: [
+            "<h2>",
+            "Postconditions",
+            "</h2>",
+        ], in: res), res)
+        XCTAssertFalse(matchPattern(match: [
+            "<h2>",
+            "Returns",
+            "</h2>",
+        ], in: res), res)
+        XCTAssertFalse(matchPattern(match: [
+            "<h2>",
+            "Throws Info",
+            "</h2>",
+        ], in: res), res)
+        XCTAssertFalse(matchPattern(match: [
+            "<h2>",
+            "Parameters",
+            "</h2>",
+        ], in: res), res)
+        XCTAssertFalse(matchPattern(match: [
+            "<h2>",
+            "Generic Parameters",
+            "</h2>",
         ], in: res), res)
   }
 }

@@ -77,12 +77,17 @@ final class TypeAliasTest: XCTestCase {
     ctx.urlResolver.resolve(
       target: .symbol(AnyDeclID(typeAliasId)), filePath: targetPath.url, parent: nil)
 
-    let content = try! renderTypeAliasPage(ctx: ctx, of: typeAliasId, with: doc)
-    print(content)
+    let res = try! renderTypeAliasPage(ctx: ctx, of: typeAliasId, with: doc)
 
     // Assert
-    XCTAssertTrue(content.contains("Vector2"))
-    XCTAssertTrue(content.contains("Some summary"))
-    XCTAssertTrue(content.contains("Some description"))
+    XCTAssertTrue(res.contains("Vector2"), res)
+    XCTAssertTrue(res.contains("Some summary"), res)
+    XCTAssertTrue(res.contains("Some description"), res)
+
+    XCTAssertFalse(matchPattern(match: [
+            "<h2>",
+            "See Also",
+            "</h2>",
+        ], in: res), res)
   }
 }

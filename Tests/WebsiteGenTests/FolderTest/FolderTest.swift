@@ -9,7 +9,7 @@ import XCTest
 @testable import WebsiteGen
 
 final class FolderTest: XCTestCase {
-  func testFolderPageGenerationNoOverviewNoChildren() {
+  func testFolderPageGenerationNoDetailsNoChildren() {
 
     var diagnostics = DiagnosticSet()
 
@@ -65,10 +65,10 @@ final class FolderTest: XCTestCase {
     XCTAssertTrue(res.contains("<title>Documentation - Folder1</title>"), res)
     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
 
-    XCTAssertFalse(res.contains("<h2>Overview</h2>"), res)
+    XCTAssertFalse(res.contains("<h2>Details</h2>"), res)
   }
 
-  func testFolderPageGenerationWithOverviewNoChildren() {
+  func testFolderPageGenerationWithDetailsNoChildren() {
 
     var diagnostics = DiagnosticSet()
 
@@ -131,13 +131,13 @@ final class FolderTest: XCTestCase {
 
     XCTAssertTrue(res.contains("<title>Documentation - Folder1</title>"), res)
     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
-    XCTAssertTrue(res.contains("<h2>Overview</h2>"), res)
+    XCTAssertTrue(res.contains("<h2>Details</h2>"), res)
     XCTAssertTrue(res.contains("<p>lorem ipsum</p>"), res)
 
     XCTAssertFalse(res.contains("<a href="), res)
   }
 
-  func testFolderPageGenerationWithOverviewWithChildren() {
+  func testFolderPageGenerationWithDetailsWithChildren() {
 
     var diagnostics = DiagnosticSet()
 
@@ -231,7 +231,7 @@ final class FolderTest: XCTestCase {
 
     XCTAssertTrue(res.contains("<title>Documentation - Folder1</title>"), res)
     XCTAssertTrue(res.contains("<h1>Folder1</h1>"), res)
-    XCTAssertTrue(res.contains("<h2>Overview</h2>"), res)
+    XCTAssertTrue(res.contains("<h2>Details</h2>"), res)
     XCTAssertTrue(res.contains("<p>lorem ipsum</p>"), res)
     XCTAssertTrue(res.contains("<a href=\"child1.hylodoc\""), res)
     XCTAssertTrue(res.contains("<a href=\"Folder2/index.html\""), res)

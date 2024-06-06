@@ -1,0 +1,4 @@
+trait Shape {
+  static fun name() -> String
+  fun draw(to: inout Int)
+}

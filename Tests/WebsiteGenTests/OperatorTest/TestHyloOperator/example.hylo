@@ -1,0 +1,1 @@
+public operator infix== : comparison

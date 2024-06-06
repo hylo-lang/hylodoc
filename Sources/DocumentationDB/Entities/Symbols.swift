@@ -28,6 +28,10 @@ public struct TypeAliasDocumentation: IdentifiedEntity {
 
 public struct Invariant {
   public let description: Block
+
+  public init(description: Block) {
+    self.description = description
+  }
 }
 public struct Precondition {
   public let description: Block

@@ -63,11 +63,31 @@ public struct InitializerDocumentation: IdentifiedEntity {
   public let parameters: ParameterDocumentations
   public let genericParameters: GenericParameterDocumentations
   public let throwsInfo: ThrowsInfo?
+
+  public init(
+    common: GeneralDescriptionFields,
+    preconditions: [Precondition],
+    postconditions: [Postcondition],
+    parameters: ParameterDocumentations,
+    genericParameters: GenericParameterDocumentations,
+    throwsInfo: ThrowsInfo?
+  ) {
+    self.common = common
+    self.preconditions = preconditions
+    self.postconditions = postconditions
+    self.parameters = parameters
+    self.genericParameters = genericParameters
+    self.throwsInfo = throwsInfo
+  }
 }
 
 /// Declaration of either a subscript or a property
 public struct SubscriptDeclDocumentation: IdentifiedEntity {
   public let documentation: SubscriptCommonDocumentation
+
+  public init(documentation: SubscriptCommonDocumentation) {
+    self.documentation = documentation
+  }
 }
 
 /// Additional documentation that is specific to a subscript implementation (let, inout, etc.)
@@ -83,6 +103,24 @@ public struct SubscriptCommonDocumentation {
   public let throwsInfo: ThrowsInfo?
   public let parameters: ParameterDocumentations
   public let genericParameters: GenericParameterDocumentations
+
+  public init(
+    generalDescription: GeneralDescriptionFields,
+    preconditions: [Precondition],
+    postconditions: [Postcondition],
+    yields: YieldsInfo?,
+    throwsInfo: ThrowsInfo?,
+    parameters: ParameterDocumentations,
+    genericParameters: GenericParameterDocumentations
+  ) {
+    self.generalDescription = generalDescription
+    self.preconditions = preconditions
+    self.postconditions = postconditions
+    self.yields = yields
+    self.throwsInfo = throwsInfo
+    self.parameters = parameters
+    self.genericParameters = genericParameters
+  }
 }
 
 /// This is not used but the symbol still needs to be rendered in the documentation.
