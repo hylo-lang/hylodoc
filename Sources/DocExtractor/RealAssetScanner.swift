@@ -26,11 +26,11 @@ extension ModuleInfo {
   }
 }
 
-func titleOfArticle(content: Block) -> String? {
+func splitArticleIntoTitleAndRest(content: Block) -> (title: String?, rest: Block) {
   guard case let .document(blocks) = content, case let .heading(1, text) = blocks.first else {
-    return nil
+    return (nil, content)
   }
-  return text.rawDescription
+  return (text.rawDescription, .document(.init(blocks.dropFirst())))
 }
 
 func collectTranslationUnitsByURL(ast: AST) -> [URL: TranslationUnit.ID] {
@@ -101,11 +101,12 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
       .map { fileContents in
         let content = markdownParser.parse(fileContents)
 
+        let (title, rest) = splitArticleIntoTitleAndRest(content: content)
         return assets.articles.insert(
           .init(
             location: path,
-            title: titleOfArticle(content: content),
-            content: content
+            title: title,
+            content: rest
           )
         )
       }
