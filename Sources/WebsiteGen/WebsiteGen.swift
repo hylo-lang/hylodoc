@@ -70,6 +70,8 @@ public func generateDocumentation(
           try! generateAsset(ctx: ctx, of: id, with: exporter)
         case .symbol(let id):
           try! generateSymbol(ctx: ctx, of: id, with: exporter)
+        case .empty:
+          break
         }
       })
   }

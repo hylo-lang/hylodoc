@@ -11,6 +11,7 @@ import PathWrangler
 public enum AnyTargetID: Equatable, Hashable {
   case asset(AnyAssetID)
   case symbol(AnyDeclID)
+  case empty
 }
 
 public struct TargetPath {

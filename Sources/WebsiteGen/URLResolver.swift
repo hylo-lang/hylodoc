@@ -36,6 +36,10 @@ public struct URLResolver {
 
   // Get a url referencing from one target to another
   public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath? {
+    if from == to {
+      return nil
+    }
+
     guard let fromUrl = references[from]?.0 else {
       return nil
     }
