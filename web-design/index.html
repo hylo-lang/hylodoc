@@ -27,92 +27,301 @@
   <div class="page-navigation">
     <div class="page-navigation-sticky">
       <aside class="page-tree">
-        <div class="search">
+        <div class="sidebar-search-cont">
           <!-- Only show search if JS is enabled -->
-          <input type="text" name="search" placeholder="Press   /   for Search" style="display: none">
-          <script>document.getElementsByName("search").forEach(value => value.style.display = 'block')</script>
+          <input type="text" id="sidebar-search" name="search" placeholder="Press   /   for Search" style="display: none">
+          <script>document.getElementById("sidebar-search").style.display = 'block'</script>
         </div>
 
         <!-- Navigation -->
-        <ul>
-          <li>
-            <input type="checkbox" checked>
-            <a class="folder">Standard Library</a>
-            <ul>
-              <li>
-                <input type="checkbox" checked>
-                <a class="folder">Geometry</a>
-                <ul>
-                  <li>
-                    <input type="checkbox" checked>
-                    <a class="file">Vector.hylo</a>
-                    <ul>
-                      <li class="active"><a><code class="inline"><pre><span class="keyword">type</span> Vector2</pre></code></a></li>
-                      <li><a><code class="inline"><pre><span class="keyword">fun</span> min(_:_:)</pre></code></a></li>
-                    </ul>
-                  </li>
-                  <li><a><code class="inline"><pre><span class="keyword">trait</span> Comparable</pre></code></a></li>
-                </ul>
-              </li>
-              <li>
-                <input type="checkbox">
-                <a class="folder">Concurrency</a>
-                <ul>
-                  <li><a class="file">Item #1</a></li>
-                  <li><a class="file">Item #2</a></li>
-                  <li><a class="file">Item #3</a></li>
-                  <li>
-                    <input type="checkbox">
-                    <a class="folder">Some Folder</a>
-                    <ul>
-                      <li><a class="file">Item #1</a></li>
-                      <li><a class="file">Item #2</a></li>
-                      <li><a class="file">Item #3</a></li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <input type="checkbox" checked>
-                <a class="folder">Core</a>
-                <ul>
-                  <li><a class="file">Numbers</a></li>
-                  <li><a class="file">Bool</a></li>
-                  <li><a class="file">Assert</a></li>
-                  <li><a class="file">Collection</a></li>
-                  <li>
-                    <input type="checkbox" checked>
-                    <a class="folder">Comparable</a>
-                    <ul>
-                      <li><a><code class="inline"><pre><span class="keyword">trait</span> Comparable</pre></code></a></li>
-                      <li><a><code class="inline"><pre><span class="keyword">fun</span> min(_:_:)</pre></code></a></li>
-                      <li><a><code class="inline"><pre><span class="keyword">fun</span> max(_:_:)</pre></code></a></li>
-                      <li><a><code class="inline"><pre><span class="keyword">typealias</span> Result</pre></code></a></li>
-                    </ul>
-                  </li>
-                  <li><a class="file">Comparisons</a></li>
-                  <li><a class="file">Collection Examples</a></li>
-                  <li><a class="file">RegExp</a></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <input type="checkbox">
-            <a class="folder">Module B</a>
-            <ul>
-              <li><a class="file">Item #1</a></li>
-            </ul>
-          </li>
-          <li>
-            <input type="checkbox">
-            <a class="folder">Module C</a>
-            <ul>
-              <li><a class="file">Item #1</a></li>
-              <li><a class="file">Item #2</a></li>
-            </ul>
-          </li>
-        </ul>
+        <div id="navigation-tree-container">
+          <ul>
+            <li>
+              <input type="checkbox" checked>
+              <a class="nav-entry folder" href="#">
+                <div class="arrow"></div>
+                <div class="icon"></div>
+                <span>Standard Library</span>
+              </a>
+              <a href="#" class="go-to-location" title="Open source location"></a>
+              <ul>
+                <li>
+                  <input type="checkbox" checked>
+                  <a class="nav-entry folder" href="#">
+                    <div class="arrow"></div>
+                    <div class="icon"></div>
+                    <span>Geometry</span>
+                  </a>
+                  <a href="#" class="go-to-location" title="Open source location"></a>
+                  <ul>
+                    <li>
+                      <input type="checkbox" checked>
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Vector.hylo</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                      <ul>
+                        <li class="active">
+                          <input type="checkbox">
+                          <a class="nav-entry" href="#">
+                            <div class="arrow"></div>
+                            <code class="inline"><span class="keyword">type</span> Vector2</code>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                        <li>
+                          <a class="nav-entry" href="#">
+                            <div class="arrow"></div>
+                            <code class="inline"><span class="keyword">fun</span> min(_:_:)</code>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                        <li>
+                          <a class="nav-entry" href="#">
+                            <div class="arrow"></div>
+                            <code class="inline"><pre><span class="keyword">trait</span> Comparable</pre></code>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <input type="checkbox">
+                  <a class="nav-entry folder" href="#">
+                    <div class="arrow"></div>
+                    <div class="icon"></div>
+                    <span>Concurrency</span>
+                  </a>
+                  <a href="#" class="go-to-location" title="Open source location"></a>
+                  <ul>
+                    <li>
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Item #1</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Item #2</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Item #3</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <input type="checkbox">
+                      <a class="nav-entry folder" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Some Folder</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                      <ul>
+                        <li>
+                          <a class="nav-entry source-file" href="#">
+                            <div class="arrow"></div>
+                            <div class="icon"></div>
+                            <span>Item #1</span>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                        <li>
+                          <a class="nav-entry source-file" href="#">
+                            <div class="arrow"></div>
+                            <div class="icon"></div>
+                            <span>Item #2</span>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                        <li>
+                          <a class="nav-entry source-file" href="#">
+                            <div class="arrow"></div>
+                            <div class="icon"></div>
+                            <span>Item #3</span>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <input type="checkbox" checked>
+                  <a class="nav-entry folder" href="#">
+                    <div class="arrow"></div>
+                    <div class="icon"></div>
+                    <span>Core</span>
+                  </a>
+                  <a href="#" class="go-to-location" title="Open source location"></a>
+                  <ul>
+                    <li>
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Numbers</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Bool</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <input type="checkbox">
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Assert</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <input type="checkbox">
+                      <a class="nav-entry source-file" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Collection</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <input type="checkbox" checked>
+                      <a class="nav-entry folder" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Comparable</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                      <ul>
+                        <li>
+                          <input type="checkbox">
+                          <a class="nav-entry" href="#">
+                            <div class="arrow"></div>
+                            <code class="inline"><pre><span class="keyword">trait</span> Comparable</pre></code>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                        <li>
+                          <a class="nav-entry" href="#">
+                            <div class="arrow"></div>
+                            <code class="inline"><pre><span class="keyword">fun</span> min(_:_:)</pre></code>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                        <li>
+                          <a class="nav-entry" href="#">
+                            <div class="arrow"></div>
+                            <code class="inline"><pre><span class="keyword">fun</span> max(_:_:)</pre></code>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                        <li>
+                          <input type="checkbox">
+                          <a class="nav-entry" href="#">
+                            <div class="arrow"></div>
+                            <code class="inline"><pre><span class="keyword">typealias</span> Result</pre></code>
+                          </a>
+                          <a href="#" class="go-to-location" title="Open source location"></a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="nav-entry article" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Comparisons</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <a class="nav-entry article" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>Collection Examples</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                    <li>
+                      <a class="nav-entry article" href="#">
+                        <div class="arrow"></div>
+                        <div class="icon"></div>
+                        <span>RegExp</span>
+                      </a>
+                      <a href="#" class="go-to-location" title="Open source location"></a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <input type="checkbox">
+              <a class="nav-entry folder" href="#">
+                <div class="arrow"></div>
+                <div class="icon"></div>
+                <span>Module B</span>
+              </a>
+              <a href="#" class="go-to-location" title="Open source location"></a>
+              <ul>
+                <li>
+                  <input type="checkbox">
+                  <a class="nav-entry source-file" href="#">
+                    <div class="arrow"></div>
+                    <div class="icon"></div>
+                    <span>Item #1</span>
+                  </a>
+                  <a href="#" class="go-to-location" title="Open source location"></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <input type="checkbox">
+              <a class="nav-entry folder" href="#">
+                <div class="arrow"></div>
+                <div class="icon"></div>
+                <span>Module C</span>
+              </a>
+              <a href="#" class="go-to-location" title="Open source location"></a>
+              <ul>
+                <li>
+                  <input type="checkbox">
+                  <a class="nav-entry source-file" href="#">
+                    <div class="arrow"></div>
+                    <div class="icon"></div>
+                    <span>Item #1</span>
+                  </a>
+                  <a href="#" class="go-to-location" title="Open source location"></a>
+                </li>
+                <li>
+                  <input type="checkbox">
+                  <a class="nav-entry source-file" href="#">
+                    <div class="arrow"></div>
+                    <div class="icon"></div>
+                    <span>Item #2</span>
+                  </a>
+                  <a href="#" class="go-to-location" title="Open source location"></a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </aside>
     </div>
 

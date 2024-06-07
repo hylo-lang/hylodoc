@@ -1,18 +1,27 @@
+
 .page-tree {
   // Colors
   $background: #161616;
 
-  @apply p-3;
   background-color: $background;
 
-  .search {
+  $margin: 8px;
+
+  display: grid;
+  grid-template-rows: auto 1fr;
+
+  .sidebar-search-cont {
+    margin: $margin;
+    box-sizing: border-box;
+
     // Colors
     $background: #0F0F0F;
     $placeholder: #717171;
     $text: $text-secondary;
     $focus: #F25FB7;
 
-    @apply relative z-0 w-full py-0 pr-0 pl-8 mb-3 rounded-md overflow-hidden;
+    width: calc(100% - #{$margin} * 2);
+    @apply relative z-0 py-0 pr-0 pl-8 mb-3 rounded-md overflow-hidden;
     border: 1px solid $thin-divider;
 
     & > input {
@@ -52,108 +61,99 @@
     }
   }
 
-  & > ul {
-    @apply relative;
+  $depth-indentation: 16px;
+
+  ul > li {
+    --next-depth: calc(var(--depth) + 1);
   }
+  li > ul {
+    --depth: var(--next-depth);
+  }
+  .nav-entry {
+    display: flex;
+    padding-left: calc(var(--depth) * $depth-indentation + $margin);
+    align-items: center;
 
-  ul {
-    // Colors
-    $item-active-background: #331020;
-    $item-active-color: $text-primary;
-    $item-hover-background: #1C1C1C;
-    $item-hover-color: $text-primary;
-    $item-inactive-color: $text-secondary;
-    $item-inactive-background: transparent;
+    & > .icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin-right: 4px;
+    }
 
-    @apply z-0 pl-5 list-none;
-
-    & > li {
-      @apply transition-colors duration-300;
-      color: $item-inactive-color;
-      background-color: $item-inactive-background;
-
-      & > ul {
-        @apply hidden;
-      }
-
-      &:has(> :checked), &.active, &:hover {
-        color: $item-hover-color;
-      }
-
-      &:before {
-        @apply transition-opacity duration-300 ease-in-out opacity-0 absolute left-0 w-full -z-10 rounded-md;
-        margin-top: 0.2rem;
-        content: '‎';
-        background-color: $item-hover-background;
-      }
-
-      &.active:before {
-        @apply opacity-100;
-        background-color: $item-active-background;
-      }
-
-      // hovering on the element itself and not the nested list
-      &:hover:not(:has(> ul:hover)):before {
-        @apply opacity-100;
-      }
-
-      & > input[type="checkbox"] {
-        @apply relative invisible m-0 -ml-4;
-        width: 0.75rem;
-        height: 1.1rem;
-
-        &:before {
-          @apply absolute -left-2.5 visible -rotate-90;
-          width: 1.15rem;
-          height: 1.15rem;
-          top: -0.33rem;
-          content: url(icons/arrow_solid.svg);
-        }
-
-        &:checked {
-          &:before {
-            @apply rotate-0;
-            left: 0.05rem;
-            top: -0.35rem;
-          }
-
-          & ~ ul {
-            @apply block;
-          }
-        }
-      }
-
-      & > a {
-        @apply cursor-pointer inline-block;
-
-        code {
-          @apply inline-block;
-        }
-
-        &.folder, &.file {
-          @apply relative;
-          padding-left: 1.4rem;
-
-          &:before {
-            @apply absolute left-0 top-0.5 bg-cover bg-no-repeat;
-            content: '‎';
-          }
-        }
-
-        &.folder:before {
-          @apply w-4 h-3.5;
-          background-image: url(icons/folder.svg);
-        }
-
-        &.file:before {
-          @apply w-4 h-4;
-          background-image: url(icons/file.svg);
-        }
-
-        &:not(.file):not(.folder) {
-          @apply ml-0.5;
-        }
-      }
+    &.folder > .icon {
+      background-image: url(icons/folder.svg);
+    }
+    &.source-file > .icon {
+      background-image: url(icons/source-file.svg);
+    }
+    &.article > .icon {
+      background-image: url(icons/article.svg);
     }
   }
+
+  li {
+    position: relative;
+  }
+  .go-to-location {
+    position: absolute;
+    right: 16px;
+    top: 0;
+    height: 32px;
+    width: 32px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(icons/source.svg);
+    display: none;
+  }
+
+  // When something on top is hovered, the nav-entry should still be considered hovered
+  .nav-entry:hover, input[type=checkbox]:hover + .nav-entry, .nav-entry:has(+ .go-to-location:hover) {
+    background-color: var(--navigation-input);
+
+    & + .go-to-location {
+      display: block;
+    }
+  }
+
+  .arrow {
+    background-image: url(icons/arrow_solid.svg);
+    width: 32px;
+    height: 32px;
+    display: block;
+    visibility: hidden;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: rotate(-90deg);
+  }
+  input[type=checkbox] + .nav-entry > .arrow {
+    visibility: visible;
+  }
+
+  input[type=checkbox] {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    left: calc(var(--depth) * $depth-indentation + $margin);
+    opacity: 0;
+    z-index: 1;
+
+    &:checked + .nav-entry > .arrow {
+      transform: rotate(0);
+    }
+    &:focus-visible + .nav-entry > .arrow {
+      outline: 2px solid white;
+    }
+  }
+
+  input[type=checkbox]:not(:checked) ~ ul {
+    display: none;
+  }
+}
+
+#navigation-tree-container {
+  overflow: auto;
+  --depth: 0
 }
