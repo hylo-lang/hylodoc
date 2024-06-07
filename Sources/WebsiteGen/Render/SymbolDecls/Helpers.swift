@@ -27,29 +27,41 @@ func getOutput(_ program: TypedProgram, _ output: AnyExprID?) -> String? {
 }
 
 func wrapIndentation(_ count: Int) -> String {
-  return wrap("span", "indentation", String(repeating: " ", count: count))
+  return wrap("span", String(repeating: " ", count: count), className: "indentation")
 }
 
 func wrapKeyword(_ inner: String) -> String {
-  return wrap("span", "keyword", inner)
+  return wrap("span", inner, className: "keyword")
 }
 
 func wrapIdentifier(_ inner: String) -> String {
-  return wrap("span", "identifier", inner)
+  return wrap("span", inner, className: "identifier")
 }
 
 func wrapType(_ inner: String) -> String {
-  return wrap("a", "type", inner)
+  return wrap("a", inner, className: "type")
 }
 
-func wrapName(_ inner: String) -> String {
-  return wrap("span", "name", inner)
+func wrapSymbolName(_ inner: String, href: String? = nil) -> String {
+  if href == nil {
+    return inner
+  }
+
+  return wrap("a", inner, href: href)
+}
+
+func wrapParamName(_ inner: String) -> String {
+  return wrap("span", inner, className: "parameter-name")
 }
 
 func wrapCodeBlock(_ inner: String) -> String {
-  return wrap("div", "code", inner)
+  return wrap("div", inner, className: "code")
 }
 
-func wrap(_ element: String, _ className: String, _ inner: String) -> String {
-  return "<\(element) class=\"\(className)\">\(inner)</\(element)>"
+func wrap(_ element: String, _ inner: String, className: String? = nil, href: String? = nil)
+  -> String
+{
+  let link = href != nil ? " href=\"\(href!)\"" : ""
+  let classes = className != nil ? " class=\"\(className!)\"" : ""
+  return "<\(element)\(classes)\(link)>\(inner)</\(element)>"
 }

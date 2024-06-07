@@ -9,7 +9,7 @@ func renderSimpleTrait(_ program: TypedProgram, _ n: TraitDecl.ID, _ raw: Bool)
 
   var result = raw ? "trait" : wrapKeyword("trait")
   result += " "
-  result += raw ? identifier : wrapName(identifier)
+  result += raw ? identifier : wrapParamName(identifier)
 
   return result
 }
@@ -22,7 +22,7 @@ func renderSimpleTypeAlias(_ program: TypedProgram, _ n: TypeAliasDecl.ID, _ raw
 
   var result = raw ? "typealias" : wrapKeyword("typealias")
   result += " "
-  result += raw ? identifier : wrapName(identifier)
+  result += raw ? identifier : wrapParamName(identifier)
 
   return result
 }
@@ -33,7 +33,7 @@ func renderSimpleProductType(_ program: TypedProgram, _ n: ProductTypeDecl.ID, _
   let productType = program.ast[n]
   var result = raw ? "type" : wrapKeyword("type")
   result += " "
-  result += raw ? productType.baseName : wrapName(productType.baseName)
+  result += raw ? productType.baseName : wrapParamName(productType.baseName)
   return result
 }
 
@@ -52,7 +52,7 @@ func renderSimpleBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ raw: Bo
   }
   result += raw ? introducer : wrapKeyword(introducer)
   result += " "
-  result += raw ? variable.baseName : wrapName(variable.baseName)
+  result += raw ? variable.baseName : wrapParamName(variable.baseName)
 
   return result
 }
@@ -65,7 +65,7 @@ func renderSimpleInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID, _
 
   var result = raw ? "init" : wrapKeyword("init")
   let tail = "(\(params))"
-  result += raw ? tail : wrapName(tail)
+  result += raw ? tail : wrapParamName(tail)
 
   return result
 }
@@ -86,7 +86,7 @@ func renderSimpleFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ raw: 
   result += raw ? "fun" : wrapKeyword("fun")
   result += " "
   let tail = "\(identifier)(\(renderSimpleParams(program, function.parameters)))"
-  result += raw ? tail : wrapName(tail)
+  result += raw ? tail : wrapParamName(tail)
 
   return result
 }
@@ -102,7 +102,7 @@ func renderSimpleMethod(_ program: TypedProgram, _ n: MethodDecl.ID, _ raw: Bool
   result += raw ? "fun" : wrapKeyword("fun")
   result += " "
   let tail = "\(identifier)(\(renderSimpleParams(program, method.parameters)))"
-  result += raw ? tail : wrapName(tail)
+  result += raw ? tail : wrapParamName(tail)
 
   return result
 }
@@ -128,7 +128,7 @@ func renderSimpleSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ raw
     tail += "(\(renderSimpleParams(program, sub.parameters)))"
   }
 
-  result += raw ? tail : wrapName(tail)
+  result += raw ? tail : wrapParamName(tail)
 
   return result
 }

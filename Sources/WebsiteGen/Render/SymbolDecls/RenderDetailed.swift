@@ -26,24 +26,40 @@ func renderDetailedTypeAlias(_ program: TypedProgram, _ n: TypeAliasDecl.ID, _ i
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedProductType(_ program: TypedProgram, _ n: ProductTypeDecl.ID, _ inline: Bool)
+func renderDetailedProductType(
+  _ context: GenerationContext, _ referringFrom: AnyTargetID, _ n: ProductTypeDecl.ID,
+  _ inline: Bool
+)
   -> String
 {
-  let productType = program.ast[n]
-  var result = "\(wrapKeyword("type")) \(productType.baseName)"
+  let productType = context.typedProgram.ast[n]
+  let symbolUrl = context.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?
+    .description
+
+  var result = "\(wrapKeyword("type")) \(wrapSymbolName(productType.baseName, href: symbolUrl))"
   let baseLength = productType.baseName.count + 8
+
+  // let to = AnyTargetID.symbol(AnyDeclID(n))
+
+  // let x: BundledNode<ProductTypeDecl.ID, TypedProgram> = program[n]
+  // print(x.)
+
+  // print(x?.description ?? "-")
+  // print(from)
+  // print(to)
+  // print(resolver)
 
   if !productType.conformances.isEmpty {
     result += " : "
 
-    let nameExpr = program.ast[productType.conformances[0]]
+    let nameExpr = context.typedProgram.ast[productType.conformances[0]]
     result += wrapType(nameExpr.name.value.stem)
 
     for i in (1..<productType.conformances.count) {
       result += ","
       result += inline ? " " : "\n\(wrapIndentation(baseLength))"
 
-      let nameExpr = program.ast[productType.conformances[i]]
+      let nameExpr = context.typedProgram.ast[productType.conformances[i]]
       result += wrapType(nameExpr.name.value.stem)
     }
   }
@@ -217,7 +233,7 @@ func renderDetailedParam(_ program: TypedProgram, _ n: ParameterDecl.ID) -> Stri
 
   var result = label
   if name != label {
-    result += " \(wrapName(name))"
+    result += " \(wrapParamName(name))"
   }
 
   result += ":"

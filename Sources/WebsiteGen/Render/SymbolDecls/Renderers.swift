@@ -4,7 +4,9 @@ import FrontEnd
 public protocol SymbolDeclRenderer {
   func renderTraitDecl(_ n: TraitDecl.ID) -> String
   func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String
-  func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String
+  func renderProductTypeDecl(
+    _ ctx: GenerationContext, _ n: ProductTypeDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
   func renderBindingDecl(_ n: BindingDecl.ID) -> String
   func renderInitializerDecl(_ n: InitializerDecl.ID) -> String
   func renderFunctionDecl(_ n: FunctionDecl.ID) -> String
@@ -43,7 +45,9 @@ public struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
     return renderSimpleTypeAlias(program, n, true)
   }
 
-  public func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
+  public func renderProductTypeDecl(
+    _ context: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ from: AnyTargetID
+  ) -> String {
     return renderSimpleProductType(program, n, true)
   }
 
@@ -85,7 +89,9 @@ public struct NavigationSymbolDecRenderer: SymbolDeclRenderer {
     return renderSimpleTypeAlias(program, n, false)
   }
 
-  public func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
+  public func renderProductTypeDecl(
+    _ context: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ from: AnyTargetID
+  ) -> String {
     return renderSimpleProductType(program, n, false)
   }
 
@@ -127,8 +133,10 @@ public struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
     return renderDetailedTypeAlias(program, n, true)
   }
 
-  public func renderProductTypeDecl(_ n: FrontEnd.ProductTypeDecl.ID) -> String {
-    return renderDetailedProductType(program, n, true)
+  public func renderProductTypeDecl(
+    _ context: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ from: AnyTargetID
+  ) -> String {
+    return renderDetailedProductType(context, from, n, true)
   }
 
   public func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
@@ -169,8 +177,10 @@ public struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
     return renderDetailedTypeAlias(program, n, false)
   }
 
-  public func renderProductTypeDecl(_ n: ProductTypeDecl.ID) -> String {
-    return renderDetailedProductType(program, n, false)
+  public func renderProductTypeDecl(
+    _ context: GenerationContext, _ n: ProductTypeDecl.ID, _ from: AnyTargetID
+  ) -> String {
+    return renderDetailedProductType(context, from, n, false)
   }
 
   public func renderBindingDecl(_ n: BindingDecl.ID) -> String {

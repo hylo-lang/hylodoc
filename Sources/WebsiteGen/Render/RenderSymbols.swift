@@ -9,7 +9,7 @@ typealias nameAndContentArray = [nameAndContent]
 
 /// Get the members of a declaration
 /// - Parameters:
-///   - referringFrom: 
+///   - referringFrom:
 ///   - decls: array of declaration IDs
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 /// - Returns: dictionary with keys as section names and values as arrays of tuples containing name (as an HTML string, including url) and summary of the member
@@ -17,114 +17,118 @@ func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: Gen
   -> [OrderedDictionary<String, nameAndContentArray>.Element]
 {
   // the order of the buckets is what determines the order of the sections in the page
-    var buckets: OrderedDictionary<String, nameAndContentArray> = [
-        "Associated Types": [],
-        "Associated Values": [],
-        "Type Aliases": [],
-        "Bindings": [],
-        "Operators": [],
-        "Functions": [],
-        "Methods": [],
-        "Method Implementations": [],
-        "Subscripts": [],
-        "Subscript Implementations": [],
-        "Initializers": [],
-        "Traits": [],
-        "Product Types": []
-    ]
+  var buckets: OrderedDictionary<String, nameAndContentArray> = [
+    "Associated Types": [],
+    "Associated Values": [],
+    "Type Aliases": [],
+    "Bindings": [],
+    "Operators": [],
+    "Functions": [],
+    "Methods": [],
+    "Method Implementations": [],
+    "Subscripts": [],
+    "Subscript Implementations": [],
+    "Initializers": [],
+    "Traits": [],
+    "Product Types": [],
+  ]
   let _ = decls.map { declId in
-    let (name, summary, key) = getMemberNameAndSummary(ctx: ctx, of: declId)
+    let (name, summary, key) = getMemberNameAndSummary(
+      ctx: ctx, of: declId, referringFrom: referringFrom)
     buckets[key, default: []].append((name: name, summary: summary))
   }
-  return buckets.filter{ !$0.value.isEmpty}.map{$0}
+  return buckets.filter { !$0.value.isEmpty }.map { $0 }
 }
 
 /// Get the name and summary of a member
 /// - Parameters:
-///   - ctx: context for page generation, containing documentation database, ast and stencil templating 
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: member declaration to get name and summary of
 /// - Returns: name, summary of the member, and key of the section it belongs to in prepareMembersData
-func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID) -> (name: String, summary: String, key: String) {
-    var name: String 
-    var summary: Block?
-    var key: String
+func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFrom: AnyTargetID) -> (
+  name: String, summary: String, key: String
+) {
+  var name: String
+  var summary: Block?
+  var key: String
 
-    switch of.kind {
-    // TODO Mark needs to implement this
-    // case AssociatedTypeDecl.self:
-    //     name = ctx.renderers.inline.renderAssociatedTypeDecl(AssociatedTypeDecl.ID(of)!)
-    //     let docID = AssociatedTypeDecl.ID(of)!
-    //     summary = ctx.documentation.symbols.associatedTypeDocs[docID]?.common.summary
-    //     key = "Associated Types"
-    // TODO Mark needs to implement this
-    // case AssociatedValueDecl.self:
-    //     name = ctx.renderers.inline.renderAssociatedValueDecl(AssociatedValueDecl.ID(of)!)
-    //     let docID = AssociatedValueDecl.ID(of)!
-    //     summary = ctx.documentation.symbols.associatedValueDocs[docID]?.common.summary
-    //     key = "Associated Values"
-    case TypeAliasDecl.self:
-        name = ctx.renderers.inline.renderTypeAliasDecl(TypeAliasDecl.ID(of)!)
-        let docID = TypeAliasDecl.ID(of)!
-        summary = ctx.documentation.symbols.typeAliasDocs[docID]?.common.summary
-        key = "Type Aliases"
-    case BindingDecl.self:
-        name = ctx.renderers.inline.renderBindingDecl(BindingDecl.ID(of)!)
-        let docID = BindingDecl.ID(of)!
-        summary = ctx.documentation.symbols.bindingDocs[docID]?.common.summary
-        key = "Bindings"
-    // TODO Mark needs to implement this
-    // case OperatorDecl.self:
-    //     name = ctx.renderers.inline.renderOperatorDecl(OperatorDecl.ID(of)!)
-    //     let docID = OperatorDecl.ID(of)!
-    //     summary = ctx.documentation.symbols.operatorDocs[docID]?.documentation.summary
-    //     key = "Operators"
-    case FunctionDecl.self:
-        name = ctx.renderers.inline.renderFunctionDecl(FunctionDecl.ID(of)!)
-        let docID = FunctionDecl.ID(of)!
-        summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.summary
-        key = "Functions"
-    case MethodDecl.self:
-        name = ctx.renderers.inline.renderMethodDecl(MethodDecl.ID(of)!)
-        let docID = MethodDecl.ID(of)!
-        summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.summary
-        key = "Methods"
-    // not expected to be used, needed for exhaustive switch
-    case MethodImpl.self:
-        fatalError("Method implementation should not be rendered")
-    case SubscriptDecl.self:
-        name = ctx.renderers.inline.renderSubscriptDecl(SubscriptDecl.ID(of)!)
-        let docID = SubscriptDecl.ID(of)!
-        summary = ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.generalDescription.summary
-        key = "Subscripts"
-    // not expected to be used, needed for exhaustive switch
-    case SubscriptImpl.self:
-        fatalError("Subscript implementation should not be rendered")
-    case InitializerDecl.self:
-        name = ctx.renderers.inline.renderInitializerDecl(InitializerDecl.ID(of)!)
-        let docID = InitializerDecl.ID(of)!
-        summary = ctx.documentation.symbols.initializerDocs[docID]?.common.summary
-        key = "Initializers"
-    case TraitDecl.self:
-        name = ctx.renderers.inline.renderTraitDecl(TraitDecl.ID(of)!)
-        let docID = TraitDecl.ID(of)!
-        summary = ctx.documentation.symbols.traitDocs[docID]?.common.summary
-        key = "Traits"
-    case ProductTypeDecl.self:
-        name = ctx.renderers.inline.renderProductTypeDecl(ProductTypeDecl.ID(of)!)
-        let docID = ProductTypeDecl.ID(of)!
-        summary = ctx.documentation.symbols.productTypeDocs[docID]?.generalDescription.summary
-        key = "Product Types"
-    default:
-        name = ""
-        key = ""
-    }
+  switch of.kind {
+  // TODO Mark needs to implement this
+  // case AssociatedTypeDecl.self:
+  //     name = ctx.renderers.inline.renderAssociatedTypeDecl(AssociatedTypeDecl.ID(of)!)
+  //     let docID = AssociatedTypeDecl.ID(of)!
+  //     summary = ctx.documentation.symbols.associatedTypeDocs[docID]?.common.summary
+  //     key = "Associated Types"
+  // TODO Mark needs to implement this
+  // case AssociatedValueDecl.self:
+  //     name = ctx.renderers.inline.renderAssociatedValueDecl(AssociatedValueDecl.ID(of)!)
+  //     let docID = AssociatedValueDecl.ID(of)!
+  //     summary = ctx.documentation.symbols.associatedValueDocs[docID]?.common.summary
+  //     key = "Associated Values"
+  case TypeAliasDecl.self:
+    name = ctx.renderers.inline.renderTypeAliasDecl(TypeAliasDecl.ID(of)!)
+    let docID = TypeAliasDecl.ID(of)!
+    summary = ctx.documentation.symbols.typeAliasDocs[docID]?.common.summary
+    key = "Type Aliases"
+  case BindingDecl.self:
+    name = ctx.renderers.inline.renderBindingDecl(BindingDecl.ID(of)!)
+    let docID = BindingDecl.ID(of)!
+    summary = ctx.documentation.symbols.bindingDocs[docID]?.common.summary
+    key = "Bindings"
+  // TODO Mark needs to implement this
+  // case OperatorDecl.self:
+  //     name = ctx.renderers.inline.renderOperatorDecl(OperatorDecl.ID(of)!)
+  //     let docID = OperatorDecl.ID(of)!
+  //     summary = ctx.documentation.symbols.operatorDocs[docID]?.documentation.summary
+  //     key = "Operators"
+  case FunctionDecl.self:
+    name = ctx.renderers.inline.renderFunctionDecl(FunctionDecl.ID(of)!)
+    let docID = FunctionDecl.ID(of)!
+    summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.summary
+    key = "Functions"
+  case MethodDecl.self:
+    name = ctx.renderers.inline.renderMethodDecl(MethodDecl.ID(of)!)
+    let docID = MethodDecl.ID(of)!
+    summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.summary
+    key = "Methods"
+  // not expected to be used, needed for exhaustive switch
+  case MethodImpl.self:
+    fatalError("Method implementation should not be rendered")
+  case SubscriptDecl.self:
+    name = ctx.renderers.inline.renderSubscriptDecl(SubscriptDecl.ID(of)!)
+    let docID = SubscriptDecl.ID(of)!
+    summary =
+      ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.generalDescription.summary
+    key = "Subscripts"
+  // not expected to be used, needed for exhaustive switch
+  case SubscriptImpl.self:
+    fatalError("Subscript implementation should not be rendered")
+  case InitializerDecl.self:
+    name = ctx.renderers.inline.renderInitializerDecl(InitializerDecl.ID(of)!)
+    let docID = InitializerDecl.ID(of)!
+    summary = ctx.documentation.symbols.initializerDocs[docID]?.common.summary
+    key = "Initializers"
+  case TraitDecl.self:
+    name = ctx.renderers.inline.renderTraitDecl(TraitDecl.ID(of)!)
+    let docID = TraitDecl.ID(of)!
+    summary = ctx.documentation.symbols.traitDocs[docID]?.common.summary
+    key = "Traits"
+  case ProductTypeDecl.self:
+    name = ctx.renderers.inline.renderProductTypeDecl(
+      ctx, ProductTypeDecl.ID(of)!, referringFrom)
+    let docID = ProductTypeDecl.ID(of)!
+    summary = ctx.documentation.symbols.productTypeDocs[docID]?.generalDescription.summary
+    key = "Product Types"
+  default:
+    name = ""
+    key = ""
+  }
 
-    if let summary = summary {
-      return (name, HtmlGenerator.standard.generate(doc: summary), key)
-    }
-    else {
-      return (name, "", key)
-    }
+  if let summary = summary {
+    return (name, HtmlGenerator.standard.generate(doc: summary), key)
+  } else {
+    return (name, "", key)
+  }
 }
 
 /// Render the associated-type page
@@ -456,7 +460,8 @@ public func renderMethodPage(
 
     // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
     args["members"] = prepareMembersData(
-    referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map{member in AnyDeclID(member)}, ctx: ctx)
+      referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
+      ctx: ctx)
 
     args["seeAlso"] = doc.documentation.common.seeAlso.map {
       HtmlGenerator.standard.generate(doc: $0)
@@ -542,7 +547,8 @@ public func renderSubscriptPage(
   }
   // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
   args["members"] = prepareMembersData(
-    referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map{member in AnyDeclID(member)}, ctx: ctx)
+    referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
+    ctx: ctx)
 
   return try ctx.stencil.renderTemplate(name: "subscript_layout.html", context: args)
 }
@@ -677,15 +683,16 @@ public func renderProductTypePage(
   ctx: GenerationContext, of: ProductTypeDecl.ID, with doc: ProductTypeDocumentation?
 ) throws -> String {
   let decl: ProductTypeDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderProductTypeDecl(of)
+  args["pageTitle"] = ctx.renderers.simple.renderProductTypeDecl(ctx, of, target)
   args["pageType"] = "Product Type"
-  args["declarationPreview"] = ctx.renderers.block.renderProductTypeDecl(of)
+  args["declarationPreview"] = ctx.renderers.block.renderProductTypeDecl(ctx, of, target)
 
   if let doc = doc {
     if let summary = doc.generalDescription.summary {
