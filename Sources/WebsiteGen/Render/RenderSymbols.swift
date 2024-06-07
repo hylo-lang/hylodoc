@@ -33,9 +33,11 @@ func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: Gen
     "Product Types": [],
   ]
   let _ = decls.map { declId in
-    let (name, summary, key) = getMemberNameAndSummary(
+    if let (name, summary, key) = getMemberNameAndSummary(
       ctx: ctx, of: declId, referringFrom: referringFrom)
-    buckets[key, default: []].append((name: name, summary: summary))
+    {
+      buckets[key, default: []].append((name: name, summary: summary))
+    }
   }
   return buckets.filter { !$0.value.isEmpty }.map { $0 }
 }
@@ -47,7 +49,7 @@ func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: Gen
 /// - Returns: name, summary of the member, and key of the section it belongs to in prepareMembersData
 func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFrom: AnyTargetID) -> (
   name: String, summary: String, key: String
-) {
+)? {
   var name: String
   var summary: Block?
   var key: String
@@ -93,7 +95,8 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
     key = "Methods"
   // not expected to be used, needed for exhaustive switch
   case MethodImpl.self:
-    fatalError("Method implementation should not be rendered")
+    // fatalError("Method implementation should not be rendered")
+    return nil
   case SubscriptDecl.self:
     name = InlineSymbolDeclRenderer.renderSubscriptDecl(ctx, SubscriptDecl.ID(of)!, referringFrom)
     let docID = SubscriptDecl.ID(of)!
@@ -102,7 +105,8 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
     key = "Subscripts"
   // not expected to be used, needed for exhaustive switch
   case SubscriptImpl.self:
-    fatalError("Subscript implementation should not be rendered")
+    // fatalError("Subscript implementation should not be rendered")
+    return nil
   case InitializerDecl.self:
     name = InlineSymbolDeclRenderer.renderInitializerDecl(
       ctx, InitializerDecl.ID(of)!, referringFrom)
