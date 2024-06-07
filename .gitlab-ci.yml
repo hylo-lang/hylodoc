@@ -1,7 +1,6 @@
 image: alexcazacu1/hylo-base-image-cicd:1.0.4
 stages:
   - format
-  - build
   - test
 
 format-job:
@@ -17,34 +16,8 @@ format-job:
         echo "No formatting issues found.";
       fi
 
-build-job:
-  stage: build
-  script:
-    - swift build -c debug
-  artifacts:
-    paths: [.build/]
-
-cli-tests-job:
-  stage: test
-  needs: [build-job]
-  script: 
-    - swift test --filter CLITests
-
-code-gen-tests-job:
-  stage: test
-  needs: [build-job]
-  script:
-    - swift test --filter WebsiteGenTests
-
-frontend-tests-job:
-  stage: test
-  needs: [build-job]
-  script:
-    - swift test --filter DocExtractorTests
-
 export-test-coverage-job:
   stage: test
-  needs: [build-job]
   script:
     - swift test -c debug -Xswiftc -enable-testing --explicit-target-dependency-import-check error --parallel --enable-code-coverage
     - shopt -s nullglob
@@ -68,3 +41,4 @@ export-test-coverage-job:
       coverage_report:
         coverage_format: cobertura
         path: ./.build/coverage.xml
+
