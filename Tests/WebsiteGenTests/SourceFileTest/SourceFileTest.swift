@@ -40,14 +40,19 @@ final class SourceFileTest: XCTestCase {
 
     var diagnostics = DiagnosticSet()
 
-    let ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    let myModuleId = try! ast.makeModule("MyModule", sourceCode: [
+      SourceFile(synthesizedText: """
+      
+      """, named: "sf.hylo")
+    ], builtinModuleAccess: false, diagnostics: &diagnostics)
 
     let typedProgram = try! TypedProgram(
       annotating: ScopedProgram(ast), inParallel: false,
       reportingDiagnosticsTo: &diagnostics,
       tracingInferenceIf: { (_, _) in false })
 
-    let translationUnit = TranslationUnit.ID(rawValue: 2)
+    let translationUnitId = ast[myModuleId].sources.first!
 
     let sourceFile = SourceFileAsset(
       location: URL(string: "root/Folder1/sf.hylo")!,
@@ -69,27 +74,20 @@ final class SourceFileTest: XCTestCase {
           .document([.paragraph(Text("He ran into my second see also 10 times..."))]),
         ]
       ),
-      translationUnit: translationUnit
+      translationUnit: translationUnitId
     )
 
-    let pathUrl =
-      "/Users/evyatarhadasi/Desktop/code/automated-documentation-generation-tool/Tests/WebsiteGenTests/SourceFileTest/TestOutput"
     var db = DocumentationDatabase.init()
-    let sourceFileID = db.assets.sourceFiles.insert(sourceFile, for: translationUnit)
+    let sourceFileID = db.assets.sourceFiles.insert(sourceFile, for: translationUnitId)
     let ctx = GenerationContext(
       documentation: db,
       stencil: createDefaultStencilEnvironment(),
       typedProgram: typedProgram,
-      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: pathUrl))
+      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "/"))
     )
 
-    var res: String = ""
-
-    do {
-      res = try renderSourceFilePage(ctx: ctx, of: sourceFileID)
-    } catch {
-      XCTFail("Should not throw")
-    }
+    let res = try! renderSourceFilePage(ctx: ctx, of: sourceFileID)
+    let _ = res
 
     XCTAssertTrue(
       res.contains("<p>Carving up a summary for dinner, minding my own business.</p>"), res)
