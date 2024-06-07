@@ -85,10 +85,8 @@ func renderDetailedBinding(
   result += "\(wrapKeyword(introducer)) \(identifier)"
   result = wrapLink(result, href: symbolUrl)
 
-  if bindingPattern.annotation != nil, let d = NameExpr.ID(bindingPattern.annotation!) {
-    let nameExpr = ctx.typedProgram.ast[d]
-    let name = String(describing: nameExpr.name.value)
-    result += ": \(wrapType(name))"
+  if let typeWrapped = renderDetailedType(ctx, bindingPattern.annotation, referringFrom) {
+    result += ": \(typeWrapped)"
   }
 
   return result
@@ -127,7 +125,7 @@ func renderDetailedFunction(
   result = wrapLink(result, href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, function.parameters, inline, referringFrom)))"
 
-  if let output = renderDetailedOutput(ctx, function.output, referringFrom) {
+  if let output = renderDetailedType(ctx, function.output, referringFrom) {
     result += " -> \(output)"
   }
 
@@ -153,7 +151,7 @@ func renderDetailedMethod(
   result += wrapLink("\(wrapKeyword("fun")) \(identifier)", href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, method.parameters, inline, referringFrom)))"
 
-  if let output = renderDetailedOutput(ctx, method.output, referringFrom) {
+  if let output = renderDetailedType(ctx, method.output, referringFrom) {
     result += " -> \(output)"
   }
 
@@ -197,7 +195,7 @@ func renderDetailedSubscript(
     result += "(\(renderDetailedParams(ctx, sub.parameters, inline, referringFrom)))"
   }
 
-  if let output = renderDetailedOutput(ctx, sub.output, referringFrom) {
+  if let output = renderDetailedType(ctx, sub.output, referringFrom) {
     result += ": \(output)"
   }
 
@@ -260,31 +258,32 @@ func renderDetailedParam(
     result += " \(wrapParamName(name))"
   }
 
-  result += ":"
+  if let typeWrapped = renderDetailedType(ctx, type, referringFrom) {
+    result += ":"
 
-  if convention != AccessEffect.let {
-    result += " \(wrapKeyword(String(describing: convention)))"
+    if convention != AccessEffect.let {
+      result += " \(wrapKeyword(String(describing: convention)))"
+    }
+
+    result += " \(typeWrapped)"
   }
 
-  result += " \(wrapType(type))"
   return result
 }
 
-func renderDetailedOutput(
-  _ ctx: GenerationContext, _ output: AnyExprID?, _ referringFrom: AnyTargetID
+func renderDetailedType(
+  _ ctx: GenerationContext, _ type: AnyExprID?, _ referringFrom: AnyTargetID
 )
   -> String?
 {
-  if let inner = getOutputName(ctx.typedProgram, output) {
+  if let name = getTypeName(ctx.typedProgram, type) {
     var url: String? = nil
 
-    if let nameExpr = NameExpr.ID(output!) {
-      if let decl = ctx.typedProgram.referredDecl[nameExpr]?.decl {
-        url = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(decl)))?.description
-      }
+    if let decl = getExprDecl(ctx.typedProgram, type) {
+      url = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(decl)))?.description
     }
 
-    return wrapType(inner, href: url)
+    return wrapType(name, href: url)
   }
 
   return nil

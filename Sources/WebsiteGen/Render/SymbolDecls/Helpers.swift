@@ -5,10 +5,9 @@ func getParamLabel(_ parameter: ParameterDecl) -> String {
   return parameter.label != nil ? parameter.label!.value : "_"
 }
 
-func getParamType(_ program: TypedProgram, _ parameter: ParameterDecl) -> String {
+func getParamType(_ program: TypedProgram, _ parameter: ParameterDecl) -> AnyExprID {
   let paramType = program.ast[parameter.annotation!]
-  let nameExpr = program.ast[NameExpr.ID(paramType.bareType)]!
-  return nameExpr.name.value.stem
+  return paramType.bareType
 }
 
 func getParamConvention(_ program: TypedProgram, _ parameter: ParameterDecl) -> AccessEffect {
@@ -16,13 +15,21 @@ func getParamConvention(_ program: TypedProgram, _ parameter: ParameterDecl) -> 
   return paramType.convention.value
 }
 
-func getOutputName(_ program: TypedProgram, _ output: AnyExprID?) -> String? {
-  if output == nil {
+func getTypeName(_ program: TypedProgram, _ type: AnyExprID?) -> String? {
+  if type == nil {
     return nil
   }
 
-  let d = NameExpr.ID(output!)
-  let nameExpr: NameExpr = program.ast[d]!
+  let d = NameExpr.ID(type!)
+  return getTypeName(program, d)
+}
+
+func getTypeName(_ program: TypedProgram, _ type: NameExpr.ID?) -> String? {
+  if type == nil {
+    return nil
+  }
+
+  let nameExpr: NameExpr = program.ast[type]!
   return nameExpr.name.value.stem
 }
 
