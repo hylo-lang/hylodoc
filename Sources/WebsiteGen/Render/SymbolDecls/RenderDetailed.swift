@@ -26,8 +26,9 @@ func renderDetailedTypeAlias(
 
   var result = wrapLink("\(wrapKeyword("typealias")) \(identifier)", href: symbolUrl)
 
-  let nameExpr = ctx.typedProgram.ast[NameExpr.ID(typeAlias.aliasedType)]!
-  result += " = \(wrapType(nameExpr.name.value.stem))"
+  if let wrappedType = renderDetailedType(ctx, typeAlias.aliasedType, referringFrom) {
+    result += " = \(wrappedType)"
+  }
 
   return result
 }
@@ -48,15 +49,15 @@ func renderDetailedProductType(
   if !productType.conformances.isEmpty {
     result += " : "
 
-    let nameExpr = ctx.typedProgram.ast[productType.conformances[0]]
-    result += wrapType(nameExpr.name.value.stem)
+    let nameExpr = productType.conformances[0]
+    result += renderDetailedType(ctx, AnyExprID(nameExpr), referringFrom)!
 
     for i in (1..<productType.conformances.count) {
       result += ","
       result += inline ? " " : "\n\(wrapIndentation(baseLength))"
 
-      let nameExpr = ctx.typedProgram.ast[productType.conformances[i]]
-      result += wrapType(nameExpr.name.value.stem)
+      let nameExpr = productType.conformances[i]
+      result += renderDetailedType(ctx, AnyExprID(nameExpr), referringFrom)!
     }
   }
 
