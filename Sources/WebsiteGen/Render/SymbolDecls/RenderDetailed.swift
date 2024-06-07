@@ -127,8 +127,8 @@ func renderDetailedFunction(
   result = wrapLink(result, href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, function.parameters, inline, referringFrom)))"
 
-  if let output = getOutput(ctx.typedProgram, function.output) {
-    result += " -> \(wrapType(output))"
+  if let output = renderDetailedOutput(ctx, function.output, referringFrom) {
+    result += " -> \(output)"
   }
 
   let effect =
@@ -153,8 +153,8 @@ func renderDetailedMethod(
   result += wrapLink("\(wrapKeyword("fun")) \(identifier)", href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, method.parameters, inline, referringFrom)))"
 
-  if let output = getOutput(ctx.typedProgram, method.output) {
-    result += " -> \(wrapType(output))"
+  if let output = renderDetailedOutput(ctx, method.output, referringFrom) {
+    result += " -> \(output)"
   }
 
   result += " { "
@@ -197,8 +197,8 @@ func renderDetailedSubscript(
     result += "(\(renderDetailedParams(ctx, sub.parameters, inline, referringFrom)))"
   }
 
-  if let output = getOutput(ctx.typedProgram, sub.output) {
-    result += ": \(wrapType(output))"
+  if let output = renderDetailedOutput(ctx, sub.output, referringFrom) {
+    result += ": \(output)"
   }
 
   result += " { "
@@ -268,4 +268,24 @@ func renderDetailedParam(
 
   result += " \(wrapType(type))"
   return result
+}
+
+func renderDetailedOutput(
+  _ ctx: GenerationContext, _ output: AnyExprID?, _ referringFrom: AnyTargetID
+)
+  -> String?
+{
+  if let inner = getOutputName(ctx.typedProgram, output) {
+    var url: String? = nil
+
+    if let nameExpr = NameExpr.ID(output!) {
+      if let decl = ctx.typedProgram.referredDecl[nameExpr]?.decl {
+        url = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(decl)))?.description
+      }
+    }
+
+    return wrapType(inner, href: url)
+  }
+
+  return nil
 }

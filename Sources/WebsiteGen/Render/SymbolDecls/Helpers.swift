@@ -16,14 +16,28 @@ func getParamConvention(_ program: TypedProgram, _ parameter: ParameterDecl) -> 
   return paramType.convention.value
 }
 
-func getOutput(_ program: TypedProgram, _ output: AnyExprID?) -> String? {
+func getOutputName(_ program: TypedProgram, _ output: AnyExprID?) -> String? {
   if output == nil {
     return nil
   }
 
   let d = NameExpr.ID(output!)
-  let nameExpr = program.ast[d]!
+  let nameExpr: NameExpr = program.ast[d]!
   return nameExpr.name.value.stem
+}
+
+func getExprDecl(_ program: TypedProgram, _ expr: AnyExprID?) -> AnyDeclID? {
+  if expr == nil {
+    return nil
+  }
+
+  if let nameExpr = NameExpr.ID(expr!) {
+    if let decl = program.referredDecl[nameExpr]?.decl {
+      return decl
+    }
+  }
+
+  return nil
 }
 
 func wrapIndentation(_ count: Int) -> String {
@@ -38,8 +52,8 @@ func wrapIdentifier(_ inner: String) -> String {
   return wrap("span", inner, className: "identifier")
 }
 
-func wrapType(_ inner: String) -> String {
-  return wrap("a", inner, className: "type")
+func wrapType(_ inner: String, href: String? = nil) -> String {
+  return wrap(href != nil ? "a" : "span", inner, className: "type", href: href)
 }
 
 func wrapLink(_ inner: String, href: String? = nil) -> String {

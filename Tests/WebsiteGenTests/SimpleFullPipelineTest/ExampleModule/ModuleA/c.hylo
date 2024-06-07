@@ -27,7 +27,7 @@ type MyType : TraitA, TraitB {
   //   set   { if y > x { &x = new_value } else { &y = new_value } }
   // }
 
-  public fun functionLarge(hello hello: Int, _ world: Float64) inout -> Int {}
+  public fun functionLarge(hello hello: Int, _ world: Float64) inout -> Element {}
   public fun functionSmall(_ world: Float64) -> Int {}
   public static fun functionTiny() {}
 
