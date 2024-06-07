@@ -13,8 +13,8 @@ public struct CLI: ParsableCommand {
     usage: "hdc <source-path> --output <output-path>"
   )
 
-  @Argument(help: "The path to the source bundle. ")
-  var sourceBundlePath: String
+  @Argument(help: "The paths to the source bundle. ")
+  var sourceBundlePaths: [String]
 
   @Option(name: .shortAndLong, help: "The output path for the HTML files. ")
   var outputPath: String = "./dist"
@@ -25,17 +25,7 @@ public struct CLI: ParsableCommand {
     let clock = ContinuousClock()
     let duration = try clock.measure({
       let fileManager = FileManager.default
-
-      let sourceURL = URL(fileURLWithPath: sourceBundlePath)
       let outputURL = URL(fileURLWithPath: outputPath)
-
-      var isDirectory: ObjCBool = false
-      guard fileManager.fileExists(atPath: sourceURL.path, isDirectory: &isDirectory),
-        isDirectory.boolValue
-      else {
-        throw ValidationError(
-          "Source path '\(sourceURL.path)' does not exist or is not a directory. ")
-      }
 
       if fileManager.fileExists(atPath: outputURL.path) {
         try fileManager.removeItem(at: outputURL)
@@ -43,9 +33,34 @@ public struct CLI: ParsableCommand {
 
       var diagnostics = DiagnosticSet()
       var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
-      let rootModuleId = try! ast.makeModule(
-        "root", sourceCode: sourceFiles(in: [sourceURL]),
-        builtinModuleAccess: true, diagnostics: &diagnostics)
+      var modules: [InputModuleInfo] = []
+
+
+      for sourceBundlePath in sourceBundlePaths {
+        let sourceURL = URL(fileURLWithPath: sourceBundlePath)
+        
+        var isDirectory: ObjCBool = false
+        guard fileManager.fileExists(atPath: sourceURL.path, isDirectory: &isDirectory),
+          isDirectory.boolValue
+        else {
+          throw ValidationError(
+            "Source path '\(sourceURL.path)' does not exist or is not a directory. ")
+        }        
+        
+        let rootModuleId = try! ast.makeModule(
+          "\(sourceURL.lastPathComponent)", sourceCode: sourceFiles(in: [sourceURL]),
+          builtinModuleAccess: true, diagnostics: &diagnostics)
+
+        modules.append(.init(name: "\(sourceURL.lastPathComponent)", 
+        rootFolderPath: sourceURL, astId: rootModuleId))
+      }
+
+      guard !modules.isEmpty else {
+        print("Failed to generate modules or empty modules.")
+        throw NSError(
+          domain: "CLIError", code: 3,
+          userInfo: [NSLocalizedDescriptionKey: "Failed to generate modules or empty modules."])
+      }
 
       let typedProgram = try TypedProgram(
         annotating: ScopedProgram(ast), inParallel: false,
@@ -60,9 +75,8 @@ public struct CLI: ParsableCommand {
 
       let result = extractDocumentation(
         typedProgram: typedProgram,
-        for: [
-          .init(name: "rootModule", rootFolderPath: sourceURL, astId: rootModuleId)
-        ])
+        for: modules
+        )
 
       switch result {
       case .success(let documentationDatabase):
