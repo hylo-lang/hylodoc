@@ -9,7 +9,6 @@ public struct GenerationContext {
   public let stencil: Environment
   public let typedProgram: TypedProgram
   public var urlResolver: URLResolver
-  public let renderers: SymbolDeclRenderers
 }
 
 extension FileSystemLoader {
@@ -39,13 +38,11 @@ public func generateDocumentation(
   // Setup Context
   let stencil = createDefaultStencilEnvironment()
   let resolver = URLResolver(baseUrl: AbsolutePath(url: target)!)
-  let renderers = SymbolDeclRenderers.init(program: typedProgram, resolver: resolver)
   var ctx = GenerationContext(
     documentation: documentation,
     stencil: stencil,
     typedProgram: typedProgram,
-    urlResolver: resolver,
-    renderers: renderers
+    urlResolver: resolver
   )
 
   // Resolve URL's

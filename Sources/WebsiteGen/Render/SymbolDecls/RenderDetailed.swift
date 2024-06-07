@@ -1,10 +1,12 @@
 import Foundation
 import FrontEnd
 
-func renderDetailedTrait(_ program: TypedProgram, _ n: TraitDecl.ID, _ inline: Bool)
+func renderDetailedTrait(
+  _ ctx: GenerationContext, _ n: TraitDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+)
   -> String
 {
-  let trait = program.ast[n]
+  let trait = ctx.typedProgram.ast[n]
   let identifier = trait.identifier.value
 
   let result = "\(wrapKeyword("trait")) \(identifier)"
@@ -12,28 +14,30 @@ func renderDetailedTrait(_ program: TypedProgram, _ n: TraitDecl.ID, _ inline: B
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedTypeAlias(_ program: TypedProgram, _ n: TypeAliasDecl.ID, _ inline: Bool)
+func renderDetailedTypeAlias(
+  _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+)
   -> String
 {
-  let typeAlias = program.ast[n]
+  let typeAlias = ctx.typedProgram.ast[n]
   let identifier = typeAlias.identifier.value
 
   var result = "\(wrapKeyword("typealias")) \(identifier) = "
 
-  let nameExpr = program.ast[NameExpr.ID(typeAlias.aliasedType)]!
+  let nameExpr = ctx.typedProgram.ast[NameExpr.ID(typeAlias.aliasedType)]!
   result += wrapType(nameExpr.name.value.stem)
 
   return inline ? result : wrapCodeBlock(result)
 }
 
 func renderDetailedProductType(
-  _ context: GenerationContext, _ referringFrom: AnyTargetID, _ n: ProductTypeDecl.ID,
-  _ inline: Bool
+  _ ctx: GenerationContext, _ n: ProductTypeDecl.ID,
+  _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
-  let productType = context.typedProgram.ast[n]
-  let symbolUrl = context.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?
+  let productType = ctx.typedProgram.ast[n]
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?
     .description
 
   var result = "\(wrapKeyword("type")) \(wrapSymbolName(productType.baseName, href: symbolUrl))"
@@ -52,14 +56,14 @@ func renderDetailedProductType(
   if !productType.conformances.isEmpty {
     result += " : "
 
-    let nameExpr = context.typedProgram.ast[productType.conformances[0]]
+    let nameExpr = ctx.typedProgram.ast[productType.conformances[0]]
     result += wrapType(nameExpr.name.value.stem)
 
     for i in (1..<productType.conformances.count) {
       result += ","
       result += inline ? " " : "\n\(wrapIndentation(baseLength))"
 
-      let nameExpr = context.typedProgram.ast[productType.conformances[i]]
+      let nameExpr = ctx.typedProgram.ast[productType.conformances[i]]
       result += wrapType(nameExpr.name.value.stem)
     }
   }
@@ -67,12 +71,14 @@ func renderDetailedProductType(
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ inline: Bool) -> String {
-  let binding = program.ast[n]
-  let bindingPattern = program.ast[binding.pattern]
+func renderDetailedBinding(
+  _ ctx: GenerationContext, _ n: BindingDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+) -> String {
+  let binding = ctx.typedProgram.ast[n]
+  let bindingPattern = ctx.typedProgram.ast[binding.pattern]
 
-  let subpattern = program.ast[NamePattern.ID(bindingPattern.subpattern)]!
-  let variable = program.ast[subpattern.decl]
+  let subpattern = ctx.typedProgram.ast[NamePattern.ID(bindingPattern.subpattern)]!
+  let variable = ctx.typedProgram.ast[subpattern.decl]
 
   let introducer = String(describing: bindingPattern.introducer.value)
   var result = ""
@@ -84,7 +90,7 @@ func renderDetailedBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ inlin
   result += "\(wrapKeyword(introducer)) \(variable.baseName)"
 
   if bindingPattern.annotation != nil, let d = NameExpr.ID(bindingPattern.annotation!) {
-    let nameExpr = program.ast[d]
+    let nameExpr = ctx.typedProgram.ast[d]
     let name = String(describing: nameExpr.name.value)
     result += ": \(wrapType(name))"
   }
@@ -92,20 +98,24 @@ func renderDetailedBinding(_ program: TypedProgram, _ n: BindingDecl.ID, _ inlin
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedInitializer(_ program: TypedProgram, _ n: InitializerDecl.ID, _ inline: Bool)
+func renderDetailedInitializer(
+  _ ctx: GenerationContext, _ n: InitializerDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+)
   -> String
 {
-  let initializer = program.ast[n]
+  let initializer = ctx.typedProgram.ast[n]
   var result = wrapKeyword("init")
-  result += "(\(renderDetailedParams(program, initializer.parameters, inline)))"
+  result += "(\(renderDetailedParams(ctx, initializer.parameters, inline, referringFrom)))"
 
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inline: Bool)
+func renderDetailedFunction(
+  _ ctx: GenerationContext, _ n: FunctionDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+)
   -> String
 {
-  let function = program.ast[n]
+  let function = ctx.typedProgram.ast[n]
   let identifier = function.identifier!.value
   var result = ""
 
@@ -114,9 +124,9 @@ func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inl
   }
 
   result += "\(wrapKeyword("fun")) \(identifier)"
-  result += "(\(renderDetailedParams(program, function.parameters, inline)))"
+  result += "(\(renderDetailedParams(ctx, function.parameters, inline, referringFrom)))"
 
-  if let output = getOutput(program, function.output) {
+  if let output = getOutput(ctx.typedProgram, function.output) {
     result += " -> \(wrapType(output))"
   }
 
@@ -128,24 +138,26 @@ func renderDetailedFunction(_ program: TypedProgram, _ n: FunctionDecl.ID, _ inl
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedMethod(_ program: TypedProgram, _ n: MethodDecl.ID, _ inline: Bool)
+func renderDetailedMethod(
+  _ ctx: GenerationContext, _ n: MethodDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+)
   -> String
 {
-  let method = program.ast[n]
+  let method = ctx.typedProgram.ast[n]
   let identifier = method.identifier.value
   var result = ""
 
   result += "\(wrapKeyword("fun")) \(identifier)"
-  result += "(\(renderDetailedParams(program, method.parameters, inline)))"
+  result += "(\(renderDetailedParams(ctx, method.parameters, inline, referringFrom)))"
 
-  if let output = getOutput(program, method.output) {
+  if let output = getOutput(ctx.typedProgram, method.output) {
     result += " -> \(wrapType(output))"
   }
 
   result += " { "
 
   for (i, impl) in method.impls.enumerated() {
-    let implementation = program.ast[impl]
+    let implementation = ctx.typedProgram.ast[impl]
     let effect = String(describing: implementation.introducer.value)
 
     result += wrapKeyword(effect)
@@ -157,10 +169,12 @@ func renderDetailedMethod(_ program: TypedProgram, _ n: MethodDecl.ID, _ inline:
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ inline: Bool)
+func renderDetailedSubscript(
+  _ ctx: GenerationContext, _ n: SubscriptDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+)
   -> String
 {
-  let sub: SubscriptDecl = program.ast[n]
+  let sub: SubscriptDecl = ctx.typedProgram.ast[n]
   var result = ""
 
   if sub.isStatic {
@@ -174,17 +188,17 @@ func renderDetailedSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ i
   }
 
   if sub.introducer.value == SubscriptDecl.Introducer.subscript {
-    result += "(\(renderDetailedParams(program, sub.parameters, inline)))"
+    result += "(\(renderDetailedParams(ctx, sub.parameters, inline, referringFrom)))"
   }
 
-  if let output = getOutput(program, sub.output) {
+  if let output = getOutput(ctx.typedProgram, sub.output) {
     result += ": \(wrapType(output))"
   }
 
   result += " { "
 
   for (i, impl) in sub.impls.enumerated() {
-    let implementation = program.ast[impl]
+    let implementation = ctx.typedProgram.ast[impl]
     let effect = String(describing: implementation.introducer.value)
 
     result += wrapKeyword(effect)
@@ -196,7 +210,9 @@ func renderDetailedSubscript(_ program: TypedProgram, _ n: SubscriptDecl.ID, _ i
   return inline ? result : wrapCodeBlock(result)
 }
 
-func renderDetailedParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID], _ inline: Bool)
+func renderDetailedParams(
+  _ ctx: GenerationContext, _ ns: [ParameterDecl.ID], _ inline: Bool, _ referringFrom: AnyTargetID
+)
   -> String
 {
   var result = ""
@@ -206,7 +222,7 @@ func renderDetailedParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID], _ i
       result += "\n\(wrapIndentation(3))"
     }
 
-    result += renderDetailedParam(program, p)
+    result += renderDetailedParam(ctx, p, referringFrom)
 
     if i < ns.count - 1 {
       result += ","
@@ -224,12 +240,14 @@ func renderDetailedParams(_ program: TypedProgram, _ ns: [ParameterDecl.ID], _ i
   return result
 }
 
-func renderDetailedParam(_ program: TypedProgram, _ n: ParameterDecl.ID) -> String {
-  let parameter = program.ast[n]
+func renderDetailedParam(
+  _ ctx: GenerationContext, _ n: ParameterDecl.ID, _ referringFrom: AnyTargetID
+) -> String {
+  let parameter = ctx.typedProgram.ast[n]
   let label = getParamLabel(parameter)
   let name = parameter.baseName
-  let type = getParamType(program, parameter)
-  let convention = getParamConvention(program, parameter)
+  let type = getParamType(ctx.typedProgram, parameter)
+  let convention = getParamConvention(ctx.typedProgram, parameter)
 
   var result = label
   if name != label {

@@ -55,39 +55,39 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
   switch of.kind {
   // TODO Mark needs to implement this
   // case AssociatedTypeDecl.self:
-  //     name = ctx.renderers.inline.renderAssociatedTypeDecl(AssociatedTypeDecl.ID(of)!)
+  //     name = InlineSymbolDeclRenderer.renderAssociatedTypeDecl(AssociatedTypeDecl.ID(of)!)
   //     let docID = AssociatedTypeDecl.ID(of)!
   //     summary = ctx.documentation.symbols.associatedTypeDocs[docID]?.common.summary
   //     key = "Associated Types"
   // TODO Mark needs to implement this
   // case AssociatedValueDecl.self:
-  //     name = ctx.renderers.inline.renderAssociatedValueDecl(AssociatedValueDecl.ID(of)!)
+  //     name = InlineSymbolDeclRenderer.renderAssociatedValueDecl(AssociatedValueDecl.ID(of)!)
   //     let docID = AssociatedValueDecl.ID(of)!
   //     summary = ctx.documentation.symbols.associatedValueDocs[docID]?.common.summary
   //     key = "Associated Values"
   case TypeAliasDecl.self:
-    name = ctx.renderers.inline.renderTypeAliasDecl(TypeAliasDecl.ID(of)!)
+    name = InlineSymbolDeclRenderer.renderTypeAliasDecl(ctx, TypeAliasDecl.ID(of)!, referringFrom)
     let docID = TypeAliasDecl.ID(of)!
     summary = ctx.documentation.symbols.typeAliasDocs[docID]?.common.summary
     key = "Type Aliases"
   case BindingDecl.self:
-    name = ctx.renderers.inline.renderBindingDecl(BindingDecl.ID(of)!)
+    name = InlineSymbolDeclRenderer.renderBindingDecl(ctx, BindingDecl.ID(of)!, referringFrom)
     let docID = BindingDecl.ID(of)!
     summary = ctx.documentation.symbols.bindingDocs[docID]?.common.summary
     key = "Bindings"
   // TODO Mark needs to implement this
   // case OperatorDecl.self:
-  //     name = ctx.renderers.inline.renderOperatorDecl(OperatorDecl.ID(of)!)
+  //     name = InlineSymbolDeclRenderer.renderOperatorDecl(OperatorDecl.ID(of)!)
   //     let docID = OperatorDecl.ID(of)!
   //     summary = ctx.documentation.symbols.operatorDocs[docID]?.documentation.summary
   //     key = "Operators"
   case FunctionDecl.self:
-    name = ctx.renderers.inline.renderFunctionDecl(FunctionDecl.ID(of)!)
+    name = InlineSymbolDeclRenderer.renderFunctionDecl(ctx, FunctionDecl.ID(of)!, referringFrom)
     let docID = FunctionDecl.ID(of)!
     summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.summary
     key = "Functions"
   case MethodDecl.self:
-    name = ctx.renderers.inline.renderMethodDecl(MethodDecl.ID(of)!)
+    name = InlineSymbolDeclRenderer.renderMethodDecl(ctx, MethodDecl.ID(of)!, referringFrom)
     let docID = MethodDecl.ID(of)!
     summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.summary
     key = "Methods"
@@ -95,7 +95,7 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
   case MethodImpl.self:
     fatalError("Method implementation should not be rendered")
   case SubscriptDecl.self:
-    name = ctx.renderers.inline.renderSubscriptDecl(SubscriptDecl.ID(of)!)
+    name = InlineSymbolDeclRenderer.renderSubscriptDecl(ctx, SubscriptDecl.ID(of)!, referringFrom)
     let docID = SubscriptDecl.ID(of)!
     summary =
       ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.generalDescription.summary
@@ -104,17 +104,18 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
   case SubscriptImpl.self:
     fatalError("Subscript implementation should not be rendered")
   case InitializerDecl.self:
-    name = ctx.renderers.inline.renderInitializerDecl(InitializerDecl.ID(of)!)
+    name = InlineSymbolDeclRenderer.renderInitializerDecl(
+      ctx, InitializerDecl.ID(of)!, referringFrom)
     let docID = InitializerDecl.ID(of)!
     summary = ctx.documentation.symbols.initializerDocs[docID]?.common.summary
     key = "Initializers"
   case TraitDecl.self:
-    name = ctx.renderers.inline.renderTraitDecl(TraitDecl.ID(of)!)
+    name = InlineSymbolDeclRenderer.renderTraitDecl(ctx, TraitDecl.ID(of)!, referringFrom)
     let docID = TraitDecl.ID(of)!
     summary = ctx.documentation.symbols.traitDocs[docID]?.common.summary
     key = "Traits"
   case ProductTypeDecl.self:
-    name = ctx.renderers.inline.renderProductTypeDecl(
+    name = InlineSymbolDeclRenderer.renderProductTypeDecl(
       ctx, ProductTypeDecl.ID(of)!, referringFrom)
     let docID = ProductTypeDecl.ID(of)!
     summary = ctx.documentation.symbols.productTypeDocs[docID]?.generalDescription.summary
@@ -222,14 +223,15 @@ public func renderTypeAliasPage(
   ctx: GenerationContext, of: TypeAliasDecl.ID, with doc: TypeAliasDocumentation?
 ) throws -> String {
   let decl: TypeAliasDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
   args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderTypeAliasDecl(of)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
   args["pageType"] = "Type Alias"
-  args["declarationPreview"] = ctx.renderers.block.renderTypeAliasDecl(of)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
@@ -257,15 +259,16 @@ public func renderBindingPage(
   ctx: GenerationContext, of: BindingDecl.ID, with doc: BindingDocumentation?
 ) throws -> String {
   let decl: BindingDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   args["name"] = "binding"
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderBindingDecl(of)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
   args["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
-  args["declarationPreview"] = ctx.renderers.block.renderBindingDecl(of)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
 
   if let doc = doc {
     if let summary = doc.common.summary {
@@ -333,15 +336,16 @@ public func renderFunctionPage(
   ctx: GenerationContext, of: FunctionDecl.ID, with doc: FunctionDocumentation?
 ) throws -> String {
   let decl: FunctionDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   args["name"] = decl.site.text
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderFunctionDecl(of)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
   args["pageType"] = "Function"
-  args["declarationPreview"] = ctx.renderers.block.renderFunctionDecl(of)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
@@ -405,16 +409,17 @@ public func renderMethodPage(
   ctx: GenerationContext, of: MethodDecl.ID, with doc: MethodDeclDocumentation?
 ) throws -> String {
   let decl: MethodDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   // TODO address the case where the function has no name
   args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderMethodDecl(of)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
   args["pageType"] = "Method"
-  args["declarationPreview"] = ctx.renderers.block.renderMethodDecl(of)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
@@ -496,16 +501,17 @@ public func renderSubscriptPage(
   ctx: GenerationContext, of: SubscriptDecl.ID, with doc: SubscriptDeclDocumentation?
 ) throws -> String {
   let decl: SubscriptDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   args["name"] = decl.site.text
 
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderSubscriptDecl(of)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
   args["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
-  args["declarationPreview"] = ctx.renderers.block.renderSubscriptDecl(of)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
@@ -579,16 +585,17 @@ public func renderInitializerPage(
   ctx: GenerationContext, of: InitializerDecl.ID, with doc: InitializerDocumentation?
 ) throws -> String {
   let decl: InitializerDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   // TODO address the case where the function has no name
   args["name"] = decl.site.text
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderInitializerDecl(of)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
   args["pageType"] = "Initializer"
-  args["declarationPreview"] = ctx.renderers.block.renderInitializerDecl(of)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
@@ -641,15 +648,16 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
   throws -> String
 {
   let decl: TraitDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderTraitDecl(of)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
   args["pageType"] = "Trait"
-  args["declarationPreview"] = ctx.renderers.block.renderTraitDecl(of)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
 
   if let doc = doc {
     if let summary = doc.common.summary {
@@ -690,9 +698,10 @@ public func renderProductTypePage(
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = ctx.renderers.simple.renderProductTypeDecl(ctx, of, target)
+  args["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx, of, target)
   args["pageType"] = "Product Type"
-  args["declarationPreview"] = ctx.renderers.block.renderProductTypeDecl(ctx, of, target)
+  args["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(
+    ctx, of, target)
 
   if let doc = doc {
     if let summary = doc.generalDescription.summary {

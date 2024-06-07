@@ -2,204 +2,246 @@ import Foundation
 import FrontEnd
 
 public protocol SymbolDeclRenderer {
-  func renderTraitDecl(_ n: TraitDecl.ID) -> String
-  func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String
-  func renderProductTypeDecl(
+  static func renderTraitDecl(
+    _ ctx: GenerationContext, _ n: TraitDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
+  static func renderTypeAliasDecl(
+    _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
+  static func renderProductTypeDecl(
     _ ctx: GenerationContext, _ n: ProductTypeDecl.ID, _ referringFrom: AnyTargetID
   ) -> String
-  func renderBindingDecl(_ n: BindingDecl.ID) -> String
-  func renderInitializerDecl(_ n: InitializerDecl.ID) -> String
-  func renderFunctionDecl(_ n: FunctionDecl.ID) -> String
-  func renderMethodDecl(_ n: MethodDecl.ID) -> String
-  func renderSubscriptDecl(_ n: SubscriptDecl.ID) -> String
+  static func renderBindingDecl(
+    _ ctx: GenerationContext, _ n: BindingDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
+  static func renderInitializerDecl(
+    _ ctx: GenerationContext, _ n: InitializerDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
+  static func renderFunctionDecl(
+    _ ctx: GenerationContext, _ n: FunctionDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
+  static func renderMethodDecl(
+    _ ctx: GenerationContext, _ n: MethodDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
+  static func renderSubscriptDecl(
+    _ ctx: GenerationContext, _ n: SubscriptDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String
 }
 
-public struct SymbolDeclRenderers {
-  public let simple: SimpleSymbolDecRenderer
-  public let navigation: NavigationSymbolDecRenderer
-  public let inline: DetailedInlineSymbolDeclRenderer
-  public let block: DetailedBlockSymbolDeclRenderer
+public struct SimpleSymbolDeclRenderer: SymbolDeclRenderer {
 
-  public init(program: TypedProgram, resolver: URLResolver) {
-    simple = .init(program, resolver)
-    navigation = .init(program, resolver)
-    inline = .init(program, resolver)
-    block = .init(program, resolver)
-  }
-}
-
-public struct SimpleSymbolDecRenderer: SymbolDeclRenderer {
-  private let program: TypedProgram
-  private let resolver: URLResolver
-
-  public init(_ program: TypedProgram, _ resolver: URLResolver) {
-    self.program = program
-    self.resolver = resolver
-  }
-
-  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
-    return renderSimpleTrait(program, n, true)
-  }
-
-  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
-    return renderSimpleTypeAlias(program, n, true)
-  }
-
-  public func renderProductTypeDecl(
-    _ context: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ from: AnyTargetID
+  public static func renderTraitDecl(
+    _ ctx: GenerationContext, _ n: TraitDecl.ID, _ referringFrom: AnyTargetID
   ) -> String {
-    return renderSimpleProductType(program, n, true)
+    return renderSimpleTrait(ctx, n, true, referringFrom)
   }
 
-  public func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
-    return renderSimpleBinding(program, n, true)
+  public static func renderTypeAliasDecl(
+    _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleTypeAlias(ctx, n, true, referringFrom)
   }
 
-  public func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
-    return renderSimpleInitializer(program, n, true)
+  public static func renderProductTypeDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleProductType(ctx, n, true, referringFrom)
   }
 
-  public func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
-    return renderSimpleFunction(program, n, true)
+  public static func renderBindingDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.BindingDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleBinding(ctx, n, true, referringFrom)
   }
 
-  public func renderMethodDecl(_ n: FrontEnd.MethodDecl.ID) -> String {
-    return renderSimpleMethod(program, n, true)
+  public static func renderInitializerDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.InitializerDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleInitializer(ctx, n, true, referringFrom)
   }
 
-  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
-    return renderSimpleSubscript(program, n, true)
+  public static func renderFunctionDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.FunctionDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleFunction(ctx, n, true, referringFrom)
+  }
+
+  public static func renderMethodDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.MethodDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleMethod(ctx, n, true, referringFrom)
+  }
+
+  public static func renderSubscriptDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.SubscriptDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleSubscript(ctx, n, true, referringFrom)
   }
 }
 
 public struct NavigationSymbolDecRenderer: SymbolDeclRenderer {
-  private let program: TypedProgram
-  private let resolver: URLResolver
 
-  public init(_ program: TypedProgram, _ resolver: URLResolver) {
-    self.program = program
-    self.resolver = resolver
-  }
-
-  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
-    return renderSimpleTrait(program, n, false)
-  }
-
-  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
-    return renderSimpleTypeAlias(program, n, false)
-  }
-
-  public func renderProductTypeDecl(
-    _ context: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ from: AnyTargetID
+  public static func renderTraitDecl(
+    _ ctx: GenerationContext, _ n: TraitDecl.ID, _ referringFrom: AnyTargetID
   ) -> String {
-    return renderSimpleProductType(program, n, false)
+    return renderSimpleTrait(ctx, n, false, referringFrom)
   }
 
-  public func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
-    return renderSimpleBinding(program, n, false)
+  public static func renderTypeAliasDecl(
+    _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleTypeAlias(ctx, n, false, referringFrom)
   }
 
-  public func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
-    return renderSimpleInitializer(program, n, false)
+  public static func renderProductTypeDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleProductType(ctx, n, false, referringFrom)
   }
 
-  public func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
-    return renderSimpleFunction(program, n, false)
+  public static func renderBindingDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.BindingDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleBinding(ctx, n, false, referringFrom)
   }
 
-  public func renderMethodDecl(_ n: FrontEnd.MethodDecl.ID) -> String {
-    return renderSimpleMethod(program, n, false)
+  public static func renderInitializerDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.InitializerDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleInitializer(ctx, n, false, referringFrom)
   }
 
-  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
-    return renderSimpleSubscript(program, n, false)
+  public static func renderFunctionDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.FunctionDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleFunction(ctx, n, false, referringFrom)
+  }
+
+  public static func renderMethodDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.MethodDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleMethod(ctx, n, false, referringFrom)
+  }
+
+  public static func renderSubscriptDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.SubscriptDecl.ID, _ referringFrom: AnyTargetID
+  ) -> String {
+    return renderSimpleSubscript(ctx, n, false, referringFrom)
   }
 }
 
-public struct DetailedInlineSymbolDeclRenderer: SymbolDeclRenderer {
-  private let program: TypedProgram
-  private let resolver: URLResolver
+public struct InlineSymbolDeclRenderer: SymbolDeclRenderer {
 
-  public init(_ program: TypedProgram, _ resolver: URLResolver) {
-    self.program = program
-    self.resolver = resolver
-  }
-
-  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
-    return renderDetailedTrait(program, n, true)
-  }
-
-  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
-    return renderDetailedTypeAlias(program, n, true)
-  }
-
-  public func renderProductTypeDecl(
-    _ context: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ from: AnyTargetID
+  public static func renderTraitDecl(
+    _ ctx: GenerationContext, _ n: TraitDecl.ID, _ referrenceFrom: AnyTargetID
   ) -> String {
-    return renderDetailedProductType(context, from, n, true)
+    return renderDetailedTrait(ctx, n, true, referrenceFrom)
   }
 
-  public func renderBindingDecl(_ n: FrontEnd.BindingDecl.ID) -> String {
-    return renderDetailedBinding(program, n, true)
+  public static func renderTypeAliasDecl(
+    _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ referrenceFrom: AnyTargetID
+  ) -> String {
+    return renderDetailedTypeAlias(ctx, n, true, referrenceFrom)
   }
 
-  public func renderInitializerDecl(_ n: FrontEnd.InitializerDecl.ID) -> String {
-    return renderDetailedInitializer(program, n, true)
+  public static func renderProductTypeDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.ProductTypeDecl.ID, _ referrenceFrom: AnyTargetID
+  ) -> String {
+    return renderDetailedProductType(ctx, n, true, referrenceFrom)
   }
 
-  public func renderFunctionDecl(_ n: FrontEnd.FunctionDecl.ID) -> String {
-    return renderDetailedFunction(program, n, true)
+  public static func renderBindingDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.BindingDecl.ID, _ referrenceFrom: AnyTargetID
+  )
+    -> String
+  {
+    return renderDetailedBinding(ctx, n, true, referrenceFrom)
   }
 
-  public func renderMethodDecl(_ n: FrontEnd.MethodDecl.ID) -> String {
-    return renderDetailedMethod(program, n, true)
+  public static func renderInitializerDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.InitializerDecl.ID, _ referrenceFrom: AnyTargetID
+  ) -> String {
+    return renderDetailedInitializer(ctx, n, true, referrenceFrom)
   }
 
-  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
-    return renderDetailedSubscript(program, n, true)
+  public static func renderFunctionDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.FunctionDecl.ID, _ referrenceFrom: AnyTargetID
+  )
+    -> String
+  {
+    return renderDetailedFunction(ctx, n, true, referrenceFrom)
+  }
+
+  public static func renderMethodDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.MethodDecl.ID, _ referrenceFrom: AnyTargetID
+  )
+    -> String
+  {
+    return renderDetailedMethod(ctx, n, true, referrenceFrom)
+  }
+
+  public static func renderSubscriptDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.SubscriptDecl.ID, _ referrenceFrom: AnyTargetID
+  )
+    -> String
+  {
+    return renderDetailedSubscript(ctx, n, true, referrenceFrom)
   }
 }
 
-public struct DetailedBlockSymbolDeclRenderer: SymbolDeclRenderer {
-  private let program: TypedProgram
-  private let resolver: URLResolver
+public struct BlockSymbolDeclRenderer: SymbolDeclRenderer {
 
-  public init(_ program: TypedProgram, _ resolver: URLResolver) {
-    self.program = program
-    self.resolver = resolver
-  }
-
-  public func renderTraitDecl(_ n: TraitDecl.ID) -> String {
-    return renderDetailedTrait(program, n, false)
-  }
-
-  public func renderTypeAliasDecl(_ n: TypeAliasDecl.ID) -> String {
-    return renderDetailedTypeAlias(program, n, false)
-  }
-
-  public func renderProductTypeDecl(
-    _ context: GenerationContext, _ n: ProductTypeDecl.ID, _ from: AnyTargetID
+  public static func renderTraitDecl(
+    _ ctx: GenerationContext, _ n: TraitDecl.ID, _ referrenceFrom: AnyTargetID
   ) -> String {
-    return renderDetailedProductType(context, from, n, false)
+    return renderDetailedTrait(ctx, n, false, referrenceFrom)
   }
 
-  public func renderBindingDecl(_ n: BindingDecl.ID) -> String {
-    return renderDetailedBinding(program, n, false)
+  public static func renderTypeAliasDecl(
+    _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ referrenceFrom: AnyTargetID
+  ) -> String {
+    return renderDetailedTypeAlias(ctx, n, false, referrenceFrom)
   }
 
-  public func renderInitializerDecl(_ n: InitializerDecl.ID) -> String {
-    return renderDetailedInitializer(program, n, false)
+  public static func renderProductTypeDecl(
+    _ ctx: GenerationContext, _ n: ProductTypeDecl.ID, _ referrenceFrom: AnyTargetID
+  ) -> String {
+    return renderDetailedProductType(ctx, n, false, referrenceFrom)
   }
 
-  public func renderFunctionDecl(_ n: FunctionDecl.ID) -> String {
-    return renderDetailedFunction(program, n, false)
+  public static func renderBindingDecl(
+    _ ctx: GenerationContext, _ n: BindingDecl.ID, _ referrenceFrom: AnyTargetID
+  ) -> String {
+    return renderDetailedBinding(ctx, n, false, referrenceFrom)
   }
 
-  public func renderMethodDecl(_ n: FrontEnd.MethodDecl.ID) -> String {
-    return renderDetailedMethod(program, n, false)
+  public static func renderInitializerDecl(
+    _ ctx: GenerationContext, _ n: InitializerDecl.ID, _ referrenceFrom: AnyTargetID
+  )
+    -> String
+  {
+    return renderDetailedInitializer(ctx, n, false, referrenceFrom)
   }
 
-  public func renderSubscriptDecl(_ n: FrontEnd.SubscriptDecl.ID) -> String {
-    return renderDetailedSubscript(program, n, false)
+  public static func renderFunctionDecl(
+    _ ctx: GenerationContext, _ n: FunctionDecl.ID, _ referrenceFrom: AnyTargetID
+  ) -> String {
+    return renderDetailedFunction(ctx, n, false, referrenceFrom)
+  }
+
+  public static func renderMethodDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.MethodDecl.ID, _ referrenceFrom: AnyTargetID
+  )
+    -> String
+  {
+    return renderDetailedMethod(ctx, n, false, referrenceFrom)
+  }
+
+  public static func renderSubscriptDecl(
+    _ ctx: GenerationContext, _ n: FrontEnd.SubscriptDecl.ID, _ referrenceFrom: AnyTargetID
+  )
+    -> String
+  {
+    return renderDetailedSubscript(ctx, n, false, referrenceFrom)
   }
 }
