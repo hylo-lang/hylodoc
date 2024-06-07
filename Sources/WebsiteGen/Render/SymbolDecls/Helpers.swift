@@ -54,10 +54,6 @@ func wrapParamName(_ inner: String) -> String {
   return wrap("span", inner, className: "parameter-name")
 }
 
-func wrapCodeBlock(_ inner: String) -> String {
-  return wrap("div", inner, className: "code")
-}
-
 func wrap(_ element: String, _ inner: String, className: String? = nil, href: String? = nil)
   -> String
 {

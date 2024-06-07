@@ -11,7 +11,7 @@ func renderDetailedTrait(
 
   let result = "\(wrapKeyword("trait")) \(identifier)"
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedTypeAlias(
@@ -27,7 +27,7 @@ func renderDetailedTypeAlias(
   let nameExpr = ctx.typedProgram.ast[NameExpr.ID(typeAlias.aliasedType)]!
   result += wrapType(nameExpr.name.value.stem)
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedProductType(
@@ -68,7 +68,7 @@ func renderDetailedProductType(
     }
   }
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedBinding(
@@ -95,7 +95,7 @@ func renderDetailedBinding(
     result += ": \(wrapType(name))"
   }
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedInitializer(
@@ -107,7 +107,7 @@ func renderDetailedInitializer(
   var result = wrapKeyword("init")
   result += "(\(renderDetailedParams(ctx, initializer.parameters, inline, referringFrom)))"
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedFunction(
@@ -135,7 +135,7 @@ func renderDetailedFunction(
 
   result += " { \(wrapKeyword(effect)) }"
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedMethod(
@@ -166,7 +166,7 @@ func renderDetailedMethod(
 
   result += "}"
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedSubscript(
@@ -207,7 +207,7 @@ func renderDetailedSubscript(
 
   result += "}"
 
-  return inline ? result : wrapCodeBlock(result)
+  return result
 }
 
 func renderDetailedParams(

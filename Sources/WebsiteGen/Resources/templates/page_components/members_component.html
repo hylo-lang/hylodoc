@@ -1,18 +1,18 @@
 {% if members %}
-    <div class="content-section">
-        <h1>Members</h1>
-        {% for key,values in members %}
-        <h3>{{ key }}</h3>
-        <div class="content-section">
-            <ul>
-            {% for name, summary in values %}
-                <li>
-                    {{ name }}
-                    {{ summary }}
-                </li>
-            {% endfor %}
-            </ul>
-        </div>
-        {% endfor %}
-    </div>
+<div class="content-section">
+  <h1>Members</h1>
+  {% for key,values in members %}
+  <h3>{{ key }}</h3>
+  <div class="content-section">
+    <ul>
+      {% for name, summary in values %}
+      <li>
+        <code><pre>{{ name }}</pre></code>
+        {{ summary }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>
 {% endif %}
