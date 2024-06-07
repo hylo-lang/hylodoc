@@ -8,8 +8,9 @@ func renderDetailedTrait(
 {
   let trait = ctx.typedProgram.ast[n]
   let identifier = trait.identifier.value
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  let result = "\(wrapKeyword("trait")) \(identifier)"
+  let result = "\(wrapKeyword("trait")) \(wrapSymbolName(identifier, href: symbolUrl))"
 
   return result
 }
@@ -21,8 +22,9 @@ func renderDetailedTypeAlias(
 {
   let typeAlias = ctx.typedProgram.ast[n]
   let identifier = typeAlias.identifier.value
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  var result = "\(wrapKeyword("typealias")) \(identifier) = "
+  var result = "\(wrapKeyword("typealias")) \(wrapSymbolName(identifier, href: symbolUrl)) = "
 
   let nameExpr = ctx.typedProgram.ast[NameExpr.ID(typeAlias.aliasedType)]!
   result += wrapType(nameExpr.name.value.stem)
@@ -37,21 +39,11 @@ func renderDetailedProductType(
   -> String
 {
   let productType = ctx.typedProgram.ast[n]
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?
-    .description
+  let identifier = productType.identifier.value
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  var result = "\(wrapKeyword("type")) \(wrapSymbolName(productType.baseName, href: symbolUrl))"
+  var result = "\(wrapKeyword("type")) \(wrapSymbolName(identifier, href: symbolUrl))"
   let baseLength = productType.baseName.count + 8
-
-  // let to = AnyTargetID.symbol(AnyDeclID(n))
-
-  // let x: BundledNode<ProductTypeDecl.ID, TypedProgram> = program[n]
-  // print(x.)
-
-  // print(x?.description ?? "-")
-  // print(from)
-  // print(to)
-  // print(resolver)
 
   if !productType.conformances.isEmpty {
     result += " : "
@@ -87,7 +79,9 @@ func renderDetailedBinding(
     result += "\(wrapKeyword("static")) "
   }
 
-  result += "\(wrapKeyword(introducer)) \(variable.baseName)"
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+
+  result += "\(wrapKeyword(introducer)) \(wrapSymbolName(variable.baseName, href: symbolUrl))"
 
   if bindingPattern.annotation != nil, let d = NameExpr.ID(bindingPattern.annotation!) {
     let nameExpr = ctx.typedProgram.ast[d]
@@ -104,7 +98,9 @@ func renderDetailedInitializer(
   -> String
 {
   let initializer = ctx.typedProgram.ast[n]
-  var result = wrapKeyword("init")
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+
+  var result = wrapSymbolName("init", href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, initializer.parameters, inline, referringFrom)))"
 
   return result
@@ -123,7 +119,9 @@ func renderDetailedFunction(
     result += "\(wrapKeyword("static")) "
   }
 
-  result += "\(wrapKeyword("fun")) \(identifier)"
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+
+  result += "\(wrapKeyword("fun")) \(wrapSymbolName(identifier, href: symbolUrl))"
   result += "(\(renderDetailedParams(ctx, function.parameters, inline, referringFrom)))"
 
   if let output = getOutput(ctx.typedProgram, function.output) {
@@ -147,7 +145,9 @@ func renderDetailedMethod(
   let identifier = method.identifier.value
   var result = ""
 
-  result += "\(wrapKeyword("fun")) \(identifier)"
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+
+  result += "\(wrapKeyword("fun")) \(wrapSymbolName(identifier, href: symbolUrl))"
   result += "(\(renderDetailedParams(ctx, method.parameters, inline, referringFrom)))"
 
   if let output = getOutput(ctx.typedProgram, method.output) {
@@ -184,7 +184,9 @@ func renderDetailedSubscript(
   result += wrapKeyword(String(describing: sub.introducer.value))
 
   if let identifier = sub.identifier {
-    result += " \(identifier.value)"
+    let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?
+      .description
+    result += " \(wrapSymbolName(identifier.value, href: symbolUrl))"
   }
 
   if sub.introducer.value == SubscriptDecl.Introducer.subscript {

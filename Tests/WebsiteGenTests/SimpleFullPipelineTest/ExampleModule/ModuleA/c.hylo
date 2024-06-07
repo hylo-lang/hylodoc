@@ -1,0 +1,14 @@
+/// This is my trait, its great!
+public trait TraitA {}
+
+public type TypeA : TraitA {
+  public typealias Element = Float64
+
+  public var x: Int
+
+  public init(count n: Int) {}
+
+  // public fun test() -> Int {}
+
+  public fun functionSmall(_ world: Float64) -> Element {}
+}
