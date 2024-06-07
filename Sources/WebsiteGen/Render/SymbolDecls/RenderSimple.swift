@@ -73,8 +73,9 @@ func renderSimpleInitializer(
   let initializer = ctx.typedProgram.ast[n]
   let params = renderSimpleParams(ctx, initializer.parameters, referringFrom)
 
-  var result = "init(\(params))"
-  result = raw ? result : wrapParamName(result)
+  var result = raw ? "init" : wrapKeyword("init")
+  let tail = "(\(params))"
+  result += raw ? tail : wrapParamName(tail)
 
   return result
 }

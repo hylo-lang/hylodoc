@@ -10,7 +10,7 @@ func renderDetailedTrait(
   let identifier = trait.identifier.value
   let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  let result = "\(wrapKeyword("trait")) \(wrapSymbolName(identifier, href: symbolUrl))"
+  let result = wrapLink("\(wrapKeyword("trait")) \(identifier)", href: symbolUrl)
 
   return result
 }
@@ -24,10 +24,10 @@ func renderDetailedTypeAlias(
   let identifier = typeAlias.identifier.value
   let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  var result = "\(wrapKeyword("typealias")) \(wrapSymbolName(identifier, href: symbolUrl)) = "
+  var result = wrapLink("\(wrapKeyword("typealias")) \(identifier)", href: symbolUrl)
 
   let nameExpr = ctx.typedProgram.ast[NameExpr.ID(typeAlias.aliasedType)]!
-  result += wrapType(nameExpr.name.value.stem)
+  result += " = \(wrapType(nameExpr.name.value.stem))"
 
   return result
 }
@@ -42,7 +42,7 @@ func renderDetailedProductType(
   let identifier = productType.identifier.value
   let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  var result = "\(wrapKeyword("type")) \(wrapSymbolName(identifier, href: symbolUrl))"
+  var result = wrapLink("\(wrapKeyword("type")) \(identifier)", href: symbolUrl)
   let baseLength = productType.baseName.count + 8
 
   if !productType.conformances.isEmpty {
@@ -79,9 +79,11 @@ func renderDetailedBinding(
     result += "\(wrapKeyword("static")) "
   }
 
+  let identifier = variable.baseName
   let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  result += "\(wrapKeyword(introducer)) \(wrapSymbolName(variable.baseName, href: symbolUrl))"
+  result += "\(wrapKeyword(introducer)) \(identifier)"
+  result = wrapLink(result, href: symbolUrl)
 
   if bindingPattern.annotation != nil, let d = NameExpr.ID(bindingPattern.annotation!) {
     let nameExpr = ctx.typedProgram.ast[d]
@@ -100,7 +102,7 @@ func renderDetailedInitializer(
   let initializer = ctx.typedProgram.ast[n]
   let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  var result = wrapSymbolName("init", href: symbolUrl)
+  var result = wrapLink(wrapKeyword("init"), href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, initializer.parameters, inline, referringFrom)))"
 
   return result
@@ -121,7 +123,8 @@ func renderDetailedFunction(
 
   let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  result += "\(wrapKeyword("fun")) \(wrapSymbolName(identifier, href: symbolUrl))"
+  result += "\(wrapKeyword("fun")) \(identifier)"
+  result = wrapLink(result, href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, function.parameters, inline, referringFrom)))"
 
   if let output = getOutput(ctx.typedProgram, function.output) {
@@ -147,7 +150,7 @@ func renderDetailedMethod(
 
   let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
 
-  result += "\(wrapKeyword("fun")) \(wrapSymbolName(identifier, href: symbolUrl))"
+  result += wrapLink("\(wrapKeyword("fun")) \(identifier)", href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, method.parameters, inline, referringFrom)))"
 
   if let output = getOutput(ctx.typedProgram, method.output) {
@@ -184,10 +187,11 @@ func renderDetailedSubscript(
   result += wrapKeyword(String(describing: sub.introducer.value))
 
   if let identifier = sub.identifier {
-    let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?
-      .description
-    result += " \(wrapSymbolName(identifier.value, href: symbolUrl))"
+    result += " \(identifier.value)"
   }
+
+  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  result = wrapLink(result, href: symbolUrl)
 
   if sub.introducer.value == SubscriptDecl.Introducer.subscript {
     result += "(\(renderDetailedParams(ctx, sub.parameters, inline, referringFrom)))"

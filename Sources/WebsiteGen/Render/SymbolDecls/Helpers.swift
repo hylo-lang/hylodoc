@@ -42,7 +42,7 @@ func wrapType(_ inner: String) -> String {
   return wrap("a", inner, className: "type")
 }
 
-func wrapSymbolName(_ inner: String, href: String? = nil) -> String {
+func wrapLink(_ inner: String, href: String? = nil) -> String {
   if href == nil {
     return inner
   }
