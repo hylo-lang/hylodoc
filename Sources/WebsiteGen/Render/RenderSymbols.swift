@@ -2,17 +2,129 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 import MarkdownKit
+import OrderedCollections
 
-func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: GenerationContext) -> [(name: String, url: String)] {
-  decls.map { declId in 
-    return (
-      getMembers(ctx: ctx, of: declId).name,
-      ctx.urlResolver.refer(
-        from: referringFrom,
-        to: .symbol(AnyDeclID(declId))
-      )?.description ?? ""
-    )
+typealias nameAndContent = (name: String, summary: String)
+typealias nameAndContentArray = [nameAndContent]
+
+/// Get the members of a declaration
+/// - Parameters:
+///   - referringFrom: 
+///   - decls: array of declaration IDs
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating
+/// - Returns: dictionary with keys as section names and values as arrays of tuples containing name (as an HTML string, including url) and summary of the member
+func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: GenerationContext)
+  -> [OrderedDictionary<String, nameAndContentArray>.Element]
+{
+  // the order of the buckets is what determines the order of the sections in the page
+    var buckets: OrderedDictionary<String, nameAndContentArray> = [
+        "Associated Types": [],
+        "Associated Values": [],
+        "Type Aliases": [],
+        "Bindings": [],
+        "Operators": [],
+        "Functions": [],
+        "Methods": [],
+        "Method Implementations": [],
+        "Subscripts": [],
+        "Subscript Implementations": [],
+        "Initializers": [],
+        "Traits": [],
+        "Product Types": []
+    ]
+  let _ = decls.map { declId in
+    let (name, summary, key) = getMemberNameAndSummary(ctx: ctx, of: declId)
+    buckets[key, default: []].append((name: name, summary: summary))
   }
+  return buckets.filter{ !$0.value.isEmpty}.map{$0}
+}
+
+/// Get the name and summary of a member
+/// - Parameters:
+///   - ctx: context for page generation, containing documentation database, ast and stencil templating 
+///   - of: member declaration to get name and summary of
+/// - Returns: name, summary of the member, and key of the section it belongs to in prepareMembersData
+func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID) -> (name: String, summary: String, key: String) {
+    var name: String 
+    var summary: Block?
+    var key: String
+
+    switch of.kind {
+    // TODO Mark needs to implement this
+    // case AssociatedTypeDecl.self:
+    //     name = ctx.renderers.inline.renderAssociatedTypeDecl(AssociatedTypeDecl.ID(of)!)
+    //     let docID = AssociatedTypeDecl.ID(of)!
+    //     summary = ctx.documentation.symbols.associatedTypeDocs[docID]?.common.summary
+    //     key = "Associated Types"
+    // TODO Mark needs to implement this
+    // case AssociatedValueDecl.self:
+    //     name = ctx.renderers.inline.renderAssociatedValueDecl(AssociatedValueDecl.ID(of)!)
+    //     let docID = AssociatedValueDecl.ID(of)!
+    //     summary = ctx.documentation.symbols.associatedValueDocs[docID]?.common.summary
+    //     key = "Associated Values"
+    case TypeAliasDecl.self:
+        name = ctx.renderers.inline.renderTypeAliasDecl(TypeAliasDecl.ID(of)!)
+        let docID = TypeAliasDecl.ID(of)!
+        summary = ctx.documentation.symbols.typeAliasDocs[docID]?.common.summary
+        key = "Type Aliases"
+    case BindingDecl.self:
+        name = ctx.renderers.inline.renderBindingDecl(BindingDecl.ID(of)!)
+        let docID = BindingDecl.ID(of)!
+        summary = ctx.documentation.symbols.bindingDocs[docID]?.common.summary
+        key = "Bindings"
+    // TODO Mark needs to implement this
+    // case OperatorDecl.self:
+    //     name = ctx.renderers.inline.renderOperatorDecl(OperatorDecl.ID(of)!)
+    //     let docID = OperatorDecl.ID(of)!
+    //     summary = ctx.documentation.symbols.operatorDocs[docID]?.documentation.summary
+    //     key = "Operators"
+    case FunctionDecl.self:
+        name = ctx.renderers.inline.renderFunctionDecl(FunctionDecl.ID(of)!)
+        let docID = FunctionDecl.ID(of)!
+        summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.summary
+        key = "Functions"
+    case MethodDecl.self:
+        name = ctx.renderers.inline.renderMethodDecl(MethodDecl.ID(of)!)
+        let docID = MethodDecl.ID(of)!
+        summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.summary
+        key = "Methods"
+    // not expected to be used, needed for exhaustive switch
+    case MethodImpl.self:
+        fatalError("Method implementation should not be rendered")
+    case SubscriptDecl.self:
+        name = ctx.renderers.inline.renderSubscriptDecl(SubscriptDecl.ID(of)!)
+        let docID = SubscriptDecl.ID(of)!
+        summary = ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.generalDescription.summary
+        key = "Subscripts"
+    // not expected to be used, needed for exhaustive switch
+    case SubscriptImpl.self:
+        fatalError("Subscript implementation should not be rendered")
+    case InitializerDecl.self:
+        name = ctx.renderers.inline.renderInitializerDecl(InitializerDecl.ID(of)!)
+        let docID = InitializerDecl.ID(of)!
+        summary = ctx.documentation.symbols.initializerDocs[docID]?.common.summary
+        key = "Initializers"
+    case TraitDecl.self:
+        name = ctx.renderers.inline.renderTraitDecl(TraitDecl.ID(of)!)
+        let docID = TraitDecl.ID(of)!
+        summary = ctx.documentation.symbols.traitDocs[docID]?.common.summary
+        key = "Traits"
+    case ProductTypeDecl.self:
+        name = ctx.renderers.inline.renderProductTypeDecl(ProductTypeDecl.ID(of)!)
+        let docID = ProductTypeDecl.ID(of)!
+        summary = ctx.documentation.symbols.productTypeDocs[docID]?.generalDescription.summary
+        key = "Product Types"
+    default:
+        name = ""
+        key = ""
+    }
+
+    if let summary = summary {
+      return (name, HtmlGenerator.standard.generate(doc: summary), key)
+    }
+    else {
+      return (name, "", key)
+    }
 }
 
 /// Render the associated-type page
@@ -23,34 +135,36 @@ func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: Gen
 ///   - with: parsed associated-type documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderAssociatedTypePage(ctx: GenerationContext, of: AssociatedTypeDecl.ID, with doc: AssociatedTypeDocumentation?) throws -> String {
-    let decl: AssociatedTypeDecl = ctx.typedProgram.ast[of]!
+public func renderAssociatedTypePage(
+  ctx: GenerationContext, of: AssociatedTypeDecl.ID, with doc: AssociatedTypeDocumentation?
+) throws -> String {
+  let decl: AssociatedTypeDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    // TODO address the case where the function has no name
-    args["name"] = decl.identifier.value
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  // TODO address the case where the function has no name
+  args["name"] = decl.identifier.value
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    args["pageTitle"] = decl.identifier.value
-    args["pageType"] = "Associated Type"
-    args["declarationPreview"] = decl.site.text // todo
-    
-    if let doc = doc {
-      // Summary
-      if let summary = doc.common.summary {
-        args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
+  args["pageTitle"] = decl.identifier.value
+  args["pageType"] = "Associated Type"
+  args["declarationPreview"] = decl.site.text  // todo
 
-      // Details
-      if let block = doc.common.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-
-      args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    // Summary
+    if let summary = doc.common.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
-    
-    return try ctx.stencil.renderTemplate(name: "associated_type_layout.html", context: args)
+
+    // Details
+    if let block = doc.common.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
+
+    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  }
+
+  return try ctx.stencil.renderTemplate(name: "associated_type_layout.html", context: args)
 }
 
 /// Render the associated-value page
@@ -66,30 +180,30 @@ public func renderAssociatedValuePage(
 ) throws -> String {
   let decl: AssociatedValueDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    args["name"] = decl.identifier.value
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["name"] = decl.identifier.value
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    args["pageTitle"] = decl.identifier.value
-    args["pageType"] = "Associated Value"
-    args["declarationPreview"] = decl.site.text // todo
+  args["pageTitle"] = decl.identifier.value
+  args["pageType"] = "Associated Value"
+  args["declarationPreview"] = decl.site.text  // todo
 
-    if let doc = doc {
-      // Summary
-      if let summary = doc.common.summary {
-          args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
-
-      // Details
-      if let block = doc.common.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-
-      args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    // Summary
+    if let summary = doc.common.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    return try ctx.stencil.renderTemplate(name: "associated_value_layout.html", context: args)
+    // Details
+    if let block = doc.common.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
+
+    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  }
+
+  return try ctx.stencil.renderTemplate(name: "associated_value_layout.html", context: args)
 }
 
 /// Render the type-alias page
@@ -109,9 +223,9 @@ public func renderTypeAliasPage(
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-  args["pageTitle"] = decl.identifier.value // todo
+  args["pageTitle"] = ctx.renderers.simple.renderTypeAliasDecl(of)
   args["pageType"] = "Type Alias"
-  args["declarationPreview"] = decl.site.text // todo
+  args["declarationPreview"] = ctx.renderers.block.renderTypeAliasDecl(of)
 
   if let doc = doc {
     // Summary
@@ -135,31 +249,33 @@ public func renderTypeAliasPage(
 ///   - with: parsed binding documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderBindingPage(ctx: GenerationContext, of: BindingDecl.ID, with doc: BindingDocumentation?) throws -> String {
-    let decl: BindingDecl = ctx.typedProgram.ast[of]!
+public func renderBindingPage(
+  ctx: GenerationContext, of: BindingDecl.ID, with doc: BindingDocumentation?
+) throws -> String {
+  let decl: BindingDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    args["name"] = "binding"
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["name"] = "binding"
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    args["pageTitle"] = decl.site.text // todo
-    args["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
-    args["declarationPreview"] = decl.site.text // todo
+  args["pageTitle"] = ctx.renderers.simple.renderBindingDecl(of)
+  args["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
+  args["declarationPreview"] = ctx.renderers.block.renderBindingDecl(of)
 
-    if let doc = doc {
-      if let summary = doc.common.summary {
-          args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
-      if let block = doc.common.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-
-      args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
-
-      args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    if let summary = doc.common.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
-    return try ctx.stencil.renderTemplate(name: "binding_layout.html", context: args)
+    if let block = doc.common.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
+
+    args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
+
+    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  }
+  return try ctx.stencil.renderTemplate(name: "binding_layout.html", context: args)
 }
 
 /// Render the operator page
@@ -170,34 +286,35 @@ public func renderBindingPage(ctx: GenerationContext, of: BindingDecl.ID, with d
 ///   - with: parsed operator documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderOperatorPage(ctx: GenerationContext, of: OperatorDecl.ID, with doc: OperatorDocumentation?) throws -> String {
-    let decl: OperatorDecl = ctx.typedProgram.ast[of]!
+public func renderOperatorPage(
+  ctx: GenerationContext, of: OperatorDecl.ID, with doc: OperatorDocumentation?
+) throws -> String {
+  let decl: OperatorDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    // TODO address the case where the function has no name
-    args["name"] = decl.name.value
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  // TODO address the case where the function has no name
+  args["name"] = decl.name.value
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    args["pageTitle"] = decl.site.text // todo
-    args["pageType"] = "Operator Introducer"
-    args["declarationPreview"] = decl.site.text // todo
+  args["pageTitle"] = decl.site.text  // todo
+  args["pageType"] = "Operator Introducer"
+  args["declarationPreview"] = decl.site.text  // todo
 
-    if let doc = doc {
-      // Summary
-      if let summary = doc.documentation.summary {
-        args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
-
-      // Details
-      if let block = doc.documentation.description {
-        args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-      args["seeAlso"] = doc.documentation.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    // Summary
+    if let summary = doc.documentation.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
+    // Details
+    if let block = doc.documentation.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
+    args["seeAlso"] = doc.documentation.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  }
 
-    return try ctx.stencil.renderTemplate(name: "operator_layout.html", context: args)
+  return try ctx.stencil.renderTemplate(name: "operator_layout.html", context: args)
 }
 
 /// Render the function page
@@ -218,11 +335,11 @@ public func renderFunctionPage(
   args["name"] = decl.site.text
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-  args["pageTitle"] = decl.site.text // todo
+  args["pageTitle"] = ctx.renderers.simple.renderFunctionDecl(of)
   args["pageType"] = "Function"
-  args["declarationPreview"] = decl.site.text // todo
+  args["declarationPreview"] = ctx.renderers.block.renderFunctionDecl(of)
 
-    if let doc = doc {
+  if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.summary {
       args["summary"] = HtmlGenerator.standard.generate(doc: summary)
@@ -280,58 +397,72 @@ public func renderFunctionPage(
 ///   - with: parsed method documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderMethodPage(ctx: GenerationContext, of: MethodDecl.ID, with doc: MethodDeclDocumentation?) throws -> String {
-    let decl: MethodDecl = ctx.typedProgram.ast[of]!
+public func renderMethodPage(
+  ctx: GenerationContext, of: MethodDecl.ID, with doc: MethodDeclDocumentation?
+) throws -> String {
+  let decl: MethodDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    // TODO address the case where the function has no name
-    args["name"] = decl.identifier.value
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  // TODO address the case where the function has no name
+  args["name"] = decl.identifier.value
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    args["pageTitle"] = decl.site.text // todo
-    args["pageType"] = "Method"
-    args["declarationPreview"] = decl.site.text // todo
+  args["pageTitle"] = ctx.renderers.simple.renderMethodDecl(of)
+  args["pageType"] = "Method"
+  args["declarationPreview"] = ctx.renderers.block.renderMethodDecl(of)
 
-    if let doc = doc {
-      // Summary
-      if let summary = doc.documentation.common.summary {
-          args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
-
-      // Details
-      if let block = doc.documentation.common.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-
-      args["preconditions"] = doc.documentation.preconditions.map { HtmlGenerator.standard.generate(doc: $0.description) }
-      args["postconditions"] = doc.documentation.postconditions.map { HtmlGenerator.standard.generate(doc: $0.description) }
-
-      if let returns = doc.documentation.returns {
-          switch returns {
-          case .always(let block):
-              args["returns"] = [HtmlGenerator.standard.generate(doc: block)]
-          case .cases(let blocks):
-              args["returns"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-          }
-      }
-      if let throwsInfo = doc.documentation.throwsInfo {
-          switch throwsInfo {
-          case .generally(let block):
-              args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
-          case .cases(let blocks):
-              args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-          }
-      }
-
-      args["parameters"] = doc.documentation.parameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }
-      args["genericParameters"] = doc.documentation.genericParameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }
-
-      args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
-      
-      args["seeAlso"] = doc.documentation.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    // Summary
+    if let summary = doc.documentation.common.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
-    return try ctx.stencil.renderTemplate(name: "method_layout.html", context: args)
+
+    // Details
+    if let block = doc.documentation.common.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
+
+    args["preconditions"] = doc.documentation.preconditions.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+    args["postconditions"] = doc.documentation.postconditions.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+
+    if let returns = doc.documentation.returns {
+      switch returns {
+      case .always(let block):
+        args["returns"] = [HtmlGenerator.standard.generate(doc: block)]
+      case .cases(let blocks):
+        args["returns"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
+      }
+    }
+    if let throwsInfo = doc.documentation.throwsInfo {
+      switch throwsInfo {
+      case .generally(let block):
+        args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
+      case .cases(let blocks):
+        args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
+      }
+    }
+
+    args["parameters"] = doc.documentation.parameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+    args["genericParameters"] = doc.documentation.genericParameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+
+    // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
+    args["members"] = prepareMembersData(
+    referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map{member in AnyDeclID(member)}, ctx: ctx)
+
+    args["seeAlso"] = doc.documentation.common.seeAlso.map {
+      HtmlGenerator.standard.generate(doc: $0)
+    }
+  }
+  return try ctx.stencil.renderTemplate(name: "method_layout.html", context: args)
 }
 
 /// Render the method-implementation page
@@ -356,54 +487,64 @@ public func renderMethodImplementationPage(
 ///   - with: parsed subscript documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderSubscriptPage(ctx: GenerationContext, of: SubscriptDecl.ID, with doc: SubscriptDeclDocumentation?) throws -> String {
-    let decl: SubscriptDecl = ctx.typedProgram.ast[of]!
+public func renderSubscriptPage(
+  ctx: GenerationContext, of: SubscriptDecl.ID, with doc: SubscriptDeclDocumentation?
+) throws -> String {
+  let decl: SubscriptDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    args["name"] = decl.site.text
-    
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["name"] = decl.site.text
 
-    args["pageTitle"] = decl.site.text // todo
-    args["pageType"] = "Subscript" // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
-    args["declarationPreview"] = decl.site.text // todo
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    if let doc = doc { 
-      // Summary
-      if let summary = doc.documentation.generalDescription.summary {
-          args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
+  args["pageTitle"] = ctx.renderers.simple.renderSubscriptDecl(of)
+  args["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
+  args["declarationPreview"] = ctx.renderers.block.renderSubscriptDecl(of)
 
-      // Details
-      if let block = doc.documentation.generalDescription.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-
-      if let yields = doc.documentation.yields {
-          switch yields {
-          case .always(let block):
-              args["yields"] = [HtmlGenerator.standard.generate(doc: block)]
-          case .cases(let blocks):
-              args["yields"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-          }
-      }
-      if let throwsInfo = doc.documentation.throwsInfo {
-          switch throwsInfo {
-          case .generally(let block):
-              args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
-          case .cases(let blocks):
-              args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-          }
-      }
-
-      args["parameters"] = doc.documentation.parameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }
-      args["genericParameters"] = doc.documentation.genericParameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }      
-      args["seeAlso"] = doc.documentation.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    // Summary
+    if let summary = doc.documentation.generalDescription.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
-    args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
 
-    return try ctx.stencil.renderTemplate(name: "subscript_layout.html", context: args)
+    // Details
+    if let block = doc.documentation.generalDescription.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
+
+    if let yields = doc.documentation.yields {
+      switch yields {
+      case .always(let block):
+        args["yields"] = [HtmlGenerator.standard.generate(doc: block)]
+      case .cases(let blocks):
+        args["yields"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
+      }
+    }
+    if let throwsInfo = doc.documentation.throwsInfo {
+      switch throwsInfo {
+      case .generally(let block):
+        args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
+      case .cases(let blocks):
+        args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
+      }
+    }
+
+    args["parameters"] = doc.documentation.parameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+    args["genericParameters"] = doc.documentation.genericParameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+    args["seeAlso"] = doc.documentation.generalDescription.seeAlso.map {
+      HtmlGenerator.standard.generate(doc: $0)
+    }
+  }
+  // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
+  args["members"] = prepareMembersData(
+    referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map{member in AnyDeclID(member)}, ctx: ctx)
+
+  return try ctx.stencil.renderTemplate(name: "subscript_layout.html", context: args)
 }
 
 /// Render the subscript-implementation page
@@ -428,48 +569,58 @@ public func renderSubscriptImplementationPage(
 ///   - with: parsed initializer documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderInitializerPage(ctx: GenerationContext, of: InitializerDecl.ID, with doc: InitializerDocumentation?) throws -> String {
-    let decl: InitializerDecl = ctx.typedProgram.ast[of]!
+public func renderInitializerPage(
+  ctx: GenerationContext, of: InitializerDecl.ID, with doc: InitializerDocumentation?
+) throws -> String {
+  let decl: InitializerDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    // TODO address the case where the function has no name
-    args["name"] = decl.site.text
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
-    
-    args["pageTitle"] = decl.site.text // todo
-    args["pageType"] = "Initializer"
-    args["declarationPreview"] = decl.site.text // todo
+  // TODO address the case where the function has no name
+  args["name"] = decl.site.text
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    if let doc = doc {
-      // Summary
-      if let summary = doc.common.summary {
-          args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
+  args["pageTitle"] = ctx.renderers.simple.renderInitializerDecl(of)
+  args["pageType"] = "Initializer"
+  args["declarationPreview"] = ctx.renderers.block.renderInitializerDecl(of)
 
-      // Details
-      if let block = doc.common.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-
-      args["preconditions"] = doc.preconditions.map { HtmlGenerator.standard.generate(doc: $0.description) }
-      args["postconditions"] = doc.postconditions.map { HtmlGenerator.standard.generate(doc: $0.description) }
-
-      args["parameters"] = doc.parameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }
-      args["genericParameters"] = doc.genericParameters.mapValues { HtmlGenerator.standard.generate(doc: $0.description) }
-
-      if let throwsInfo = doc.throwsInfo {
-          switch throwsInfo {
-          case .generally(let block):
-              args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
-          case .cases(let blocks):
-              args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-          }
-      }
-      
-      args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    // Summary
+    if let summary = doc.common.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
-    return try ctx.stencil.renderTemplate(name: "initializer_layout.html", context: args)
+
+    // Details
+    if let block = doc.common.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
+
+    args["preconditions"] = doc.preconditions.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+    args["postconditions"] = doc.postconditions.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+
+    args["parameters"] = doc.parameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+    args["genericParameters"] = doc.genericParameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+
+    if let throwsInfo = doc.throwsInfo {
+      switch throwsInfo {
+      case .generally(let block):
+        args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
+      case .cases(let blocks):
+        args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
+      }
+    }
+
+    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  }
+  return try ctx.stencil.renderTemplate(name: "initializer_layout.html", context: args)
 }
 
 /// Render the trait page
@@ -480,35 +631,38 @@ public func renderInitializerPage(ctx: GenerationContext, of: InitializerDecl.ID
 ///   - with: parsed trait documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: TraitDocumentation?) throws -> String {
-    let decl: TraitDecl = ctx.typedProgram.ast[of]!
+public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: TraitDocumentation?)
+  throws -> String
+{
+  let decl: TraitDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    args["name"] = decl.identifier.value
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["name"] = decl.identifier.value
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    args["pageTitle"] = decl.site.text // todo
-    args["pageType"] = "Trait"
-    args["declarationPreview"] = decl.site.text // todo
+  args["pageTitle"] = ctx.renderers.simple.renderTraitDecl(of)
+  args["pageType"] = "Trait"
+  args["declarationPreview"] = ctx.renderers.block.renderTraitDecl(of)
 
-    if let doc = doc {
-      if let summary = doc.common.summary {
-          args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
-
-      if let block = doc.common.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-
-      args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
-
-      args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    if let summary = doc.common.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    args["members"] = prepareMembersData(referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
+    if let block = doc.common.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
+    }
 
-    return try ctx.stencil.renderTemplate(name: "trait_layout.html", context: args)
+    args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
+
+    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  }
+
+  args["members"] = prepareMembersData(
+    referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
+
+  return try ctx.stencil.renderTemplate(name: "trait_layout.html", context: args)
 }
 
 /// Render the product-type page
@@ -519,114 +673,36 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
 ///   - with: parsed product-type documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderProductTypePage(ctx: GenerationContext, of: ProductTypeDecl.ID, with doc: ProductTypeDocumentation?) throws -> String {
-    let decl: ProductTypeDecl = ctx.typedProgram.ast[of]!
+public func renderProductTypePage(
+  ctx: GenerationContext, of: ProductTypeDecl.ID, with doc: ProductTypeDocumentation?
+) throws -> String {
+  let decl: ProductTypeDecl = ctx.typedProgram.ast[of]!
 
-    var args: [String : Any] = [:]
+  var args: [String: Any] = [:]
 
-    args["name"] = decl.identifier.value
-    args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["name"] = decl.identifier.value
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-    args["pageTitle"] = decl.site.text // todo
-    args["pageType"] = "Product Type"
-    args["declarationPreview"] = decl.site.text // todo
+  args["pageTitle"] = ctx.renderers.simple.renderProductTypeDecl(of)
+  args["pageType"] = "Product Type"
+  args["declarationPreview"] = ctx.renderers.block.renderProductTypeDecl(of)
 
-    if let doc = doc {
-      if let summary = doc.generalDescription.summary {
-          args["summary"] = HtmlGenerator.standard.generate(doc: summary)
-      }
-
-      if let block = doc.generalDescription.description {
-          args["details"] = HtmlGenerator.standard.generate(doc: block)
-      }
-      args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
-      args["seeAlso"] = doc.generalDescription.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+  if let doc = doc {
+    if let summary = doc.generalDescription.summary {
+      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
-    
-    args["members"] = prepareMembersData(referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
-    return try ctx.stencil.renderTemplate(name: "product_type_layout.html", context: args)
-}
-
-func getMembers(ctx: GenerationContext, of: AnyDeclID) -> (name: String, summary: Block?) {
-    switch of.kind {
-    case AssociatedTypeDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! AssociatedTypeDecl
-        let name = astDecl.identifier.value
-        let docID = AssociatedTypeDecl.ID(of)!
-        let summary = ctx.documentation.symbols.associatedTypeDocs[docID]?.common.summary
-        return (name, summary)
-    case AssociatedValueDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! AssociatedValueDecl
-        let name = astDecl.identifier.value
-        let docID = AssociatedValueDecl.ID(of)!
-        let summary = ctx.documentation.symbols.associatedValueDocs[docID]?.common.summary
-        return (name, summary)
-    case TypeAliasDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! TypeAliasDecl
-        let name = astDecl.identifier.value
-        let docID = TypeAliasDecl.ID(of)!
-        let summary = ctx.documentation.symbols.typeAliasDocs[docID]?.common.summary
-        return (name, summary)
-    // temporary, need Mark's code to handle this
-    case BindingDecl.self:
-        let name = "binding"
-        let summary: Block? = nil
-        return (name, summary)
-    case OperatorDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! OperatorDecl
-        let name = astDecl.name.value
-        let docID = OperatorDecl.ID(of)!
-        let summary = ctx.documentation.symbols.operatorDocs[docID]?.documentation.summary
-        return (name, summary)
-    case FunctionDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! FunctionDecl
-        let name = astDecl.identifier?.value ?? "function"
-        let docID = FunctionDecl.ID(of)!
-        let summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.summary
-        return (name, summary)
-    case MethodDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! MethodDecl
-        let name = astDecl.identifier.value
-        let docID = MethodDecl.ID(of)!
-        let summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.summary
-        return (name, summary)
-    // not expected to be used, needed for exhaustive switch
-    case MethodImpl.self:
-        let name = "methodImpl"
-        let summary: Block? = nil
-        return (name, summary)
-        // fatalError("Method implementation should not be rendered")
-    case SubscriptDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! SubscriptDecl
-        let name = astDecl.identifier?.value ?? "subscript(_:)"
-        let docID = SubscriptDecl.ID(of)!
-        let summary = ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.generalDescription.summary
-        return (name, summary)
-    // not expected to be used, needed for exhaustive switch
-    case SubscriptImpl.self:
-        let name = "subscriptImpl"
-        let summary: Block? = nil
-        return (name, summary)
-        // fatalError("Subscript implementation should not be rendered")
-    case InitializerDecl.self:
-        let name = "init"
-        let docID = InitializerDecl.ID(of)!
-        let summary = ctx.documentation.symbols.initializerDocs[docID]?.common.summary
-        return (name, summary)
-    case TraitDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! TraitDecl
-        let name = astDecl.identifier.value
-        let docID = TraitDecl.ID(of)!
-        let summary = ctx.documentation.symbols.traitDocs[docID]?.common.summary
-        return (name, summary)
-    case ProductTypeDecl.self:
-        let astDecl = ctx.typedProgram.ast[of]! as! ProductTypeDecl
-        let name = astDecl.identifier.value
-        let docID = ProductTypeDecl.ID(of)!
-        let summary = ctx.documentation.symbols.productTypeDocs[docID]?.generalDescription.summary
-        return (name, summary)
-    default:
-        return ("", nil)
+    if let block = doc.generalDescription.description {
+      args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
+    args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
+    args["seeAlso"] = doc.generalDescription.seeAlso.map {
+      HtmlGenerator.standard.generate(doc: $0)
+    }
+  }
+
+  args["members"] = prepareMembersData(
+    referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
+
+  return try ctx.stencil.renderTemplate(name: "product_type_layout.html", context: args)
 }

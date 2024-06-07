@@ -39,13 +39,13 @@ public func generateDocumentation(
   // Setup Context
   let stencil = createDefaultStencilEnvironment()
   let resolver = URLResolver(baseUrl: AbsolutePath(url: target)!)
+  let renderers = SymbolDeclRenderers.init(program: typedProgram, resolver: resolver)
   var ctx = GenerationContext(
     documentation: documentation,
     stencil: stencil,
     typedProgram: typedProgram,
     urlResolver: resolver,
-    renderers: .init(
-      program: typedProgram, resolver: resolver)
+    renderers: renderers
   )
 
   // Resolve URL's
