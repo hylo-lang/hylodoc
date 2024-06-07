@@ -11,7 +11,7 @@ func renderSimpleTrait(
 
   var result = raw ? "trait" : wrapKeyword("trait")
   result += " "
-  result += raw ? identifier : wrapParamName(identifier)
+  result += raw ? identifier : wrapName(identifier)
 
   return result
 }
@@ -26,7 +26,7 @@ func renderSimpleTypeAlias(
 
   var result = raw ? "typealias" : wrapKeyword("typealias")
   result += " "
-  result += raw ? identifier : wrapParamName(identifier)
+  result += raw ? identifier : wrapName(identifier)
 
   return result
 }
@@ -39,7 +39,7 @@ func renderSimpleProductType(
   let productType = ctx.typedProgram.ast[n]
   var result = raw ? "type" : wrapKeyword("type")
   result += " "
-  result += raw ? productType.baseName : wrapParamName(productType.baseName)
+  result += raw ? productType.baseName : wrapName(productType.baseName)
   return result
 }
 
@@ -60,7 +60,7 @@ func renderSimpleBinding(
   }
   result += raw ? introducer : wrapKeyword(introducer)
   result += " "
-  result += raw ? variable.baseName : wrapParamName(variable.baseName)
+  result += raw ? variable.baseName : wrapName(variable.baseName)
 
   return result
 }
@@ -75,7 +75,7 @@ func renderSimpleInitializer(
 
   var result = raw ? "init" : wrapKeyword("init")
   let tail = "(\(params))"
-  result += raw ? tail : wrapParamName(tail)
+  result += raw ? tail : wrapName(tail)
 
   return result
 }
@@ -98,7 +98,7 @@ func renderSimpleFunction(
   result += raw ? "fun" : wrapKeyword("fun")
   result += " "
   let tail = "\(identifier)(\(renderSimpleParams(ctx, function.parameters, referringFrom)))"
-  result += raw ? tail : wrapParamName(tail)
+  result += raw ? tail : wrapName(tail)
 
   return result
 }
@@ -116,7 +116,7 @@ func renderSimpleMethod(
   result += raw ? "fun" : wrapKeyword("fun")
   result += " "
   let tail = "\(identifier)(\(renderSimpleParams(ctx, method.parameters, referringFrom)))"
-  result += raw ? tail : wrapParamName(tail)
+  result += raw ? tail : wrapName(tail)
 
   return result
 }
@@ -144,7 +144,7 @@ func renderSimpleSubscript(
     tail += "(\(renderSimpleParams(ctx, sub.parameters, referringFrom)))"
   }
 
-  result += raw ? tail : wrapParamName(tail)
+  result += raw ? tail : wrapName(tail)
 
   return result
 }

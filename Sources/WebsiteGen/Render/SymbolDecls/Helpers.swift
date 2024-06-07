@@ -71,8 +71,8 @@ func wrapLink(_ inner: String, href: String? = nil) -> String {
   return wrap("a", inner, href: href)
 }
 
-func wrapParamName(_ inner: String) -> String {
-  return wrap("span", inner, className: "parameter-name")
+func wrapName(_ inner: String) -> String {
+  return wrap("span", inner, className: "name")
 }
 
 func wrap(_ element: String, _ inner: String, className: String? = nil, href: String? = nil)

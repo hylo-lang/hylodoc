@@ -256,7 +256,7 @@ func renderDetailedParam(
 
   var result = label
   if name != label {
-    result += " \(wrapParamName(name))"
+    result += " \(wrapName(name))"
   }
 
   if let typeWrapped = renderDetailedType(ctx, type, referringFrom) {
