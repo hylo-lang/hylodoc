@@ -154,6 +154,7 @@ public func renderAssociatedTypePage(
   // TODO address the case where the function has no name
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: .symbol(AnyDeclID(of)))
 
   args["pageTitle"] = decl.identifier.value
   args["pageType"] = "Associated Type"
@@ -193,6 +194,7 @@ public func renderAssociatedValuePage(
 
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: .symbol(AnyDeclID(of)))
 
   args["pageTitle"] = decl.identifier.value
   args["pageType"] = "Associated Value"
@@ -232,6 +234,7 @@ public func renderTypeAliasPage(
   var args: [String: Any] = [:]
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
   args["pageType"] = "Type Alias"
@@ -269,6 +272,7 @@ public func renderBindingPage(
 
   args["name"] = "binding"
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
   args["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
@@ -301,12 +305,14 @@ public func renderOperatorPage(
   ctx: GenerationContext, of: OperatorDecl.ID, with doc: OperatorDocumentation?
 ) throws -> String {
   let decl: OperatorDecl = ctx.typedProgram.ast[of]!
+  let target = AnyTargetID.symbol(AnyDeclID(of))
 
   var args: [String: Any] = [:]
 
   // TODO address the case where the function has no name
   args["name"] = decl.name.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
+  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = decl.site.text  // todo
   args["pageType"] = "Operator Introducer"
@@ -346,6 +352,7 @@ public func renderFunctionPage(
 
   args["name"] = decl.site.text
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
   args["pageType"] = "Function"
@@ -420,6 +427,7 @@ public func renderMethodPage(
   // TODO address the case where the function has no name
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
   args["pageType"] = "Method"
@@ -512,6 +520,7 @@ public func renderSubscriptPage(
   args["name"] = decl.site.text
 
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
   args["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
@@ -596,6 +605,7 @@ public func renderInitializerPage(
   // TODO address the case where the function has no name
   args["name"] = decl.site.text
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
   args["pageType"] = "Initializer"
@@ -658,6 +668,7 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
 
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
   args["pageType"] = "Trait"
@@ -701,6 +712,7 @@ public func renderProductTypePage(
 
   args["name"] = decl.identifier.value
   args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
+  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
 
   args["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx, of, target)
   args["pageType"] = "Product Type"

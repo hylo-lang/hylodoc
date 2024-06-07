@@ -1,8 +1,8 @@
 import DocumentationDB
 import Foundation
+import FrontEnd
 import MarkdownKit
 import Stencil
-import FrontEnd
 
 /// Render the source-file page
 ///
@@ -19,6 +19,7 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
   env["name"] = sourceFile.name
   env["pageTitle"] = sourceFile.name
   env["pageType"] = "Source File"
+  env["breadcrumb"] = breadcrumb(ctx: ctx, target: .asset(.sourceFile(of)))
 
   // check if file has summary
   if let summaryBlock = sourceFile.generalDescription.summary {
@@ -35,7 +36,8 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
   }
 
   let translationUnit = ctx.typedProgram.ast[sourceFile.translationUnit]
-  env["members"] = prepareMembersData(referringFrom: .asset(AnyAssetID(from: of)), decls: translationUnit.decls, ctx: ctx)
+  env["members"] = prepareMembersData(
+    referringFrom: .asset(AnyAssetID(from: of)), decls: translationUnit.decls, ctx: ctx)
   return try ctx.stencil.renderTemplate(name: "source_file_layout.html", context: env)
 }
 
@@ -50,6 +52,7 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throw
   let article = ctx.documentation.assets[of]!
 
   var env: [String: Any] = [:]
+  env["breadcrumb"] = breadcrumb(ctx: ctx, target: .asset(.article(of)))
 
   if let title = article.title {
     env["name"] = title
@@ -67,7 +70,7 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throw
 
 extension Asset {
   var isIndexPage: Bool {
-    return location.isFileURL &&  isIndexPageFileName(fileName: location.lastPathComponent)
+    return location.isFileURL && isIndexPageFileName(fileName: location.lastPathComponent)
   }
 }
 func isIndexPageFileName(fileName: String) -> Bool {
@@ -91,6 +94,7 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws 
 
   arr["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.folder(of)))
   arr["pageType"] = "Folder"
+  arr["breadcrumb"] = breadcrumb(ctx: ctx, target: .asset(.folder(of)))
 
   // check if folder has documentation
   arr["pageTitle"] = folder.name

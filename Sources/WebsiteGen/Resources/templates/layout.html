@@ -18,11 +18,9 @@
     </div>
 
     <div class="header-breadcrumb">
-      <a>Hylo</a>
-      <a>Standard Library</a>
-      <a>Geometry</a>
-      <a>Vector.hylo</a>
-      <a><code class="inline"><pre>type Vector2</pre></code></a>
+      {% for name, url in breadcrumb %}
+        <a href="{{ url }}">{{ name }}</a>
+      {% endfor %}
     </div>
   </div>
 
