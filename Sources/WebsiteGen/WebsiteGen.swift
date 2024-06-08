@@ -76,6 +76,9 @@ public func generateDocumentation(
       })
   }
 
+  // Generate index page with all the modules
+  generateModuleIndexDocumentation(ctx: ctx, exporter: exporter, target: target)
+
   // Copy public website assets
   // assuming target directory exists already
   let assetsSourceLocation = Bundle.module.bundleURL.appendingPathComponent("Resources")
@@ -84,4 +87,29 @@ public func generateDocumentation(
     at: assetsSourceLocation,
     to: URL(fileURLWithPath: "assets", relativeTo: target)
   )
+}
+
+public func generateModuleIndexDocumentation(
+  ctx: GenerationContext, exporter: Exporter, target: URL
+) {
+  var arr: [String: Any] = [:]
+
+  arr["pathToRoot"] = "."
+  arr["pageType"] = "Folder"
+  arr["breadcrumb"] = []
+
+  // check if folder has documentation
+  arr["pageTitle"] = "Documentation"
+  arr["name"] = arr["pageTitle"]
+
+  arr["children"] = ctx.documentation.modules.map {
+    module in
+    (
+      getAssetTitle(.folder(module.rootFolder), ctx.documentation.assets),
+      ctx.urlResolver.refer(from: .empty, to: .asset(.folder(module.rootFolder)))
+    )
+  }
+
+  let content = try! ctx.stencil.renderTemplate(name: "folder_layout.html", context: arr)
+  try! exporter.html(content: content, to: URL(fileURLWithPath: "index.html", relativeTo: target))
 }
