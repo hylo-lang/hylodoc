@@ -2,17 +2,16 @@
 <div class="content-section" id="members">
   <h1>Members</h1>
   {% for key,values in members %}
-  <h3>{{ key }}</h3>
+  <h2>{{ key }}</h2>
+  <hr style="height:1px;background-color:#353535">
   <div class="content-section">
-    <ul>
-      {% for name, summary in values %}
-      <li>
-        <code><pre>{{ name }}</pre></code>
-        {{ summary }}
-      </li>
-      {% endfor %}
-    </ul>
+    {% for name, summary in values %}
+      <code><pre>{{ name }}</pre></code>
+      {{ summary }}
+      <hr style="height:1px;background-color:#353535">
+    {% endfor %}
   </div>
+  <br>
   {% endfor %}
 </div>
 {% endif %}
