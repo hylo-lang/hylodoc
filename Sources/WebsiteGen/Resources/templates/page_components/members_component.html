@@ -3,12 +3,12 @@
   <h1>Members</h1>
   {% for key,values in members %}
   <h2>{{ key }}</h2>
-  <hr style="height:1px;background-color:#353535">
+  <hr class="members-divider">
   <div class="content-section">
     {% for name, summary in values %}
       <code><pre>{{ name }}</pre></code>
       {{ summary }}
-      <hr style="height:1px;background-color:#353535">
+      <hr class="members-divider">
     {% endfor %}
   </div>
   <br>
