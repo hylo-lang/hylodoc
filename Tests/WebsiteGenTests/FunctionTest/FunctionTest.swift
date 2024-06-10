@@ -99,10 +99,48 @@
 //       )
 //     )
 
-//     var targetPath = TargetPath(ctx: ctx)
-//     targetPath.push(decl: AnyDeclID(functionId))
-//     ctx.urlResolver.resolve(
-//       target: .symbol(AnyDeclID(functionId)), filePath: targetPath.url, parent: nil)
+    // // get product type by its id
+    // let functionId = visitor.listOfProductTypes[0]
+    // let fDoc = FunctionDocumentation(
+    //   documentation: CommonFunctionDeclLikeDocumentation(
+    //     common: CommonFunctionLikeDocumentation(
+    //       common: GeneralDescriptionFields(
+    //       summary: .document([
+    //         .paragraph(
+    //           Text(
+    //             "Carving up a summary for dinner, minding my own business."
+    //           ))
+    //       ]), 
+    //       description: .document([
+    //         .paragraph(
+    //           Text(
+    //             "In storms my husband Wilbur in a jealous description. He was crazy!"
+    //           ))
+    //       ]), 
+    //       seeAlso: [
+    //         .document([
+    //           .paragraph(
+    //             Text(
+    //               "And then he ran into my first see also."
+    //             ))
+    //         ]),
+    //         .document([
+    //           .paragraph(
+    //             Text(
+    //               "He ran into my second see also 10 times..."
+    //             ))
+    //         ]),
+    //       ]
+    //     ),
+    //       preconditions: [], 
+    //       postconditions: [], 
+    //       throwsInfo: []
+    //     ),
+    //     parameters: [:], 
+    //     genericParameters: [:]
+    //   ),
+    //   returns: []
+    // )
 
 //     let res = try! renderFunctionPage(ctx: ctx, of: functionId, with: fDoc)
 //     let _ = res

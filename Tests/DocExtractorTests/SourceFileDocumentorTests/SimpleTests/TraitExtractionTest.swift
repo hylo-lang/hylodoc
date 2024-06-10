@@ -1,30 +1,34 @@
-import FrontEnd
-import DocumentationDB
 import DocExtractor
+import DocumentationDB
+import FrontEnd
 import XCTest
 
-final class TypeAliasExtractionTest : XCTestCase {
-  func testTypeAliasExtraction() {
+final class TraitExtractionTest: XCTestCase {
+  func testTraitExtraction() {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
 
-    let sourceFile = SourceFile(synthesizedText: """
-      /// # File-level:
-      /// This is the summary of the file.
-      /// 
-      /// Hello
-      /// 
-      /// world
-      ///  - in the 
-      ///  - description
+    let sourceFile = SourceFile(
+      synthesizedText: """
+        /// # File-level:
+        /// This is the summary of the file.
+        /// 
+        /// Hello
+        /// 
+        /// world
+        ///  - in the 
+        ///  - description
 
 
-      /// Summary of typealias.
-      /// 
-      /// This is the description.
-      /// - Note: This is still the description.
-      public typealias MyType = Int
-      """, named: "testFile.hylo")
+        /// Summary of typealias.
+        /// 
+        /// This is the description.
+        /// - Note: This is still the description.
+        /// # Invariant A must be capitalized
+        trait A {
+          type B
+        }
+        """, named: "testFile.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -33,9 +37,9 @@ final class TypeAliasExtractionTest : XCTestCase {
 
     let fileLevel = sourceFileDocumentor.document(
       ast: ast,
-       translationUnitId: ast.resolveTranslationUnit(by: "testFile")!, 
-       into: &store, 
-       diagnostics: &diagnostics
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      into: &store,
+      diagnostics: &diagnostics
     )
 
     assertNoDiagnostics(diagnostics)
@@ -45,11 +49,10 @@ final class TypeAliasExtractionTest : XCTestCase {
     assertContains(fileLevel.description?.debugDescription, what: "world")
     assertContains(fileLevel.description?.debugDescription, what: "in the")
     assertContains(fileLevel.description?.debugDescription, what: "description")
-    
 
-    let declId = ast.resolveTypeAlias(by: "MyType")!
-    let myTypeDoc = store.typeAliasDocs[declId]
-  
+    let declId = ast.resolveTrait(by: "A")!
+    let myTypeDoc = store.traitDocs[declId]
+
     guard let myTypeDoc = myTypeDoc else {
       XCTFail("Expected a symbol comment, got nil")
       return
@@ -57,6 +60,9 @@ final class TypeAliasExtractionTest : XCTestCase {
 
     assertContains(myTypeDoc.common.summary?.debugDescription, what: "Summary of typealias.")
     assertContains(myTypeDoc.common.description?.debugDescription, what: "This is the description.")
-    assertContains(myTypeDoc.common.description?.debugDescription, what: "Note: This is still the description.")
+    assertContains(
+      myTypeDoc.common.description?.debugDescription, what: "Note: This is still the description.")
+    assertContains(
+      myTypeDoc.invariants.first?.description.debugDescription, what: "A must be capitalized")
   }
 }

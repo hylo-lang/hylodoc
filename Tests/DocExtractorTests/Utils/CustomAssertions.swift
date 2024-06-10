@@ -1,5 +1,5 @@
-import XCTest
 import FrontEnd
+import XCTest
 
 func assertContains(
   _ string: String, what: String,
@@ -14,14 +14,14 @@ func assertContains(
   }
 }
 
-
 func assertContains(
   _ string: String?, what: String,
   file: StaticString = #file, line: UInt = #line
 ) {
   guard let string = string else {
-    XCTFail("String is nil, but expected to be:\n" +
-    ANSIColors.green("```\n\(what)\n\n```\n"), file: file, line: line)
+    XCTFail(
+      "String is nil, but expected to be:\n" + ANSIColors.green("```\n\(what)\n\n```\n"),
+      file: file, line: line)
     return
   }
   assertContains(string, what: what, file: file, line: line)

@@ -44,6 +44,266 @@ extension AST {
     return walker.result
   }
 
+  func resolveAssociatedType(by name: String) -> AssociatedTypeDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: AssociatedTypeDecl.ID?
+      var members: [AnyDeclID] = []
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let e = TraitDecl.ID(id) {
+          members = ast[e].members
+          for member in members {
+            if let d = AssociatedTypeDecl.ID(member), ast[d].baseName == targetName {
+              result = d
+              return false
+            }
+          }
+        }
+
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveAssociatedValue(by name: String) -> AssociatedValueDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: AssociatedValueDecl.ID?
+      var members: [AnyDeclID] = []
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let e = TraitDecl.ID(id) {
+          members = ast[e].members
+          for member in members {
+            if let d = AssociatedValueDecl.ID(member), ast[d].baseName == targetName {
+              result = d
+              return false
+            }
+          }
+        }
+
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveBinding() -> [BindingDecl.ID]? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: [BindingDecl.ID]?
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let d = BindingDecl.ID(id) {
+          if result == nil {
+            result = [BindingDecl.ID]()
+          }
+          result?.append(d)
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveOperator() -> [OperatorDecl.ID]? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: [OperatorDecl.ID]?
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let d = OperatorDecl.ID(id) {
+          if result == nil {
+            result = [OperatorDecl.ID]()
+          }
+          result?.append(d)
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveFunc(by name: String) -> FunctionDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: FunctionDecl.ID?
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let d = FunctionDecl.ID(id), ast[d].identifier?.value == targetName {
+          result = d
+          return false
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveMethodDecl(by name: String) -> MethodDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: MethodDecl.ID?
+      var members: [AnyDeclID] = []
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let e = ProductTypeDecl.ID(id) {
+          members = ast[e].members
+          for member in members {
+            if let d = MethodDecl.ID(member), ast[d].identifier.value == targetName {
+              result = d
+              return false
+            }
+          }
+        }
+
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveMethodImpl(by name: String) -> [MethodImpl.ID]? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: [MethodImpl.ID]?
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let d = MethodDecl.ID(id), ast[d].identifier.value == targetName {
+          result = ast[MethodDecl.ID(d)]?.impls
+          return false
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveSubscriptDecl(by name: String) -> SubscriptDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: SubscriptDecl.ID?
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let d = SubscriptDecl.ID(id), ast[d].identifier?.value == targetName {
+          result = d
+          return false
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveSubscriptImpl(by name: String) -> [SubscriptImpl.ID]? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: [SubscriptImpl.ID]?
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let d = SubscriptDecl.ID(id), ast[d].identifier?.value == targetName {
+          result = ast[SubscriptDecl.ID(d)]?.impls
+          return false
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveInit(by name: String) -> InitializerDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: InitializerDecl.ID?
+      var members: [AnyDeclID] = []
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let e = ProductTypeDecl.ID(id), ast[e].baseName == targetName {
+          members = ast[e].members
+          for member in members {
+            if let d = InitializerDecl.ID(member) {
+              result = d
+              return false
+            }
+          }
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
+  func resolveTrait(by name: String) -> TraitDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: TraitDecl.ID?
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let d = TraitDecl.ID(id), ast[d].baseName == targetName {
+          result = d
+          return false
+        }
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
   /// - Parameter name: file name without extension
   func resolveTranslationUnit(by name: String) -> TranslationUnit.ID? {
     precondition(!name.hasSuffix(".hylo"), "Name should be passed without extension.")

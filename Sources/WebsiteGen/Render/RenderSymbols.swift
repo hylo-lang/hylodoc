@@ -86,12 +86,12 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
   case FunctionDecl.self:
     name = InlineSymbolDeclRenderer.renderFunctionDecl(ctx, FunctionDecl.ID(of)!, referringFrom)
     let docID = FunctionDecl.ID(of)!
-    summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.summary
+    summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.common.summary
     key = "Functions"
   case MethodDecl.self:
     name = InlineSymbolDeclRenderer.renderMethodDecl(ctx, MethodDecl.ID(of)!, referringFrom)
     let docID = MethodDecl.ID(of)!
-    summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.summary
+    summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.common.summary
     key = "Methods"
   // not expected to be used, needed for exhaustive switch
   case MethodImpl.self:
@@ -101,7 +101,7 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
     name = InlineSymbolDeclRenderer.renderSubscriptDecl(ctx, SubscriptDecl.ID(of)!, referringFrom)
     let docID = SubscriptDecl.ID(of)!
     summary =
-      ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.generalDescription.summary
+      ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.common.common.summary
     key = "Subscripts"
   // not expected to be used, needed for exhaustive switch
   case SubscriptImpl.self:
@@ -111,7 +111,7 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
     name = InlineSymbolDeclRenderer.renderInitializerDecl(
       ctx, InitializerDecl.ID(of)!, referringFrom)
     let docID = InitializerDecl.ID(of)!
-    summary = ctx.documentation.symbols.initializerDocs[docID]?.common.summary
+    summary = ctx.documentation.symbols.initializerDocs[docID]?.documentation.common.common.summary
     key = "Initializers"
   case TraitDecl.self:
     name = InlineSymbolDeclRenderer.renderTraitDecl(ctx, TraitDecl.ID(of)!, referringFrom)
@@ -122,7 +122,7 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
     name = InlineSymbolDeclRenderer.renderProductTypeDecl(
       ctx, ProductTypeDecl.ID(of)!, referringFrom)
     let docID = ProductTypeDecl.ID(of)!
-    summary = ctx.documentation.symbols.productTypeDocs[docID]?.generalDescription.summary
+    summary = ctx.documentation.symbols.productTypeDocs[docID]?.common.summary
     key = "Product Types"
   default:
     name = ""
@@ -320,15 +320,15 @@ public func renderOperatorPage(
 
   if let doc = doc {
     // Summary
-    if let summary = doc.documentation.summary {
+    if let summary = doc.common.summary {
       args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
     // Details
-    if let block = doc.documentation.description {
+    if let block = doc.common.description {
       args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
-    args["seeAlso"] = doc.documentation.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   }
 
   return try ctx.stencil.renderTemplate(name: "operator_layout.html", context: args)
@@ -360,37 +360,26 @@ public func renderFunctionPage(
 
   if let doc = doc {
     // Summary
-    if let summary = doc.documentation.common.summary {
+    if let summary = doc.documentation.common.common.summary {
       args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
-
     // Details
-    if let block = doc.documentation.common.description {
+    if let block = doc.documentation.common.common.description {
       args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
 
-    args["preconditions"] = doc.documentation.preconditions.map {
+    args["preconditions"] = doc.documentation.common.preconditions.map {
       HtmlGenerator.standard.generate(doc: $0.description)
     }
-    args["postconditions"] = doc.documentation.postconditions.map {
+    args["postconditions"] = doc.documentation.common.postconditions.map {
       HtmlGenerator.standard.generate(doc: $0.description)
     }
 
-    if let returns = doc.documentation.returns {
-      switch returns {
-      case .always(let block):
-        args["returns"] = [HtmlGenerator.standard.generate(doc: block)]
-      case .cases(let blocks):
-        args["returns"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-      }
+    args["returns"] = doc.returns.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
     }
-    if let throwsInfo = doc.documentation.throwsInfo {
-      switch throwsInfo {
-      case .generally(let block):
-        args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
-      case .cases(let blocks):
-        args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-      }
+    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
     }
 
     args["parameters"] = doc.documentation.parameters.mapValues {
@@ -400,7 +389,7 @@ public func renderFunctionPage(
       HtmlGenerator.standard.generate(doc: $0.description)
     }
 
-    args["seeAlso"] = doc.documentation.common.seeAlso.map {
+    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       HtmlGenerator.standard.generate(doc: $0)
     }
   }
@@ -435,37 +424,26 @@ public func renderMethodPage(
 
   if let doc = doc {
     // Summary
-    if let summary = doc.documentation.common.summary {
+    if let summary = doc.documentation.common.common.summary {
       args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
     // Details
-    if let block = doc.documentation.common.description {
+    if let block = doc.documentation.common.common.description {
       args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
 
-    args["preconditions"] = doc.documentation.preconditions.map {
+    args["preconditions"] = doc.documentation.common.preconditions.map {
       HtmlGenerator.standard.generate(doc: $0.description)
     }
-    args["postconditions"] = doc.documentation.postconditions.map {
+    args["postconditions"] = doc.documentation.common.postconditions.map {
       HtmlGenerator.standard.generate(doc: $0.description)
     }
-
-    if let returns = doc.documentation.returns {
-      switch returns {
-      case .always(let block):
-        args["returns"] = [HtmlGenerator.standard.generate(doc: block)]
-      case .cases(let blocks):
-        args["returns"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-      }
+    args["returns"] = doc.returns.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
     }
-    if let throwsInfo = doc.documentation.throwsInfo {
-      switch throwsInfo {
-      case .generally(let block):
-        args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
-      case .cases(let blocks):
-        args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-      }
+    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
     }
 
     args["parameters"] = doc.documentation.parameters.mapValues {
@@ -480,7 +458,7 @@ public func renderMethodPage(
       referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
       ctx: ctx)
 
-    args["seeAlso"] = doc.documentation.common.seeAlso.map {
+    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       HtmlGenerator.standard.generate(doc: $0)
     }
   }
@@ -528,30 +506,20 @@ public func renderSubscriptPage(
 
   if let doc = doc {
     // Summary
-    if let summary = doc.documentation.generalDescription.summary {
+    if let summary = doc.documentation.common.common.summary {
       args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
     // Details
-    if let block = doc.documentation.generalDescription.description {
+    if let block = doc.documentation.common.common.description {
       args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
 
-    if let yields = doc.documentation.yields {
-      switch yields {
-      case .always(let block):
-        args["yields"] = [HtmlGenerator.standard.generate(doc: block)]
-      case .cases(let blocks):
-        args["yields"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-      }
+    args["yields"] = doc.yields.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
     }
-    if let throwsInfo = doc.documentation.throwsInfo {
-      switch throwsInfo {
-      case .generally(let block):
-        args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
-      case .cases(let blocks):
-        args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-      }
+    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
     }
 
     args["parameters"] = doc.documentation.parameters.mapValues {
@@ -560,7 +528,7 @@ public func renderSubscriptPage(
     args["genericParameters"] = doc.documentation.genericParameters.mapValues {
       HtmlGenerator.standard.generate(doc: $0.description)
     }
-    args["seeAlso"] = doc.documentation.generalDescription.seeAlso.map {
+    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       HtmlGenerator.standard.generate(doc: $0)
     }
   }
@@ -613,39 +581,34 @@ public func renderInitializerPage(
 
   if let doc = doc {
     // Summary
-    if let summary = doc.common.summary {
+    if let summary = doc.documentation.common.common.summary {
       args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
     // Details
-    if let block = doc.common.description {
+    if let block = doc.documentation.common.common.description {
       args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
 
-    args["preconditions"] = doc.preconditions.map {
+    args["preconditions"] = doc.documentation.common.preconditions.map {
       HtmlGenerator.standard.generate(doc: $0.description)
     }
-    args["postconditions"] = doc.postconditions.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
-    }
-
-    args["parameters"] = doc.parameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
-    }
-    args["genericParameters"] = doc.genericParameters.mapValues {
+    args["postconditions"] = doc.documentation.common.postconditions.map {
       HtmlGenerator.standard.generate(doc: $0.description)
     }
 
-    if let throwsInfo = doc.throwsInfo {
-      switch throwsInfo {
-      case .generally(let block):
-        args["throwsInfo"] = [HtmlGenerator.standard.generate(doc: block)]
-      case .cases(let blocks):
-        args["throwsInfo"] = blocks.map { HtmlGenerator.standard.generate(doc: $0) }
-      }
+    args["parameters"] = doc.documentation.parameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+    args["genericParameters"] = doc.documentation.genericParameters.mapValues {
+      HtmlGenerator.standard.generate(doc: $0.description)
     }
 
-    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+      HtmlGenerator.standard.generate(doc: $0.description)
+    }
+
+    args["seeAlso"] = doc.documentation.common.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   }
   return try ctx.stencil.renderTemplate(name: "initializer_layout.html", context: args)
 }
@@ -720,15 +683,15 @@ public func renderProductTypePage(
     ctx, of, target)
 
   if let doc = doc {
-    if let summary = doc.generalDescription.summary {
+    if let summary = doc.common.summary {
       args["summary"] = HtmlGenerator.standard.generate(doc: summary)
     }
 
-    if let block = doc.generalDescription.description {
+    if let block = doc.common.description {
       args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
     args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
-    args["seeAlso"] = doc.generalDescription.seeAlso.map {
+    args["seeAlso"] = doc.common.seeAlso.map {
       HtmlGenerator.standard.generate(doc: $0)
     }
   }
