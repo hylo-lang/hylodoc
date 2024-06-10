@@ -20,7 +20,6 @@ public func tableOfContents(stencilContext: [String: Any] = [:]) -> [tocItem] {
     "genericParameters": "Generic Parameters",
     "invariants": "Invariants",
     "members": "Members",
-    "description": "Description",
     "seeAlso": "See Also",
   ]
 
