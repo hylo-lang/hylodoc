@@ -8,7 +8,7 @@ import Stencil
 extension Environment {
   public init(loader: Loader?) {
     let ext = Extension()
-    ext.registerFilter("lowercaseAndHyphenFilter") {(value: Any?) in return lowercaseAndHyphenFilter(value)}
+    ext.registerFilter("convertToID") {(value: Any?) in return convertToID(value)}
 
     self.init(
       loader: loader,
@@ -21,14 +21,11 @@ extension Environment {
 /// Convert a string to lowercase words separated by hyphens
 /// - Parameter value: the string to convert
 /// - Returns: the converted string, or the original value if it is not a string
-func lowercaseAndHyphenFilter(_ value: Any?) -> Any? {
+func convertToID(_ value: Any?) -> Any? {
     guard let string = value as? String else { return value }
     
-    // Lowercase each word
-    let lowercasedWords = string.split(separator: " ").map { $0.lowercased() }
-    
-    // Join with hyphen
-    return lowercasedWords.joined(separator: "-")
+    // taken from Tests/WebsiteGenTests/TableOfContentsHelperTest/TableOfContentsHelperTest.swift
+    return string.prefix(1).lowercased() + string.dropFirst().replacingOccurrences(of: " ", with: "")
 }
 
 /// Render an arbitrary asset page
