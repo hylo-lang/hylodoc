@@ -3,12 +3,32 @@ import Foundation
 import FrontEnd
 import Stencil
 
-/// Extension to the Stencil Environment struct to allow for default behavior of whitespace control
+/// Extension to the Stencil Environment struct to allow for default behavior of whitespace control and custom filters
 /// Removes whitespace before a block and whitespace and a single newline after a block (from https://github.com/stencilproject/Stencil/blob/master/Sources/Stencil/TrimBehaviour.swift)
 extension Environment {
   public init(loader: Loader?) {
-    self.init(loader: loader, trimBehaviour: .smart)
+    let ext = Extension()
+    ext.registerFilter("lowercaseAndHyphen") {(value: Any?) in lowercaseAndHyphenFilter(value)}
+
+    self.init(
+      loader: loader,
+      extensions: [ext],
+      trimBehaviour: .smart
+      )
   }
+}
+
+/// Convert a string to lowercase words separated by hyphens
+/// - Parameter value: the string to convert
+/// - Returns: the converted string, or the original value if it is not a string
+func lowercaseAndHyphenFilter(_ value: Any?) -> Any? {
+    guard let string = value as? String else { return value }
+    
+    // Lowercase each word
+    let lowercasedWords = string.split(separator: " ").map { $0.lowercased() }
+    
+    // Join with hyphen
+    return lowercasedWords.joined(separator: "-")
 }
 
 /// Render an arbitrary asset page

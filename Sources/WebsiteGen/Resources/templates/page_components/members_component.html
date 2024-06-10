@@ -1,17 +1,19 @@
 {% if members %}
-<div class="content-section" id="members">
+<div class="content-nested-section" id="members">
   <h1>Members</h1>
   {% for key,values in members %}
-  <h2>{{ key }}</h2>
-  <hr class="members-divider">
-  <div class="content-section">
+  <div class="content-section" id="{{ key|filter:lowercaseAndHyphenFilter }}">
+    <h2>{{ key }}</h2>
+    <hr class="members-divider">
     {% for name, summary in values %}
-      <code><pre>{{ name }}</pre></code>
-      {{ summary }}
-      <hr class="members-divider">
-    {% endfor %}
+      <div class="declaration">
+        <code><pre>{{ name }}</pre></code>
+        {{ summary }}
+        <hr class="members-divider">
+      </div>
+      {% endfor %}
+    <br>
   </div>
-  <br>
   {% endfor %}
 </div>
 {% endif %}
