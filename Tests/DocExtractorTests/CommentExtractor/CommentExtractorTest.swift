@@ -2,6 +2,7 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 import XCTest
+import TestUtils
 
 @testable import DocExtractor
 

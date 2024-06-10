@@ -1,6 +1,6 @@
 import FrontEnd
 
-extension AST {
+public extension AST {
 
   func resolveProductType(by name: String) -> ProductTypeDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
@@ -306,15 +306,18 @@ extension AST {
 
   /// - Parameter name: file name without extension
   func resolveTranslationUnit(by name: String) -> TranslationUnit.ID? {
-    precondition(!name.hasSuffix(".hylo"), "Name should be passed without extension.")
+    precondition(name.hasSuffix(".hylo"), "Name should be passed with extension.")
 
     struct ASTWalker: ASTWalkObserver {
       var result: TranslationUnit.ID?
       let targetName: String
 
       mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
-        if let d = TranslationUnit.ID(id), ast[d].site.file.baseName == targetName || true {
-          result = d
+        if let d = TranslationUnit.ID(id) {
+          if ast[d].site.file.baseName == targetName {
+            result = d
+          }
+          // print("Found \(ast[d].site.file.baseName) with content: \(ast[d].site.text)")
           return false
         }
         return true

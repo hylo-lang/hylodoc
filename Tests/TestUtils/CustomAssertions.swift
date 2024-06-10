@@ -1,7 +1,7 @@
 import FrontEnd
 import XCTest
 
-func assertContains(
+public func assertContains(
   _ string: String, what: String,
   file: StaticString = #file, line: UInt = #line
 ) {
@@ -14,7 +14,7 @@ func assertContains(
   }
 }
 
-func assertContains(
+public func assertContains(
   _ string: String?, what: String,
   file: StaticString = #file, line: UInt = #line
 ) {
@@ -27,7 +27,7 @@ func assertContains(
   assertContains(string, what: what, file: file, line: line)
 }
 
-func assertNotContains(
+public func assertNotContains(
   _ string: String, what: String,
   file: StaticString = #file, line: UInt = #line
 ) {
@@ -40,7 +40,7 @@ func assertNotContains(
   }
 }
 
-func assertNoDiagnostics(
+public func assertNoDiagnostics(
   _ diagnostics: DiagnosticSet,
   file: StaticString = #file, line: UInt = #line
 ) {

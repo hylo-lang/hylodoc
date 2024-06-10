@@ -2,6 +2,7 @@ import DocExtractor
 import DocumentationDB
 import FrontEnd
 import XCTest
+import TestUtils
 
 final class InitExtractionTest: XCTestCase {
   func testInitExtraction() {
@@ -51,7 +52,7 @@ final class InitExtractionTest: XCTestCase {
 
     let fileLevel = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

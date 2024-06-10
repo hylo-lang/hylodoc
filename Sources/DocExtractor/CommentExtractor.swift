@@ -28,6 +28,7 @@ public struct RealCommentParser<LLCommentParser: LowLevelCommentParser>: Comment
     diagnostics.formUnion(builder.diagnostics)
 
     guard !builder.diagnostics.containsError else {
+      print("Errors found while parsing comments: " + builder.diagnostics.elements.debugDescription)
       return nil
     }
     return DocumentedFile(

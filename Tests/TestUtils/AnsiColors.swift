@@ -1,4 +1,4 @@
-struct ANSIColors {
+public struct ANSIColors {
   static let _reset: String = "\u{001B}[0;0m"
   static let _black: String = "\u{001B}[0;30m"
   static let _red: String = "\u{001B}[0;31m"

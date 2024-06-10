@@ -89,23 +89,31 @@ let package = Package(
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "WebsiteGenTests",
-      dependencies: ["WebsiteGen", "StandardLibraryCore"],
+      dependencies: ["WebsiteGen", "StandardLibraryCore", "TestUtils"],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "DocExtractorTests",
-      dependencies: ["DocExtractor", "StandardLibraryCore"],
+      dependencies: ["DocExtractor", "StandardLibraryCore", "TestUtils"],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "DocumentationDBTests",
-      dependencies: ["DocumentationDB"],
+      dependencies: ["DocumentationDB", "TestUtils"],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "CLITests",
-      dependencies: ["hdc"],
+      dependencies: ["hdc", "TestUtils"],
       exclude: ["module.md"],
+      swiftSettings: allTargetsSwiftSettings),
+    .testTarget(
+      name: "TestUtils",
+      dependencies: [
+        "DocumentationDB",
+        .product(name: "FrontEnd", package: "hylo")
+      ],
+      exclude: [],
       swiftSettings: allTargetsSwiftSettings),
     .target(
       name: "StandardLibraryCore",

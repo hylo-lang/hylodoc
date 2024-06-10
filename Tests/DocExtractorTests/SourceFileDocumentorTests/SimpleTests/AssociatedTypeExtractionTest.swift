@@ -2,6 +2,7 @@ import DocExtractor
 import DocumentationDB
 import FrontEnd
 import XCTest
+import TestUtils
 
 final class AssociatedTypeExtractionTest: XCTestCase {
   func testAssociatedTypeExtraction() {
@@ -27,7 +28,7 @@ final class AssociatedTypeExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

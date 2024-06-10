@@ -2,6 +2,7 @@ import DocExtractor
 import DocumentationDB
 import FrontEnd
 import XCTest
+import TestUtils
 
 final class AssociatedValueExtractionTest: XCTestCase {
   func testAssociatedValueExtraction() {
@@ -32,7 +33,7 @@ final class AssociatedValueExtractionTest: XCTestCase {
           /// - Note: This is still the description1.
           value foo
         }
-        """, named: "testFile.hylo")
+        """, named: "testFile2.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -41,7 +42,7 @@ final class AssociatedValueExtractionTest: XCTestCase {
 
     let fileLevel = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile2.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

@@ -2,6 +2,7 @@ import DocExtractor
 import DocumentationDB
 import FrontEnd
 import XCTest
+import TestUtils
 
 final class SubscriptExtractionTest: XCTestCase {
   func testSubscriptDeclExtraction() {
@@ -43,7 +44,7 @@ final class SubscriptExtractionTest: XCTestCase {
 
     let fileLevel = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

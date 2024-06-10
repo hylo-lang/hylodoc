@@ -2,6 +2,7 @@ import DocExtractor
 import DocumentationDB
 import FrontEnd
 import XCTest
+import TestUtils
 
 final class FuncExtractionTest: XCTestCase {
   func testFuncExtractionInlineParams() {
@@ -26,7 +27,7 @@ final class FuncExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )
@@ -81,7 +82,7 @@ final class FuncExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )
@@ -136,7 +137,7 @@ final class FuncExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

@@ -1,5 +1,6 @@
 import MarkdownKit
 import XCTest
+import TestUtils
 
 @testable import DocExtractor
 
