@@ -16,7 +16,7 @@ final class OperatorExtractionTest: XCTestCase {
         /// This is the description.
         /// - Note: This is still the description.
         operator infix+ : addition
-        """, named: "testFile.hylo")
+        """, named: "testFile9.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -25,7 +25,7 @@ final class OperatorExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile9.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

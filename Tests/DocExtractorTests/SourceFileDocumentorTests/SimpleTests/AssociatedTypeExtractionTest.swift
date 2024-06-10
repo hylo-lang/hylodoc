@@ -19,7 +19,7 @@ final class AssociatedTypeExtractionTest: XCTestCase {
           /// - Note: This is still the description.
           type B
         }
-        """, named: "testFile.hylo")
+        """, named: "testFile1.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -28,7 +28,7 @@ final class AssociatedTypeExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile1.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

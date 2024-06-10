@@ -35,7 +35,7 @@ final class SubscriptExtractionTest: XCTestCase {
           /// # Yields some other stuff.
           T() 
         }
-        """, named: "testFile.hylo")
+        """, named: "testFile11.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -44,7 +44,7 @@ final class SubscriptExtractionTest: XCTestCase {
 
     let fileLevel = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile11.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

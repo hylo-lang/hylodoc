@@ -18,7 +18,7 @@ final class FuncExtractionTest: XCTestCase {
         /// # Parameter x: This is a parameter.
         /// # Generic T: This is a generic.
         fun id<T: Movable>(_ x: T) -> T { x }
-        """, named: "testFile.hylo")
+        """, named: "testFile4.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -27,7 +27,7 @@ final class FuncExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile4.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )
@@ -73,7 +73,7 @@ final class FuncExtractionTest: XCTestCase {
         /// # Generics: 
         ///   - T: This is a generic.
         fun id<T: Movable>(_ x: T) -> T { x }
-        """, named: "testFile.hylo")
+        """, named: "testFile5.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -82,7 +82,7 @@ final class FuncExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile5.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )
@@ -128,7 +128,7 @@ final class FuncExtractionTest: XCTestCase {
         /// # Generics: 
         ///   - T: This is a generic.
         fun id<T: Movable>(_ x: T) -> T { x }
-        """, named: "testFile.hylo")
+        """, named: "testFile6.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -137,7 +137,7 @@ final class FuncExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile6.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

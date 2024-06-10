@@ -70,7 +70,7 @@ final class ProductTypeExtractionTest: XCTestCase {
           var y: Int
           fun foo() -> Int { x.copy() }
         }
-        """, named: "testFile.hylo")
+        """, named: "testFile10.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -79,7 +79,7 @@ final class ProductTypeExtractionTest: XCTestCase {
 
     let _ = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile10.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

@@ -43,7 +43,7 @@ final class InitExtractionTest: XCTestCase {
             self.y = y
           }
         }
-        """, named: "testFile.hylo")
+        """, named: "testFile7.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -52,7 +52,7 @@ final class InitExtractionTest: XCTestCase {
 
     let fileLevel = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile7.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )

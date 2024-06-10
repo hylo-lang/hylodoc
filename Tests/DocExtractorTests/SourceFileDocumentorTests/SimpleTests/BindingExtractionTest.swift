@@ -27,7 +27,7 @@ final class BindingExtractionTest: XCTestCase {
         /// - Note: This is still the description.
         /// # Invariant foo must be positive
         let foo = 5
-        """, named: "testFile.hylo")
+        """, named: "testFile3.hylo")
 
     var diagnostics = DiagnosticSet()
     let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
@@ -36,7 +36,7 @@ final class BindingExtractionTest: XCTestCase {
 
     let fileLevel = sourceFileDocumentor.document(
       ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+      translationUnitId: ast.resolveTranslationUnit(by: "testFile3.hylo")!,
       into: &store,
       diagnostics: &diagnostics
     )
