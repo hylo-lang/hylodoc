@@ -1,10 +1,10 @@
 /// Documentation of product types
 public struct ProductTypeDocumentation: IdentifiedEntity {
-  public let generalDescription: GeneralDescriptionFields
+  public let common: GeneralDescriptionFields
   public let invariants: [Invariant]
 
-  public init(generalDescription: GeneralDescriptionFields, invariants: [Invariant]) {
-    self.generalDescription = generalDescription
+  public init(common: GeneralDescriptionFields, invariants: [Invariant]) {
+    self.common = common
     self.invariants = invariants
   }
 }

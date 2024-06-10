@@ -1,11 +1,53 @@
 import MarkdownKit
 
+//Structs
+
+public struct CommonFunctionLikeDocumentation {
+  public let common: GeneralDescriptionFields
+  public let preconditions: [Precondition]
+  public let postconditions: [Postcondition]
+  public let throwsInfo: [Throws]
+
+  public init(
+    common: GeneralDescriptionFields,
+    preconditions: [Precondition],
+    postconditions: [Postcondition],
+    throwsInfo: [Throws]
+  ) {
+    self.common = common
+    self.preconditions = preconditions
+    self.postconditions = postconditions
+    self.throwsInfo = throwsInfo
+  }
+}
+
+public struct CommonFunctionDeclLikeDocumentation {
+  public let common: CommonFunctionLikeDocumentation
+  public let parameters: ParameterDocumentations
+  public let genericParameters: GenericParameterDocumentations
+
+  public init(
+    common: CommonFunctionLikeDocumentation,
+    parameters: ParameterDocumentations,
+    genericParameters: GenericParameterDocumentations
+  ) {
+    self.common = common
+    self.parameters = parameters
+    self.genericParameters = genericParameters
+  }
+}
+
 /// Documentation of a free function declaration (not a method) or a static function declaration.
 public struct FunctionDocumentation: IdentifiedEntity {
-  public let documentation: CommonFunctionDocumentation
+  public let documentation: CommonFunctionDeclLikeDocumentation
+  public let returns: [Returns]
 
-  public init(documentation: CommonFunctionDocumentation) {
+  public init(
+    documentation: CommonFunctionDeclLikeDocumentation,
+    returns: [Returns]
+  ) {
     self.documentation = documentation
+    self.returns = returns
   }
 }
 
@@ -14,7 +56,16 @@ public struct FunctionDocumentation: IdentifiedEntity {
 /// Note: method declarations might have multiple implementations inside, and each implementation
 /// might also have additional documentation. In that case, that should be also displayed additionally.
 public struct MethodDeclDocumentation: IdentifiedEntity {
-  public let documentation: CommonFunctionDocumentation
+  public let documentation: CommonFunctionDeclLikeDocumentation
+  public let returns: [Returns]
+
+  public init(
+    documentation: CommonFunctionDeclLikeDocumentation,
+    returns: [Returns]
+  ) {
+    self.documentation = documentation
+    self.returns = returns
+  }
 }
 
 /// Documentation of a method implementation.
@@ -24,102 +75,52 @@ public struct MethodDeclDocumentation: IdentifiedEntity {
 /// want to have its own documentation to specify the behavior of the implementation and to
 /// add additional information that is only relevant to that implementation.
 public struct MethodImplDocumentation: IdentifiedEntity {
-  public let documentation: CommonFunctionDocumentation
-}
-
-public struct CommonFunctionDocumentation {
-  public let common: GeneralDescriptionFields
-  public let preconditions: [Precondition]
-  public let postconditions: [Postcondition]
-  public let returns: ReturnsInfo?
-  public let throwsInfo: ThrowsInfo?
-  public let parameters: ParameterDocumentations
-  public let genericParameters: GenericParameterDocumentations
+  public let documentation: CommonFunctionLikeDocumentation
+  public let returns: [Returns]
 
   public init(
-    common: GeneralDescriptionFields,
-    preconditions: [Precondition],
-    postconditions: [Postcondition],
-    returns: ReturnsInfo?,
-    throwsInfo: ThrowsInfo?,
-    parameters: ParameterDocumentations,
-    genericParameters: GenericParameterDocumentations
+    documentation: CommonFunctionLikeDocumentation,
+    returns: [Returns]
   ) {
-    self.common = common
-    self.preconditions = preconditions
-    self.postconditions = postconditions
+    self.documentation = documentation
     self.returns = returns
-    self.throwsInfo = throwsInfo
-    self.parameters = parameters
-    self.genericParameters = genericParameters
   }
 }
 
 /// Type initializer (e.g. init or memberwise init)
 public struct InitializerDocumentation: IdentifiedEntity {
-  public let common: GeneralDescriptionFields
-  public let preconditions: [Precondition]
-  public let postconditions: [Postcondition]
-  public let parameters: ParameterDocumentations
-  public let genericParameters: GenericParameterDocumentations
-  public let throwsInfo: ThrowsInfo?
+  public let documentation: CommonFunctionDeclLikeDocumentation
 
-  public init(
-    common: GeneralDescriptionFields,
-    preconditions: [Precondition],
-    postconditions: [Postcondition],
-    parameters: ParameterDocumentations,
-    genericParameters: GenericParameterDocumentations,
-    throwsInfo: ThrowsInfo?
-  ) {
-    self.common = common
-    self.preconditions = preconditions
-    self.postconditions = postconditions
-    self.parameters = parameters
-    self.genericParameters = genericParameters
-    self.throwsInfo = throwsInfo
+  public init(documentation: CommonFunctionDeclLikeDocumentation) {
+    self.documentation = documentation
   }
 }
 
 /// Declaration of either a subscript or a property
 public struct SubscriptDeclDocumentation: IdentifiedEntity {
-  public let documentation: SubscriptCommonDocumentation
+  public let documentation: CommonFunctionDeclLikeDocumentation
+  public let yields: [Yields]
 
-  public init(documentation: SubscriptCommonDocumentation) {
+  public init(
+    documentation: CommonFunctionDeclLikeDocumentation,
+    yields: [Yields]
+  ) {
     self.documentation = documentation
+    self.yields = yields
   }
 }
 
 /// Additional documentation that is specific to a subscript implementation (let, inout, etc.)
 public struct SubscriptImplDocumentation: IdentifiedEntity {
-  public let documentation: SubscriptCommonDocumentation
-}
-
-public struct SubscriptCommonDocumentation {
-  public let generalDescription: GeneralDescriptionFields
-  public let preconditions: [Precondition]
-  public let postconditions: [Postcondition]
-  public let yields: YieldsInfo?
-  public let throwsInfo: ThrowsInfo?
-  public let parameters: ParameterDocumentations
-  public let genericParameters: GenericParameterDocumentations
+  public let documentation: CommonFunctionLikeDocumentation
+  public let yields: [Yields]
 
   public init(
-    generalDescription: GeneralDescriptionFields,
-    preconditions: [Precondition],
-    postconditions: [Postcondition],
-    yields: YieldsInfo?,
-    throwsInfo: ThrowsInfo?,
-    parameters: ParameterDocumentations,
-    genericParameters: GenericParameterDocumentations
+    documentation: CommonFunctionLikeDocumentation,
+    yields: [Yields]
   ) {
-    self.generalDescription = generalDescription
-    self.preconditions = preconditions
-    self.postconditions = postconditions
+    self.documentation = documentation
     self.yields = yields
-    self.throwsInfo = throwsInfo
-    self.parameters = parameters
-    self.genericParameters = genericParameters
   }
 }
 
@@ -127,32 +128,26 @@ public struct SubscriptCommonDocumentation {
 /// All information is already present in the declaration AST node SynthesizedFunctionDecl.
 public struct SynthesizedFunctionDocumentation {}
 
-/// Documentation of the returned value of a function or method
-public enum ReturnsInfo {
-  /// Used when there is one paragraph of `# Returns:` documentation.
-  case always(Block)
+public struct Returns {
+  public let description: Block
 
-  /// Used when the function returns different information in different cases.
-  /// This can be expressed as adding list items after the `# Returns:` section header.
-  case cases([Block])
+  public init(description: Block) {
+    self.description = description
+  }
 }
 
-/// Documentation of the yielded value of a subscript or property
-public enum YieldsInfo {
-  /// Used when there is one paragraph of `# Yields:` documentation.
-  case always(Block)
+public struct Yields {
+  public let description: Block
 
-  /// Used when the function returns different information in different cases.
-  /// This can be expressed as adding list items after the `# Yields:` section header.
-  case cases([Block])
+  public init(description: Block) {
+    self.description = description
+  }
 }
 
-/// Documentation of the behavior of a function-like when it throws an exception.
-public enum ThrowsInfo {
-  /// Used when there is one paragraph of `# Throws:` documentation.
-  case generally(Block)
+public struct Throws {
+  public let description: Block
 
-  /// Used when the function throws different exceptions in different cases and the
-  /// developer wants to document these cases separately in a list form.
-  case cases([Block])
+  public init(description: Block) {
+    self.description = description
+  }
 }

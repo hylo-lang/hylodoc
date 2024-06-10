@@ -22,10 +22,10 @@ public struct BindingDocumentation: IdentifiedEntity {
 /// Note: This is not the same as a MethodDecl or FunctionDecl that is an operator.
 /// (Those have their notation field as Some(Infix|Prefix|Postfix).)
 public struct OperatorDocumentation: IdentifiedEntity {
-  public let documentation: GeneralDescriptionFields
+  public let common: GeneralDescriptionFields
 
-  public init(documentation: GeneralDescriptionFields) {
-    self.documentation = documentation
+  public init(common: GeneralDescriptionFields) {
+    self.common = common
   }
 }
 
