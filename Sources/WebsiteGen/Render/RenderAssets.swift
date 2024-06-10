@@ -28,7 +28,7 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
 
   // check if file has description
   if let descriptionBlock = sourceFile.generalDescription.description {
-    env["description"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
+    env["details"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
   }
 
   env["seeAlso"] = sourceFile.generalDescription.seeAlso.map {
@@ -38,6 +38,8 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
   let translationUnit = ctx.typedProgram.ast[sourceFile.translationUnit]
   env["members"] = prepareMembersData(
     referringFrom: .asset(AnyAssetID(from: of)), decls: translationUnit.decls, ctx: ctx)
+
+  env["toc"] = tableOfContents(stencilContext: env)
   return try ctx.stencil.renderTemplate(name: "source_file_layout.html", context: env)
 }
 
@@ -65,6 +67,7 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throw
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.article(of)))
   env["content"] = HtmlGenerator.standard.generate(doc: article.content)
 
+  env["toc"] = tableOfContents(stencilContext: env)
   return try ctx.stencil.renderTemplate(name: "article_layout.html", context: env)
 }
 
@@ -90,22 +93,22 @@ func isIndexPageFileName(fileName: String) -> Bool {
 public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws -> String {
   let folder = ctx.documentation.assets[of]!
 
-  var arr: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
-  arr["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.folder(of)))
-  arr["pageType"] = "Folder"
-  arr["breadcrumb"] = breadcrumb(ctx: ctx, target: .asset(.folder(of)))
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.folder(of)))
+  env["pageType"] = "Folder"
+  env["breadcrumb"] = breadcrumb(ctx: ctx, target: .asset(.folder(of)))
 
   // check if folder has documentation
-  arr["pageTitle"] = folder.name
+  env["pageTitle"] = folder.name
   if let detailsId = folder.documentation {
     let detailsArticle = ctx.documentation.assets[detailsId]!
-    arr["articleContent"] = HtmlGenerator.standard.generate(doc: detailsArticle.content)
+    env["articleContent"] = HtmlGenerator.standard.generate(doc: detailsArticle.content)
     if let title = detailsArticle.title {
-      arr["pageTitle"] = title
+      env["pageTitle"] = title
     }
   }
-  arr["name"] = arr["pageTitle"]
+  env["name"] = env["pageTitle"]
 
   let children = folder.children
     .filter { childId in
@@ -120,10 +123,11 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws 
       )
     }
   if !children.isEmpty {
-    arr["children"] = children
+    env["contents"] = children
   }
 
-  return try ctx.stencil.renderTemplate(name: "folder_layout.html", context: arr)
+  env["toc"] = tableOfContents(stencilContext: env)
+  return try ctx.stencil.renderTemplate(name: "folder_layout.html", context: env)
 }
 
 /// Get the title and the url of an asset

@@ -174,6 +174,7 @@ public func renderAssociatedTypePage(
     args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   }
 
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "associated_type_layout.html", context: args)
 }
 
@@ -214,6 +215,7 @@ public func renderAssociatedValuePage(
     args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   }
 
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "associated_value_layout.html", context: args)
 }
 
@@ -251,6 +253,8 @@ public func renderTypeAliasPage(
       args["details"] = HtmlGenerator.standard.generate(doc: block)
     }
   }
+
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "type_alias_layout.html", context: args)
 }
 
@@ -290,6 +294,8 @@ public func renderBindingPage(
 
     args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   }
+
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "binding_layout.html", context: args)
 }
 
@@ -331,6 +337,7 @@ public func renderOperatorPage(
     args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   }
 
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "operator_layout.html", context: args)
 }
 
@@ -394,6 +401,7 @@ public func renderFunctionPage(
     }
   }
 
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "function_layout.html", context: args)
 }
 
@@ -462,6 +470,8 @@ public func renderMethodPage(
       HtmlGenerator.standard.generate(doc: $0)
     }
   }
+
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "method_layout.html", context: args)
 }
 
@@ -537,6 +547,7 @@ public func renderSubscriptPage(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
     ctx: ctx)
 
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "subscript_layout.html", context: args)
 }
 
@@ -610,6 +621,8 @@ public func renderInitializerPage(
 
     args["seeAlso"] = doc.documentation.common.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
   }
+
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "initializer_layout.html", context: args)
 }
 
@@ -654,6 +667,7 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
   args["members"] = prepareMembersData(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "trait_layout.html", context: args)
 }
 
@@ -699,5 +713,6 @@ public func renderProductTypePage(
   args["members"] = prepareMembersData(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
+  args["toc"] = tableOfContents(stencilContext: args)
   return try ctx.stencil.renderTemplate(name: "product_type_layout.html", context: args)
 }

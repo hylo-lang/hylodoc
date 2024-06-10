@@ -92,17 +92,17 @@ public func generateDocumentation(
 public func generateModuleIndexDocumentation(
   ctx: GenerationContext, exporter: Exporter, target: URL
 ) {
-  var arr: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
-  arr["pathToRoot"] = "."
-  arr["pageType"] = "Folder"
-  arr["breadcrumb"] = []
+  env["pathToRoot"] = "."
+  env["pageType"] = "Folder"
+  env["breadcrumb"] = []
 
   // check if folder has documentation
-  arr["pageTitle"] = "Documentation"
-  arr["name"] = arr["pageTitle"]
+  env["pageTitle"] = "Documentation"
+  env["name"] = env["pageTitle"]
 
-  arr["children"] = ctx.documentation.modules.map {
+  env["contents"] = ctx.documentation.modules.map {
     module in
     (
       getAssetTitle(.folder(module.rootFolder), ctx.documentation.assets),
@@ -110,6 +110,7 @@ public func generateModuleIndexDocumentation(
     )
   }
 
-  let content = try! ctx.stencil.renderTemplate(name: "folder_layout.html", context: arr)
+  env["toc"] = tableOfContents(stencilContext: env)
+  let content = try! ctx.stencil.renderTemplate(name: "folder_layout.html", context: env)
   try! exporter.html(content: content, to: URL(fileURLWithPath: "index.html", relativeTo: target))
 }

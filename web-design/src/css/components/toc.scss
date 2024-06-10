@@ -1,9 +1,9 @@
 .page-toc {
-  @apply p-0 m-0;
+  @apply pr-8 m-0;
   min-width: fit-content;
 
   & > ul {
-    @apply relative pr-8 z-0 border-l-2;
+    @apply relative z-0 border-l-2;
     border-color: $thin-divider;
   }
 

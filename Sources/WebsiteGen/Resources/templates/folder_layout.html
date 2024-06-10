@@ -11,15 +11,15 @@
     {% include "summary_section.html" %}
 
     {% if articleContent %}
-    <div class="content-section">
+    <div class="content-section" id="content">
         {{ articleContent }}
     </div>
     {% endif %}
-    {% if children %}
-        <div class="content-section">
+    {% if contents %}
+        <div class="content-section" id="contents">
             <h1>Contents</h1>
             <ul>
-                {% for childTitle,childUrl in children %}
+                {% for childTitle,childUrl in contents %}
                 <li><a href="{{ childUrl }}" style="color: lightblue">{{ childTitle }}</a></li>
                 {% endfor %}
             </ul>

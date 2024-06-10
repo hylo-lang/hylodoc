@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="{{ pathToRoot }}/assets/logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ name }}</title>
-  <link rel="stylesheet" crossorigin href="{{ pathToRoot }}/assets/index-DSezNRbW.css">
+  <link rel="stylesheet" crossorigin href="{{ pathToRoot }}/assets/index-CrEOqb6o.css">
 </head>
 
 <body class="page">
@@ -129,21 +129,18 @@
           <h2>On this page</h2>
           <ul>
             <li><a href="#summary">Summary</a></li>
-            <li><a href="#details">Details</a></li>
-            <li><a href="#invariants">Invariants</a></li>
+            {% for id, name, children in toc %}
             <li>
-              <a href="#members">Members</a>
+              <a href="#{{ id }}">{{ name }}</a>
+              {% if children %}
               <ul>
-                <li><a href="#stored-properties">Stored Properties</a></li>
-                <li><a href="#initializers">Initializers</a></li>
-                <li><a href="#subscripts">Subscripts</a></li>
-                <li><a href="#methods">Methods</a></li>
-                <li><a href="#static-variables">Static Variables</a></li>
-                <li><a href="#types">Types</a></li>
+                {% for id, name in children %}
+                <li><a href="#{{ id }}">{{ name }}</a></li>
+                {% endfor %}
               </ul>
+              {% endif %}
             </li>
-            <li><a href="#conformance">Conformance</a></li>
-            <li><a href="#see-also">See Also</a></li>
+            {% endfor %}
           </ul>
         </aside>
       </div>
