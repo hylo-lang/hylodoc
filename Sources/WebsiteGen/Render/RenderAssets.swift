@@ -23,16 +23,16 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
 
   // check if file has summary
   if let summaryBlock = sourceFile.generalDescription.summary {
-    env["summary"] = HtmlGenerator.standard.generate(doc: summaryBlock)
+    env["summary"] = ctx.htmlGenerator.generate(doc: summaryBlock)
   }
 
   // check if file has description
   if let descriptionBlock = sourceFile.generalDescription.description {
-    env["details"] = HtmlGenerator.standard.generate(doc: descriptionBlock)
+    env["details"] = ctx.htmlGenerator.generate(doc: descriptionBlock)
   }
 
   env["seeAlso"] = sourceFile.generalDescription.seeAlso.map {
-    HtmlGenerator.standard.generate(doc: $0)
+    ctx.htmlGenerator.generate(doc: $0)
   }
 
   let translationUnit = ctx.typedProgram.ast[sourceFile.translationUnit]
@@ -65,7 +65,7 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throw
   env["pageType"] = "Article"
 
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.article(of)))
-  env["content"] = HtmlGenerator.standard.generate(doc: article.content)
+  env["content"] = ctx.htmlGenerator.generate(doc: article.content)
 
   env["toc"] = tableOfContents(stencilContext: env)
   return try ctx.stencil.renderTemplate(name: "article_layout.html", context: env)
@@ -103,7 +103,7 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws 
   env["pageTitle"] = folder.name
   if let detailsId = folder.documentation {
     let detailsArticle = ctx.documentation.assets[detailsId]!
-    env["articleContent"] = HtmlGenerator.standard.generate(doc: detailsArticle.content)
+    env["articleContent"] = ctx.htmlGenerator.generate(doc: detailsArticle.content)
     if let title = detailsArticle.title {
       env["pageTitle"] = title
     }

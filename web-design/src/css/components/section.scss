@@ -38,7 +38,7 @@
   }
 
   .tag {
-    @apply px-1.5 pb-0.5 m-0 rounded-lg font-mono inline-block;
+    @apply px-1.5 m-0 rounded-lg font-mono inline-block;
     border: 1px solid $thin-divider;
     background-color: $snippet-background;
   }

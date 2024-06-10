@@ -130,7 +130,7 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
   }
 
   if let summary = summary {
-    return (name, HtmlGenerator.standard.generate(doc: summary), key)
+    return (name, ctx.htmlGenerator.generate(doc: summary), key)
   } else {
     return (name, "", key)
   }
@@ -163,15 +163,15 @@ public func renderAssociatedTypePage(
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
   args["toc"] = tableOfContents(stencilContext: args)
@@ -204,15 +204,15 @@ public func renderAssociatedValuePage(
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
   args["toc"] = tableOfContents(stencilContext: args)
@@ -245,12 +245,12 @@ public func renderTypeAliasPage(
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
   }
 
@@ -284,15 +284,15 @@ public func renderBindingPage(
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
     if let block = doc.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
+    args["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
 
-    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
   args["toc"] = tableOfContents(stencilContext: args)
@@ -327,14 +327,14 @@ public func renderOperatorPage(
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
-    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
   args["toc"] = tableOfContents(stencilContext: args)
@@ -368,36 +368,36 @@ public func renderFunctionPage(
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
     args["preconditions"] = doc.documentation.common.preconditions.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["postconditions"] = doc.documentation.common.postconditions.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     args["returns"] = doc.returns.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     args["parameters"] = doc.documentation.parameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
-      HtmlGenerator.standard.generate(doc: $0)
+      ctx.htmlGenerator.generate(doc: $0)
     }
   }
 
@@ -433,32 +433,32 @@ public func renderMethodPage(
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
     args["preconditions"] = doc.documentation.common.preconditions.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["postconditions"] = doc.documentation.common.postconditions.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["returns"] = doc.returns.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     args["parameters"] = doc.documentation.parameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
@@ -467,7 +467,7 @@ public func renderMethodPage(
       ctx: ctx)
 
     args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
-      HtmlGenerator.standard.generate(doc: $0)
+      ctx.htmlGenerator.generate(doc: $0)
     }
   }
 
@@ -517,29 +517,29 @@ public func renderSubscriptPage(
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
     args["yields"] = doc.yields.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     args["parameters"] = doc.documentation.parameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
-      HtmlGenerator.standard.generate(doc: $0)
+      ctx.htmlGenerator.generate(doc: $0)
     }
   }
   // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
@@ -593,33 +593,35 @@ public func renderInitializerPage(
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
     args["preconditions"] = doc.documentation.common.preconditions.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["postconditions"] = doc.documentation.common.postconditions.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     args["parameters"] = doc.documentation.parameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
     args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
     args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      HtmlGenerator.standard.generate(doc: $0.description)
+      ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["seeAlso"] = doc.documentation.common.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
+      ctx.htmlGenerator.generate(doc: $0)
+    }
   }
 
   args["toc"] = tableOfContents(stencilContext: args)
@@ -652,16 +654,16 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     if let block = doc.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
+    args["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
 
-    args["seeAlso"] = doc.common.seeAlso.map { HtmlGenerator.standard.generate(doc: $0) }
+    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
   args["members"] = prepareMembersData(
@@ -698,15 +700,15 @@ public func renderProductTypePage(
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      args["summary"] = HtmlGenerator.standard.generate(doc: summary)
+      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     if let block = doc.common.description {
-      args["details"] = HtmlGenerator.standard.generate(doc: block)
+      args["details"] = ctx.htmlGenerator.generate(doc: block)
     }
-    args["invariants"] = doc.invariants.map { HtmlGenerator.standard.generate(doc: $0.description) }
+    args["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
     args["seeAlso"] = doc.common.seeAlso.map {
-      HtmlGenerator.standard.generate(doc: $0)
+      ctx.htmlGenerator.generate(doc: $0)
     }
   }
 

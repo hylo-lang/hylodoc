@@ -1,6 +1,7 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
+import MarkdownKit
 import PathWrangler
 import Stencil
 
@@ -9,6 +10,7 @@ public struct GenerationContext {
   public let stencil: Environment
   public let typedProgram: TypedProgram
   public var urlResolver: URLResolver
+  public let htmlGenerator: HtmlGenerator
 }
 
 extension FileSystemLoader {
@@ -42,7 +44,8 @@ public func generateDocumentation(
     documentation: documentation,
     stencil: stencil,
     typedProgram: typedProgram,
-    urlResolver: resolver
+    urlResolver: resolver,
+    htmlGenerator: RenderHTMLGenerator()
   )
 
   // Resolve URL's

@@ -1,0 +1,45 @@
+type MyType : TraitA, TraitB {
+  public typealias Element = Float64
+
+  public var radians: Float64
+  public let member2 = "What"
+  public static let member3: Element
+
+  public init(first m1: Float64, _ m2: Int) {}
+
+  /// My summary for this function
+  ///
+  /// Details go here
+  /// ```hylo
+  /// let example = functionLarge(hello: 0, world: 0.0)
+  /// print(example)
+  /// ```
+  ///
+  /// # Parameters:
+  /// - hello: hello from the other side
+  /// - world: or word, I *wonder*
+  ///
+  /// # Preconditions:
+  /// - Invar A
+  /// - Invar `B`
+  ///
+  /// # Returns: some element
+  ///
+  /// # Complexity:
+  /// - time: O(n)
+  /// - space: O(n)
+  public fun functionLarge(hello hello: Int, _ world: Float64) inout -> Element {}
+  public fun functionSmall(_ world: Element) -> Int {}
+  public static fun functionTiny() {}
+
+  public fun foo(_ x: Self, n: Int) -> Float64 {
+    let   { }
+    sink  { }
+    inout { }
+  }
+
+  public property degrees: Float64 {
+    let { }
+    inout { }
+  }
+}
