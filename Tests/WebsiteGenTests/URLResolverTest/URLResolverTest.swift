@@ -102,6 +102,22 @@ final class URLResolverTest: XCTestCase {
       resolver.refer(from: target2, to: target1), RelativePath(pathString: "target.html"))
   }
 
+  func testReferenceToIndexFile() {
+    let target1: AnyTargetID = .asset(.article(ArticleAsset.ID(1)))
+    let target2: AnyTargetID = .asset(.article(ArticleAsset.ID(2)))
+
+    var resolver: URLResolver = .init(baseUrl: AbsolutePath(pathString: "/root"))
+    resolver.resolve(
+      target: target1, filePath: RelativePath(pathString: "some/path/index.html"), parent: nil)
+    resolver.resolve(
+      target: target2, filePath: RelativePath(pathString: "some/path/article.html"), parent: nil)
+
+    XCTAssertEqual(
+      resolver.refer(from: target1, to: target2), RelativePath(pathString: "article.html"))
+    XCTAssertEqual(
+      resolver.refer(from: target2, to: target1)!.resolved(), RelativePath(pathString: ""))
+  }
+
   func testNoParent() {
     let target1: AnyTargetID = .asset(.article(ArticleAsset.ID(1)))
 

@@ -37,7 +37,15 @@ public struct URLResolver {
   // Get a url referencing from one target to another
   public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath? {
     if case .empty = from {
-      return references[to]?.0
+      guard let ref = references[to] else {
+        return nil
+      }
+
+      if URL(path: ref.0).lastPathComponent == "index.html" {
+        return ref.0 / ".."
+      }
+
+      return ref.0
     } else if case .empty = to {
       return nil
     } else if from == to {
@@ -50,6 +58,10 @@ public struct URLResolver {
 
     guard let toUrl = references[to]?.0 else {
       return nil
+    }
+
+    if URL(path: toUrl).lastPathComponent == "index.html" {
+      return fromUrl.refer(to: toUrl) / ".."
     }
 
     return fromUrl.refer(to: toUrl)

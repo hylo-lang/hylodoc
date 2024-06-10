@@ -34,9 +34,10 @@ private func traverseAssets(
   case .folder(let id):
     // Traverse children
     let folder = ctx.documentation.assets.folders[id]!
-    folder.children.forEach {
-      child in traverseAssets(ctx: ctx, root: child, visitor: visitor, path: &path)
-    }
+    folder.children.filter { folder.documentation == nil || $0 != .article(folder.documentation!) }
+      .forEach {
+        child in traverseAssets(ctx: ctx, root: child, visitor: visitor, path: &path)
+      }
     break
   case .sourceFile(let id):
     // Traverse children

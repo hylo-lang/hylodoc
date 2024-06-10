@@ -29,23 +29,37 @@ public struct TargetPath {
 
     // Directory structure
     var index = 0
-    while index < stack.count, case .asset(let id) = stack[index] {
-      url = url / convertAssetToPath(ctx: ctx, asset: id)
+    while index + 1 < stack.count {
+      let target = stack[index]
       index += 1
+
+      if case .asset(let assetId) = target {
+        url = url / ctx.documentation.assets[assetId]!.name
+      } else if case .symbol(let declId) = target {
+        let name = displayNameOfSymbol(ctx: ctx, symbol: declId)
+        let parts = name.split(omittingEmptySubsequences: false, whereSeparator: { $0 == " " })
+        url = url / String(parts.last!)
+      }
     }
 
-    if index + 1 <= stack.count {
-      // symbol name as part of url?
-      // counter for symbols
-      url = url / "symbol-\(symbolCounter).html"
-    } else if case .asset(let id) = stack[index - 1] {
-      if case .folder(_) = id {
-        // append index.html for folder since that has a nested structure
-        url = url / "index.html"
-      } else if case .sourceFile(_) = id {
-        // append index.html for sourceFile since that has a nested structure
-        url = url / "index.html"
+    guard let lastTarget = stack.last else {
+      return url
+    }
+
+    if case .asset(let assetId) = lastTarget {
+      if case .article(_) = assetId {
+        let name = ctx.documentation.assets[assetId]!.name
+        let parts = name.split(omittingEmptySubsequences: false, whereSeparator: { $0 == "." })
+        return url / (String(parts.first!) + ".html")
+      } else if case .otherFile(_) = assetId {
+        return url / ctx.documentation.assets[assetId]!.name
       }
+
+      return url / ctx.documentation.assets[assetId]!.name / "index.html"
+    } else if case .symbol(let declId) = lastTarget {
+      let name = displayNameOfSymbol(ctx: ctx, symbol: declId)
+      let parts = name.split(omittingEmptySubsequences: false, whereSeparator: { $0 == " " })
+      return url / String(parts.last!) / "index.html"
     }
 
     return url

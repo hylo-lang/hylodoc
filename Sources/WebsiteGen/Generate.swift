@@ -63,6 +63,16 @@ public struct DefaultExporter: Exporter {
   }
 
   public func html(content: String, to: URL) throws {
+    if !to.lastPathComponent.hasSuffix(".html") {
+      let expanded = to.appendingPathComponent("index.html")
+
+      // Write file
+      try FileManager.default.createDirectory(
+        at: expanded.deletingLastPathComponent(), withIntermediateDirectories: true)
+      try content.write(to: expanded, atomically: false, encoding: String.Encoding.utf8)
+      return
+    }
+
     // Write file
     try FileManager.default.createDirectory(
       at: to.deletingLastPathComponent(), withIntermediateDirectories: true)
