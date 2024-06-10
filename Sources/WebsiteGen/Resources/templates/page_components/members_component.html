@@ -2,7 +2,7 @@
 <div class="content-nested-section" id="members">
   <h1>Members</h1>
   {% for key,values in members %}
-  <div class="content-section" id="{{ key|filter:lowercaseAndHyphenFilter }}">
+  <div class="content-section" id="{{ key|lowercaseAndHyphenFilter }}">
     <h2>{{ key }}</h2>
     {% for name, summary in values %}
       <div class="declaration">

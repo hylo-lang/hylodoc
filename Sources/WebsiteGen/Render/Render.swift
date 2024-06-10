@@ -8,7 +8,7 @@ import Stencil
 extension Environment {
   public init(loader: Loader?) {
     let ext = Extension()
-    ext.registerFilter("lowercaseAndHyphen") {(value: Any?) in lowercaseAndHyphenFilter(value)}
+    ext.registerFilter("lowercaseAndHyphenFilter") {(value: Any?) in return lowercaseAndHyphenFilter(value)}
 
     self.init(
       loader: loader,
