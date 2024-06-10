@@ -332,13 +332,13 @@
           <h2>On this page</h2>
           <ul>
             <li><a href="#summary">Summary</a></li>
-            {% for id, name, children in toc %}
+            {% for item in toc %}
             <li>
-              <a href="#{{ id }}">{{ name }}</a>
-              {% if children %}
+              <a href="#{{ item.id }}">{{ item.name }}</a>
+              {% if item.children %}
               <ul>
-                {% for id, name in children %}
-                <li><a href="#{{ id }}">{{ name }}</a></li>
+                {% for childItem in item.children %}
+                <li><a href="#{{ childItem.id }}">{{ childItem.name }}</a></li>
                 {% endfor %}
               </ul>
               {% endif %}

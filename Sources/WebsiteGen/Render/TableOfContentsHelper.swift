@@ -1,6 +1,10 @@
 import OrderedCollections
 
-public typealias tocItem = (id: String, name: String, children: [Any])
+public struct tocItem: Equatable {
+  var id: String
+  var name: String
+  var children: [tocItem] = []
+}
 
 public func tableOfContents(stencilContext: [String: Any] = [:]) -> [tocItem] {
   let buckets: OrderedDictionary<String, String> = [
@@ -26,12 +30,14 @@ public func tableOfContents(stencilContext: [String: Any] = [:]) -> [tocItem] {
       let array = stencilContext[key] as? [OrderedDictionary<String, nameAndContentArray>.Element]
     {
       let children = array.map { $0.key }.map {
-        (id: $0.prefix(1).lowercased() + $0.dropFirst(), name: $0)
+        tocItem(
+          id: $0.prefix(1).lowercased() + $0.dropFirst().replacingOccurrences(of: " ", with: ""),
+          name: $0, children: [])
       }
-      return (id: key, name: value, children: children)
+      return tocItem(id: key, name: value, children: children)
     }
 
-    return (id: key, name: value, children: [])
+    return tocItem(id: key, name: value, children: [])
   }
 }
 
