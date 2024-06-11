@@ -67,7 +67,6 @@ private func traverseSymbols(
 ) {
   // Visit
   path.push(decl: root)
-  visitor(path)
 
   // Traverse
   switch root.kind {
@@ -79,28 +78,14 @@ private func traverseSymbols(
     FunctionDecl.self,
     MethodImpl.self,
     SubscriptImpl.self,
-    InitializerDecl.self:
-    // Supported, but they don't have children
-    break
-  case MethodDecl.self:
-    let id = MethodDecl.ID(root)!
-    let decl = ctx.typedProgram.ast[id]!
-
-    // Traverse children
-    decl.impls.forEach {
-      child in traverseSymbols(ctx: ctx, root: AnyDeclID(child), visitor: visitor, path: &path)
-    }
-    break
-  case SubscriptDecl.self:
-    let id = SubscriptDecl.ID(root)!
-    let decl = ctx.typedProgram.ast[id]!
-
-    // Traverse children
-    decl.impls.forEach {
-      child in traverseSymbols(ctx: ctx, root: AnyDeclID(child), visitor: visitor, path: &path)
-    }
+    InitializerDecl.self,
+    MethodDecl.self,
+    SubscriptDecl.self:
+    visitor(path)
     break
   case TraitDecl.self:
+    visitor(path)
+
     let id = TraitDecl.ID(root)!
     let decl = ctx.typedProgram.ast[id]!
 
@@ -110,6 +95,8 @@ private func traverseSymbols(
     }
     break
   case ProductTypeDecl.self:
+    visitor(path)
+
     let id = ProductTypeDecl.ID(root)!
     let decl = ctx.typedProgram.ast[id]!
 
