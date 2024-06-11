@@ -160,6 +160,10 @@
     display: block;
     width: 100%;
   }
+
+  code.inline {
+    font-size: .9rem; // Jetbrains mono looks a bit larger visually, so we need to offset it a bit
+  }
 }
 
 #navigation-tree-container {
