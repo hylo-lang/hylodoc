@@ -83,6 +83,10 @@
       margin-right: 4px;
     }
 
+    & > * {
+      flex-shrink: 0;
+    }
+
     &.folder > .icon {
       background-image: url(icons/folder.svg);
     }
@@ -150,6 +154,11 @@
 
   input[type=checkbox]:not(:checked) ~ ul {
     display: none;
+  }
+
+  ul, li {
+    display: block;
+    width: 100%;
   }
 }
 
