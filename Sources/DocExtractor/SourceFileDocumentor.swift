@@ -287,7 +287,6 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
   //TODO: in the future make an array of (initializers, database) for the basic types
   // that only have the common description and just iterate using the array, avoids a lot of repetition
   // also one array for types that have common desc + invariants, etc.
-  // PROBLEM! markdown is not supported inside inline sections!!! Need to call parser again?
   mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
     if let d = TypeAliasDecl.ID(id) {
       if let symbolComment = documentedFile.symbolComments[ast[d].site.startIndex] {
@@ -616,13 +615,13 @@ private func removeSectionTitleInline(
   text: String,
   comment: SourceRepresentable<LowLevelCommentInfo>,
   diagnostics: inout DiagnosticSet
-) -> Block {
+) -> String {
   if text.lowercased().hasPrefix(title.inlineName) {
-    return Block.paragraph(Text.init(text.dropFirst(title.inlineName.count)))
+    return String(text.dropFirst(title.inlineName.count))
   } else {
     diagnostics.insert(
       .warning("Unable to remove title from inline section with text \(text)", at: comment.site))
-    return Block.paragraph(Text.init(Substring(text)))
+    return text
   }
 }
 
@@ -648,11 +647,11 @@ private func parseSpecialSection<T>(
 
   if !inlineSections.isEmpty {
     for inlineSection in inlineSections {
-      let descriptionBlock = removeSectionTitleInline(
+      let descriptionText = removeSectionTitleInline(
         title: type, text: inlineSection.name,
         comment: comment, diagnostics: &diagnostics
       )
-      parsedSections.append(constructor(descriptionBlock))
+      parsedSections.append(constructor(MarkdownParser.standard.parse(descriptionText)))
     }
   } else {
     let blockSection = comment.value.specialSections.first {

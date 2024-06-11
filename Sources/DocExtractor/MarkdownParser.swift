@@ -140,7 +140,7 @@ public struct RealLowLevelCommentParser: LowLevelCommentParser {
           sections.append(section)
         }
 
-        let headingText = text.rawDescription.trimmingCharacters(in: .whitespaces)
+        let headingText = text.description.trimmingCharacters(in: .whitespaces)
 
         guard !headingText.isEmpty else {
           return .failure(.emptySpecialSectionHeading)
