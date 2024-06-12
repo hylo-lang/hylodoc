@@ -1,4 +1,5 @@
 // swift-tools-version:5.10
+import CompilerPluginSupport
 import Foundation
 import PackageDescription
 
@@ -36,6 +37,7 @@ let package = Package(
     .package(url: "https://github.com/objecthub/swift-markdownkit.git", from: "1.1.8"),
     .package(url: "https://github.com/pavel-trafimuk/Stencil", branch: "master"),
     .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "5.2.2"),
+    .package(url: "https://github.com/apple/swift-syntax.git", branch: "release/5.10"),
 
     // Web server for preview:
 
@@ -55,6 +57,15 @@ let package = Package(
       path: "Sources/hdc",
       swiftSettings: allTargetsSwiftSettings),
     .target(
+      name: "HDCUtils",
+      dependencies: [
+        "StandardLibraryCore",
+        "HDCMacros",
+        .product(name: "FrontEnd", package: "hylo"),
+      ],
+      exclude: ["module.md"],
+      swiftSettings: allTargetsSwiftSettings),
+    .target(
       name: "CLI",
       dependencies: [
         "DocExtractor",
@@ -72,6 +83,7 @@ let package = Package(
     .target(
       name: "DocumentationDB",
       dependencies: [
+        "HDCUtils",
         .product(name: "FrontEnd", package: "hylo"),
         .product(name: "MarkdownKit", package: "swift-markdownkit"),
       ],
@@ -97,6 +109,13 @@ let package = Package(
       ],
       exclude: ["module.md"],
       resources: [.copy("Resources/")],
+      swiftSettings: allTargetsSwiftSettings),
+    .macro(
+      name: "HDCMacros",
+      dependencies: [
+        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+        .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+      ],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "WebsiteGenTests",
@@ -134,6 +153,24 @@ let package = Package(
         .product(name: "FrontEnd", package: "hylo"),
       ],
       exclude: [],
+      swiftSettings: allTargetsSwiftSettings),
+    .testTarget(
+      name: "HDCMacrosTests",
+      dependencies: [
+        "HDCMacros",
+        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+      ],
+      exclude: ["module.md"],
+      swiftSettings: allTargetsSwiftSettings),
+    .testTarget(
+      name: "HDCUtilsTests",
+      dependencies: [
+        "HDCUtils",
+        .product(name: "FrontEnd", package: "hylo"),
+      ],
+      path: "Tests/HDCUtilsTests",
+      exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .target(
       name: "HyloStandardLibrary",
