@@ -3,22 +3,39 @@
 /// Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 type Vector2 {
   /// First component of the vector.
-  var x: Float64
+  public var x: Float64
 
   /// Second component of the vector.
-  var y: Float64
+  public var y: Float64
 
-  /// Initializes the vector with two components.
-  init(x: Float64, y: Float64) {
+  public memberwise init
+
+  /// Summary of init.
+  /// 
+  /// This is the description.
+  /// - Note: This is still the description.
+  /// # Preconditions:
+  ///   - Parameters exist
+  /// # Postconditions:
+  ///   - Type exists
+  /// # Throws big errors!
+  public init(x: Float64, y: Float64) {
     self.x = x
     self.y = y
   }
 
-  /// Returns the vector multiplied by scale, without mutating the original vector.
-  fun multiplied(by scale: Float64) -> Vector2 { 
-    return Vector2(x: self.x * scale, y: self.y * scale)
-   }
-
    /// xxxxxxxxx
    typealias foo = String
+}
+
+/// Summary of the product type.
+///
+/// This is the description of the product type.
+/// # Invariants: 
+///   - x and y must always be positive.
+type A {
+  var x: Int
+  var y: Int
+
+  fun foo() -> Int { x.copy() }
 }

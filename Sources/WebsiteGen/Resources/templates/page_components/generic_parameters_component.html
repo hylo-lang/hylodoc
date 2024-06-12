@@ -1,12 +1,11 @@
 {% if genericParameters %}
     <div class="content-section" id="genericParameters">
-        <h1>Generic Parameters</h1>
-        <ul>
-        {% for el in genericParameters %}
-            <li>
-            {{ el }}
-            </li>
+        <h2>Generic Parameters</h2>
+        {% for key, value in genericParameters %}
+            <div class="declaration">
+                {{ key }}
+                {{ value }}
+            </div>
         {% endfor %}
-        </ul>
     </div>
 {% endif %}

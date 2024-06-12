@@ -1,12 +1,11 @@
 {% if parameters %}
     <div class="content-section" id="parameters">
-        <h1>Parameters</h1>
-        <ul>
-        {% for el in parameters %}
-            <li>
-            {{ el }}
-            </li>
+        <h2>Parameters</h2>
+        {% for key, value in parameters %}
+            <div class="declaration">
+                {{ key }}
+                {{ value }}
+            </div>
         {% endfor %}
-        </ul>
     </div>
 {% endif %}

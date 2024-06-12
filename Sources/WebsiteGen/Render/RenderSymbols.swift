@@ -389,11 +389,11 @@ public func renderFunctionPage(
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["parameters"] = doc.documentation.parameters.map { key, value in
+      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
 
     args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
@@ -454,11 +454,11 @@ public func renderMethodPage(
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["parameters"] = doc.documentation.parameters.map { key, value in
+      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
 
     // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
@@ -532,11 +532,11 @@ public func renderSubscriptPage(
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["parameters"] = doc.documentation.parameters.map { key, value in
+      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
     args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       ctx.htmlGenerator.generate(doc: $0)
@@ -608,11 +608,11 @@ public func renderInitializerPage(
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["parameters"] = doc.documentation.parameters.map { key, value in
+      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.mapValues {
-      ctx.htmlGenerator.generate(doc: $0.description)
+    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
 
     args["throwsInfo"] = doc.documentation.common.throwsInfo.map {

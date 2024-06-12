@@ -1,3 +1,7 @@
-public fun examleFunction() {
-  return
-}
+/// Summary of function.
+/// 
+/// This is the description.
+/// - Note: This is still the description.
+/// # Parameter x: This is a parameter.
+/// # Generic T: This is a generic.
+fun id<T: Movable>(_ x: T) -> T { x }
