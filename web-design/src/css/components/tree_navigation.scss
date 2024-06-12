@@ -100,7 +100,13 @@
 
   li {
     position: relative;
+
+    &.active > .nav-entry {
+      background-color: var(--active-navigation-item-bg);
+      color: $text-primary;
+    }
   }
+
   .go-to-location {
     position: absolute;
     right: 16px;

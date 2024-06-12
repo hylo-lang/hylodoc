@@ -1,0 +1,24 @@
+<li {% if item.id|toString == targetId|toString %} class="active"{% endif %}>
+    {% if item.children %}
+    <input type="checkbox" checked>
+    {% endif %}
+
+    <a class="nav-entry {{ item.typeClass }}" href="{% referTo %}">
+        <div class="arrow"></div>
+        {% if item.typeClass == "symbol" %}
+        <code class="inline"><pre>{{ item.name }}</pre></code>
+        {% else %}
+        <div class="icon"></div>
+        <span>{{ item.name }}</span>
+        {% endif %}
+    </a>
+    <!-- <a href="#" class="go-to-location" title="Open source location"></a> unsupported -->
+
+    {% if item.children %}
+    <ul>
+        {% for item in item.children %}
+          {% include "page_components/tree_item.html" %}
+        {% endfor %}
+    </ul>
+    {% endif %}
+</li>

@@ -11,6 +11,7 @@ public struct GenerationContext {
   public let typedProgram: TypedProgram
   public var urlResolver: URLResolver
   public let htmlGenerator: HtmlGenerator
+  public var tree: [TreeItem]
 }
 
 extension FileSystemLoader {
@@ -46,7 +47,8 @@ public func generateDocumentation(
     stencil: stencil,
     typedProgram: typedProgram,
     urlResolver: resolver,
-    htmlGenerator: CustomHTMLGenerator()
+    htmlGenerator: CustomHTMLGenerator(),
+    tree: []
   )
 
   // Resolve URL's
@@ -59,6 +61,9 @@ public func generateDocumentation(
         (path: TargetPath) in
         ctx.urlResolver.resolve(target: path.target, filePath: path.url, parent: path.parent)
       })
+  }
+  ctx.tree = documentation.modules.map {
+    treeItemFromAsset(ctx: ctx, assetId: .folder($0.rootFolder))
   }
 
   // Generate assets and symbols
@@ -115,7 +120,6 @@ public func generateModuleIndexDocumentation(
 
   env["pathToRoot"] = "."
   env["pageType"] = "Folder"
-  env["breadcrumb"] = []
 
   // check if folder has documentation
   env["pageTitle"] = "Documentation"
@@ -129,7 +133,7 @@ public func generateModuleIndexDocumentation(
     )
   }
 
-  env["toc"] = tableOfContents(stencilContext: env)
-  let content = try! ctx.stencil.renderTemplate(name: "folder_layout.html", context: env)
+  let content = try! renderTemplate(
+    ctx: ctx, targetId: .empty, name: "folder_layout.html", env: &env)
   try! exporter.html(content: content, to: URL(fileURLWithPath: "index.html", relativeTo: target))
 }

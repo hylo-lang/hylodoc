@@ -18,7 +18,7 @@ extension Environment {
           return ""
         }
 
-        guard let item = context["item"] as? TreeFlatItem else {
+        guard let item = context["item"] as? TreeItem else {
           return ""
         }
 
@@ -160,7 +160,10 @@ public func renderSymbolPage(ctx: GenerationContext, of: AnyDeclID) throws -> St
 public func renderTemplate(
   ctx: GenerationContext, targetId: AnyTargetID, name: String, env: inout [String: Any]
 ) throws -> String {
+  env["targetId"] = targetId
+  env["targetUrl"] = ctx.urlResolver.references[targetId]?.path ?? RelativePath(pathString: ".")
   env["breadcrumb"] = breadcrumb(ctx: ctx, target: targetId)
+  env["tree"] = ctx.tree
   env["toc"] = tableOfContents(stencilContext: env)
   return try ctx.stencil.renderTemplate(name: name, context: env)
 }

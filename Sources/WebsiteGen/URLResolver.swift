@@ -4,8 +4,8 @@ import OrderedCollections
 import PathWrangler
 
 public struct URLResolver {
-  var tree: Tree? = nil
-  var references: OrderedDictionary<AnyTargetID, (path: RelativePath, parentId: AnyTargetID?)> = [:]
+
+  var references: [AnyTargetID: (path: RelativePath, parentId: AnyTargetID?)] = [:]
   let baseUrl: AbsolutePath
 
   public init(baseUrl: AbsolutePath) {
@@ -68,50 +68,6 @@ public struct URLResolver {
     }
 
     return stack
-  }
-
-  /// Generate the navigation tree
-  public mutating func computeTree(ctx: GenerationContext) {
-    // Map references into tree items
-    var treeItems = ctx.urlResolver.references.filter {
-      // Don't include other-files in navigation
-      switch $0.key {
-      case .asset(let assetId):
-        switch assetId {
-        case .otherFile(_):
-          return false
-        default:
-          return true
-        }
-      default:
-        return true
-      }
-    }.reduce(into: OrderedDictionary<AnyTargetID, TreeDynamicItem>()) {
-      dict, elem in
-      let (key, value) = elem
-      dict[key] = TreeDynamicItem(
-        parent: value.parentId,
-        name: navigationNameOfTarget(ctx: ctx, target: key),
-        relativePath: value.path,
-        children: []
-      )
-    }.filter { !$0.value.name.isEmpty }
-
-    // Apply nesting
-    var roots: [AnyTargetID] = []
-    for (target, item) in treeItems {
-      guard let parentId = item.parent else {
-        // If it has no parent then it must be a root
-        roots.append(target)
-        continue
-      }
-
-      // Make item a child
-      treeItems[parentId]!.children.append(target)
-    }
-
-    // Flatten tree from root items
-    self.tree = roots.map { id in flatItem(ctx: ctx, treeItems: treeItems, targetId: id) }
   }
 
 }

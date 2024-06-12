@@ -5,6 +5,10 @@ import PathWrangler
 
 /// Generate the breadcrumb tuples for a target
 public func breadcrumb(ctx: GenerationContext, target: AnyTargetID) -> [(String, RelativePath?)] {
+  if case .empty = target {
+    return []
+  }
+
   return ctx.urlResolver.pathStack(target: target).map {
     pathTarget in
     (
