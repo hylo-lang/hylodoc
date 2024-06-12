@@ -25,14 +25,14 @@ final class SubscriptExtractionTest: XCTestCase {
         /// 
         /// This is the description.
         /// - Note: This is still the description.
-        /// # Yields some stuff.
+        /// # Yields: some stuff.
         /// # Parameter param: sample param desc
         subscript foo(param: Int): T { 
           /// Summary of subscript implementation.
           /// 
           /// This is the description2.
           /// - Note: This is still the description2.
-          /// # Yields some other stuff.
+          /// # Yields: some other stuff.
           T() 
         }
         """, named: "testFile11.hylo")

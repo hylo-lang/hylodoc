@@ -145,21 +145,21 @@ public enum SpecialSectionType {
     case .parameter:
       return "parameter "
     case .returns:
-      return "returns "
+      return "returns: "
     case .throws:
-      return "throws "
+      return "throws: "
     case .precondition:
-      return "precondition "
+      return "precondition: "
     case .postcondition:
-      return "postcondition "
+      return "postcondition: "
     case .invariant:
-      return "invariant "
+      return "invariant: "
     case .complexity:
-      return "complexity "
+      return "complexity: "
     case .generic:
       return "generic "
     case .yields:
-      return "yields "
+      return "yields: "
     }
   }
 

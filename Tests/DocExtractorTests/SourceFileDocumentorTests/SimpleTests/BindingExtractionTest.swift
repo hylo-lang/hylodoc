@@ -25,7 +25,7 @@ final class BindingExtractionTest: XCTestCase {
         /// 
         /// This is the description.
         /// - Note: This is still the description.
-        /// # Invariant foo must be positive
+        /// # Invariant: foo must be positive
         let foo = 5
         """, named: "testFile3.hylo")
 

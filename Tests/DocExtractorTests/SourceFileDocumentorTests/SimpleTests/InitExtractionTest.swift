@@ -37,7 +37,7 @@ final class InitExtractionTest: XCTestCase {
           ///   - Parameters exist
           /// # Postconditions:
           ///   - Type exists
-          /// # Throws big errors!
+          /// # Throws: big errors!
           public init(x: Float64, y: Float64) {
             self.x = x
             self.y = y

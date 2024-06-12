@@ -25,7 +25,7 @@ final class TraitExtractionTest: XCTestCase {
         /// 
         /// This is the description.
         /// - Note: This is still the description.
-        /// # Invariant A must be capitalized
+        /// # Invariant: A must be capitalized
         trait A {
           type B
         }

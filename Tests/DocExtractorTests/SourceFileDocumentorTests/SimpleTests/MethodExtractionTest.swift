@@ -35,7 +35,7 @@ final class MethodExtractionTest: XCTestCase {
           /// This is the description1.
           /// - Note: This is still the description1.
           /// # Parameter delta: it is a vector
-          /// # Returns another vector!
+          /// # Returns: another vector!
           public fun offset(by delta: Vector2) -> Vector2 {
             /// Summary of method implementation.
             /// 

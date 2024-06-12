@@ -14,7 +14,7 @@ final class ProductTypeExtractionTest: XCTestCase {
         /// Summary of the product type.
         ///
         /// This is the description of the product type.
-        /// # Invariant x and y must always be positive.
+        /// # Invariant: x and y must always be positive.
         type A {
           var x: Int
           var y: Int
