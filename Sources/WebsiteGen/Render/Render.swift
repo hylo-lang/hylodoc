@@ -1,6 +1,7 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
+import PathWrangler
 import Stencil
 
 /// Extension to the Stencil Environment struct to allow for default behavior of whitespace control and custom filters
@@ -8,13 +9,28 @@ import Stencil
 extension Environment {
   public init(loader: Loader?) {
     let ext = Extension()
-    ext.registerFilter("convertToID") {(value: Any?) in return convertToID(value)}
+    ext.registerFilter("convertToID") { (value: Any?) in return convertToID(value) }
+    ext.registerFilter("toString") { value in String(describing: value) }
+    ext.registerSimpleTag(
+      "referTo",
+      handler: { context in
+        guard let targetUrl = context["targetUrl"] as? RelativePath else {
+          return ""
+        }
+
+        guard let item = context["item"] as? TreeFlatItem else {
+          return ""
+        }
+
+        return String(describing: targetUrl.refer(to: item.relativePath).resolved())
+      })
+    // TODO register tag to refer between items
 
     self.init(
       loader: loader,
       extensions: [ext],
       trimBehaviour: .smart
-      )
+    )
   }
 }
 
@@ -22,10 +38,10 @@ extension Environment {
 /// - Parameter value: the string to convert
 /// - Returns: the converted string, or the original value if it is not a string
 func convertToID(_ value: Any?) -> Any? {
-    guard let string = value as? String else { return value }
-    
-    // taken from Tests/WebsiteGenTests/TableOfContentsHelperTest/TableOfContentsHelperTest.swift
-    return string.prefix(1).lowercased() + string.dropFirst().replacingOccurrences(of: " ", with: "")
+  guard let string = value as? String else { return value }
+
+  // taken from Tests/WebsiteGenTests/TableOfContentsHelperTest/TableOfContentsHelperTest.swift
+  return string.prefix(1).lowercased() + string.dropFirst().replacingOccurrences(of: " ", with: "")
 }
 
 /// Render an arbitrary asset page
@@ -139,4 +155,12 @@ public func renderSymbolPage(ctx: GenerationContext, of: AnyDeclID) throws -> St
   default:
     return ""
   }
+}
+
+public func renderTemplate(
+  ctx: GenerationContext, targetId: AnyTargetID, name: String, env: inout [String: Any]
+) throws -> String {
+  env["breadcrumb"] = breadcrumb(ctx: ctx, target: targetId)
+  env["toc"] = tableOfContents(stencilContext: env)
+  return try ctx.stencil.renderTemplate(name: name, context: env)
 }

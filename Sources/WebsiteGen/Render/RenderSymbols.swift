@@ -149,33 +149,32 @@ public func renderAssociatedTypePage(
 ) throws -> String {
   let decl: AssociatedTypeDecl = ctx.typedProgram.ast[of]!
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
   // TODO address the case where the function has no name
-  args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: .symbol(AnyDeclID(of)))
+  env["name"] = decl.identifier.value
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-  args["pageTitle"] = decl.identifier.value
-  args["pageType"] = "Associated Type"
-  args["declarationPreview"] = decl.site.text  // todo
+  env["pageTitle"] = decl.identifier.value
+  env["pageType"] = "Associated Type"
+  env["declarationPreview"] = decl.site.text  // todo
 
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "associated_type_layout.html", context: args)
+  return try renderTemplate(
+    ctx: ctx, targetId: .symbol(AnyDeclID(of)), name: "associated_type_layout.html", env: &env)
 }
 
 /// Render the associated-value page
@@ -191,32 +190,31 @@ public func renderAssociatedValuePage(
 ) throws -> String {
   let decl: AssociatedValueDecl = ctx.typedProgram.ast[of]!
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
-  args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: .symbol(AnyDeclID(of)))
+  env["name"] = decl.identifier.value
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .symbol(AnyDeclID(of)))
 
-  args["pageTitle"] = decl.identifier.value
-  args["pageType"] = "Associated Value"
-  args["declarationPreview"] = decl.site.text  // todo
+  env["pageTitle"] = decl.identifier.value
+  env["pageType"] = "Associated Value"
+  env["declarationPreview"] = decl.site.text  // todo
 
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "associated_value_layout.html", context: args)
+  return try renderTemplate(
+    ctx: ctx, targetId: .symbol(AnyDeclID(of)), name: "associated_value_layout.html", env: &env)
 }
 
 /// Render the type-alias page
@@ -233,29 +231,27 @@ public func renderTypeAliasPage(
   let decl: TypeAliasDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
-  args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  var env: [String: Any] = [:]
+  env["name"] = decl.identifier.value
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
-  args["pageType"] = "Type Alias"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
+  env["pageType"] = "Type Alias"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "type_alias_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "type_alias_layout.html", env: &env)
 }
 
 /// Render the binding page
@@ -272,31 +268,29 @@ public func renderBindingPage(
   let decl: BindingDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
-  args["name"] = "binding"
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  env["name"] = "binding"
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
-  args["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
+  env["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
     if let block = doc.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
+    env["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
 
-    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "binding_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "binding_layout.html", env: &env)
 }
 
 /// Render the operator page
@@ -313,32 +307,30 @@ public func renderOperatorPage(
   let decl: OperatorDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
   // TODO address the case where the function has no name
-  args["name"] = decl.name.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  env["name"] = decl.name.value
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = decl.site.text  // todo
-  args["pageType"] = "Operator Introducer"
-  args["declarationPreview"] = decl.site.text  // todo
+  env["pageTitle"] = decl.site.text  // todo
+  env["pageType"] = "Operator Introducer"
+  env["declarationPreview"] = decl.site.text  // todo
 
   if let doc = doc {
     // Summary
     if let summary = doc.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
-    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "operator_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "operator_layout.html", env: &env)
 }
 
 /// Render the function page
@@ -355,54 +347,51 @@ public func renderFunctionPage(
   let decl: FunctionDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
+  env["name"] = decl.site.text
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["name"] = decl.site.text
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
-
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
-  args["pageType"] = "Function"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
+  env["pageType"] = "Function"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["preconditions"] = doc.documentation.common.preconditions.map {
+    env["preconditions"] = doc.documentation.common.preconditions.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
-    args["postconditions"] = doc.documentation.common.postconditions.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
-    }
-
-    args["returns"] = doc.returns.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
-    }
-    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+    env["postconditions"] = doc.documentation.common.postconditions.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.map { key, value in
+    env["returns"] = doc.returns.map {
+      ctx.htmlGenerator.generate(doc: $0.description)
+    }
+    env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+      ctx.htmlGenerator.generate(doc: $0.description)
+    }
+
+    env["parameters"] = doc.documentation.parameters.map { key, value in
       (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
 
-    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
+    env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       ctx.htmlGenerator.generate(doc: $0)
     }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "function_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "function_layout.html", env: &env)
 }
 
 /// Render the method page
@@ -419,60 +408,58 @@ public func renderMethodPage(
   let decl: MethodDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
   // TODO address the case where the function has no name
-  args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  env["name"] = decl.identifier.value
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
-  args["pageType"] = "Method"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
+  env["pageType"] = "Method"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["preconditions"] = doc.documentation.common.preconditions.map {
+    env["preconditions"] = doc.documentation.common.preconditions.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
-    args["postconditions"] = doc.documentation.common.postconditions.map {
+    env["postconditions"] = doc.documentation.common.postconditions.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
-    args["returns"] = doc.returns.map {
+    env["returns"] = doc.returns.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
-    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+    env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.map { key, value in
+    env["parameters"] = doc.documentation.parameters.map { key, value in
       (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
 
     // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
-    args["members"] = prepareMembersData(
+    env["members"] = prepareMembersData(
       referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
       ctx: ctx)
 
-    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
+    env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       ctx.htmlGenerator.generate(doc: $0)
     }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "method_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "method_layout.html", env: &env)
 }
 
 /// Render the method-implementation page
@@ -503,52 +490,50 @@ public func renderSubscriptPage(
   let decl: SubscriptDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
-  args["name"] = decl.site.text
+  env["name"] = decl.site.text
 
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
-  args["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
+  env["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["yields"] = doc.yields.map {
+    env["yields"] = doc.yields.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
-    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+    env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.map { key, value in
+    env["parameters"] = doc.documentation.parameters.map { key, value in
       (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
+    env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       ctx.htmlGenerator.generate(doc: $0)
     }
   }
   // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
-  args["members"] = prepareMembersData(
+  env["members"] = prepareMembersData(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
     ctx: ctx)
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "subscript_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "subscript_layout.html", env: &env)
 }
 
 /// Render the subscript-implementation page
@@ -579,53 +564,51 @@ public func renderInitializerPage(
   let decl: InitializerDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
   // TODO address the case where the function has no name
-  args["name"] = decl.site.text
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  env["name"] = decl.site.text
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
-  args["pageType"] = "Initializer"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
+  env["pageType"] = "Initializer"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
 
   if let doc = doc {
     // Summary
     if let summary = doc.documentation.common.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     // Details
     if let block = doc.documentation.common.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["preconditions"] = doc.documentation.common.preconditions.map {
+    env["preconditions"] = doc.documentation.common.preconditions.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
-    args["postconditions"] = doc.documentation.common.postconditions.map {
+    env["postconditions"] = doc.documentation.common.postconditions.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["parameters"] = doc.documentation.parameters.map { key, value in
+    env["parameters"] = doc.documentation.parameters.map { key, value in
       (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
     }
-    args["genericParameters"] = doc.documentation.genericParameters.map { key, value in
+    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
 
-    args["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+    env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
       ctx.htmlGenerator.generate(doc: $0.description)
     }
 
-    args["seeAlso"] = doc.documentation.common.common.seeAlso.map {
+    env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
       ctx.htmlGenerator.generate(doc: $0)
     }
   }
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "initializer_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "initializer_layout.html", env: &env)
 }
 
 /// Render the trait page
@@ -642,35 +625,33 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
   let decl: TraitDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
-  args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  env["name"] = decl.identifier.value
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
-  args["pageType"] = "Trait"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
+  env["pageType"] = "Trait"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     if let block = doc.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
 
-    args["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
+    env["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
 
-    args["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
-  args["members"] = prepareMembersData(
+  env["members"] = prepareMembersData(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "trait_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "trait_layout.html", env: &env)
 }
 
 /// Render the product-type page
@@ -687,34 +668,32 @@ public func renderProductTypePage(
   let decl: ProductTypeDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
 
-  var args: [String: Any] = [:]
+  var env: [String: Any] = [:]
 
-  args["name"] = decl.identifier.value
-  args["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
-  args["breadcrumb"] = breadcrumb(ctx: ctx, target: target)
+  env["name"] = decl.identifier.value
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  args["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx, of, target)
-  args["pageType"] = "Product Type"
-  args["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx, of, target)
+  env["pageType"] = "Product Type"
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(
     ctx, of, target)
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      args["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
     }
 
     if let block = doc.common.description {
-      args["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generate(doc: block)
     }
-    args["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
-    args["seeAlso"] = doc.common.seeAlso.map {
+    env["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
+    env["seeAlso"] = doc.common.seeAlso.map {
       ctx.htmlGenerator.generate(doc: $0)
     }
   }
 
-  args["members"] = prepareMembersData(
+  env["members"] = prepareMembersData(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
-  args["toc"] = tableOfContents(stencilContext: args)
-  return try ctx.stencil.renderTemplate(name: "product_type_layout.html", context: args)
+  return try renderTemplate(ctx: ctx, targetId: target, name: "product_type_layout.html", env: &env)
 }
