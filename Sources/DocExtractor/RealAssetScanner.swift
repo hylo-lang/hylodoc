@@ -93,7 +93,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
     typedProgram: TypedProgram,
     sourceFileDocumentor: SFDocumentor,
     fileManager: FileManager = .default,
-    markdownParser: MarkdownParser = .standard
+    markdownParser: MarkdownParser = HyloDocMarkdownParser.standard
   ) {
     self.modules = modules
     self.typedProgram = typedProgram
@@ -193,11 +193,11 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
 /// Scans the assets in the given modules and calls the visitor for each asset.
 public func extractDocumentation(typedProgram: TypedProgram, for modules: [InputModuleInfo]) ->  //
   Result<
-    DocumentationDatabase, DocExtractionError<DocDBBuildingAssetScanner<RealSourceFileDocumentor<RealCommentParser<RealLowLevelCommentParser>>>
-  >>
+    DocumentationDatabase, DocExtractionError<DocDBBuildingAssetScanner<RealSourceFileDocumentor>>
+  >
 {
   let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-  let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
+  let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
   var builder = DocDBBuildingAssetScanner(
     modules: modules,
     typedProgram: typedProgram,

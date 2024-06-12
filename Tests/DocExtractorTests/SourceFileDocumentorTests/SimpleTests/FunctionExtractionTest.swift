@@ -7,7 +7,7 @@ import TestUtils
 final class FuncExtractionTest: XCTestCase {
   func testFuncExtractionInlineParams() {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
+    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
 
     let sourceFile = SourceFile(
       synthesizedText: """
@@ -60,7 +60,7 @@ final class FuncExtractionTest: XCTestCase {
 
   func testFuncExtractionSectionParams() {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
+    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
 
     let sourceFile = SourceFile(
       synthesizedText: """
@@ -115,7 +115,7 @@ final class FuncExtractionTest: XCTestCase {
 
   func testFuncExtractionWrongParams() {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
+    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
 
     let sourceFile = SourceFile(
       synthesizedText: """

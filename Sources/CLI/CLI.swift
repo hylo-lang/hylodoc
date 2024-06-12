@@ -83,7 +83,7 @@ public struct CLI: ParsableCommand {
         guard generateDocumentation(
           documentation: documentationDatabase,
           typedProgram: typedProgram,
-          target: outputURL
+          exportPath: outputURL
         ) else {
           throw NSError(
             domain: "CLIError", code: 3,

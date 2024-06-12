@@ -36,17 +36,17 @@ public func createDefaultStencilEnvironment() -> Environment {
 public func generateDocumentation(
   documentation: DocumentationDatabase,
   typedProgram: TypedProgram,
-  target: URL
+  exportPath: URL
 ) -> Bool {
   // Setup Context
   let stencil = createDefaultStencilEnvironment()
-  let resolver = URLResolver(baseUrl: AbsolutePath(url: target)!)
+  let resolver = URLResolver(baseUrl: AbsolutePath(url: exportPath)!)
   var ctx = GenerationContext(
     documentation: documentation,
     stencil: stencil,
     typedProgram: typedProgram,
     urlResolver: resolver,
-    htmlGenerator: RenderHTMLGenerator()
+    htmlGenerator: CustomHTMLGenerator()
   )
 
   // Resolve URL's
@@ -81,14 +81,18 @@ public func generateDocumentation(
   }
 
   // Generate index page with all the modules
-  generateModuleIndexDocumentation(ctx: ctx, exporter: exporter, target: target)
+  generateModuleIndexDocumentation(ctx: ctx, exporter: exporter, target: exportPath)
 
-  // Copy public website assets
-  // assuming target directory exists already
-  let assetsSourceLocation = Bundle.module.bundleURL.appendingPathComponent("Resources")
+  return copyPublicWebsiteAssets(exportPath: exportPath)
+}
+
+/// Precondition: directory exists at `exportPath`
+func copyPublicWebsiteAssets(exportPath: URL) -> Bool {
+  let assetsSourceLocation = Bundle.module.bundleURL
+    .appendingPathComponent("Resources")
     .appendingPathComponent("assets")
-  
-  let assetsExportLocation = URL(fileURLWithPath: "assets", relativeTo: target)
+
+  let assetsExportLocation = exportPath.appendingPathComponent("assets")
   do {
     try FileManager.default.copyItem(
       at: assetsSourceLocation,

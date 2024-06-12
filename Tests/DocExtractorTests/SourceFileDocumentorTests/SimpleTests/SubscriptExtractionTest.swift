@@ -7,7 +7,7 @@ import TestUtils
 final class SubscriptExtractionTest: XCTestCase {
   func testSubscriptDeclExtraction() {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
+    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
 
     let sourceFile = SourceFile(
       synthesizedText: """

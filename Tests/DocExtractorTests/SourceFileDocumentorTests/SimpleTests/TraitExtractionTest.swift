@@ -7,7 +7,7 @@ import TestUtils
 final class TraitExtractionTest: XCTestCase {
   func testTraitExtraction() {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser)
+    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
 
     let sourceFile = SourceFile(
       synthesizedText: """

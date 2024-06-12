@@ -78,6 +78,7 @@ public enum MarkdownParserError: Error, CustomStringConvertible {
 
 public struct RealLowLevelCommentParser: LowLevelCommentParser {
   public init() {}
+  private static let markdownParser = HyloDocMarkdownParser.standard
 
   public enum ParsingError: Error, Equatable {
     case missingWhitespace(inLine: String)
@@ -88,7 +89,7 @@ public struct RealLowLevelCommentParser: LowLevelCommentParser {
   public func parse(commentLines: [String]) -> Result<LowLevelCommentInfo, ParsingError> {
     stripLeadingDocSlashes(commentLines: commentLines)
       .map { $0.joined(separator: "\n") }
-      .map { MarkdownParser.standard.parse($0) }
+      .map { Self.markdownParser.parse($0) }
       .flatMap { markdownDoc in
         guard case let .document(blocks) = markdownDoc else {
           fatalError(

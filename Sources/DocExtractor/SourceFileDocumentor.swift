@@ -9,11 +9,13 @@ public protocol SourceFileDocumentor {
   ) -> GeneralDescriptionFields
 }
 
-public struct RealSourceFileDocumentor<CommentParserT: CommentParser>: SourceFileDocumentor {
-  private let commentParser: CommentParserT
+public struct RealSourceFileDocumentor: SourceFileDocumentor {
+  private let commentParser: any CommentParser
+  private let markdownParser: MarkdownParser
 
-  public init(commentParser: CommentParserT) {
+  public init(commentParser: any CommentParser, markdownParser: MarkdownParser) {
     self.commentParser = commentParser
+    self.markdownParser = markdownParser
   }
 
   public func document(
@@ -35,7 +37,7 @@ public struct RealSourceFileDocumentor<CommentParserT: CommentParser>: SourceFil
     // Traverse the AST to collect symbol documentation
 
     var visitor = SymbolDocumenterASTVisitor(
-      symbolStore: symbolStore, documentedFile: documentedFile)
+      symbolStore: symbolStore, documentedFile: documentedFile, markdownParser: markdownParser)
     ast.walk(translationUnitId, notifying: &visitor)
 
     symbolStore = visitor.symbolStore
@@ -123,7 +125,6 @@ private func parseSeeAlsoSection(
 }
 
 public enum SpecialSectionType {
-  // todo add these when extending the parser, possibly dealing with plurals somehow
   case `parameter`
   case `returns`
   case `throws`
@@ -278,10 +279,14 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
   public private(set) var symbolStore: SymbolDocStore
   public private(set) var diagnostics: DiagnosticSet
 
-  init(symbolStore: SymbolDocStore, documentedFile: DocumentedFile) {
+  private let markdownParser: MarkdownParser
+
+  init(symbolStore: SymbolDocStore, documentedFile: DocumentedFile, markdownParser: MarkdownParser)
+  {
     self.symbolStore = symbolStore
     self.documentedFile = documentedFile
     self.diagnostics = DiagnosticSet()
+    self.markdownParser = markdownParser
   }
 
   //TODO: in the future make an array of (initializers, database) for the basic types
@@ -367,7 +372,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
               comment: symbolComment, diagnostics: &diagnostics),
             invariants: parseSpecialSection(
               type: .invariant, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Invariant.init(description:))
+              constructor: Invariant.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -386,7 +391,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
               comment: symbolComment, diagnostics: &diagnostics),
             invariants: parseSpecialSection(
               type: .invariant, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Invariant.init(description:))
+              constructor: Invariant.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -406,7 +411,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
               comment: symbolComment, diagnostics: &diagnostics),
             invariants: parseSpecialSection(
               type: .invariant, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Invariant.init(description:))
+              constructor: Invariant.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -430,7 +435,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
             ),
             returns: parseSpecialSection(
               type: .returns, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Returns.init(description:))
+              constructor: Returns.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -454,7 +459,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
             ),
             returns: parseSpecialSection(
               type: .returns, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Returns.init(description:))
+              constructor: Returns.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -476,7 +481,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
             ),
             returns: parseSpecialSection(
               type: .returns, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Returns.init(description:))
+              constructor: Returns.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -500,7 +505,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
             ),
             yields: parseSpecialSection(
               type: .yields, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Yields.init(description:))
+              constructor: Yields.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -522,7 +527,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
             ),
             yields: parseSpecialSection(
               type: .yields, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Yields.init(description:))
+              constructor: Yields.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -578,13 +583,13 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
       common: symbolGeneralDescriptionMaker(comment: comment, diagnostics: &diagnostics),
       preconditions: parseSpecialSection(
         type: .precondition, comment: comment, diagnostics: &diagnostics,
-        constructor: Precondition.init(description:)),
+        constructor: Precondition.init(description:), markdownParser: markdownParser),
       postconditions: parseSpecialSection(
         type: .postcondition, comment: comment, diagnostics: &diagnostics,
-        constructor: Postcondition.init(description:)),
+        constructor: Postcondition.init(description:), markdownParser: markdownParser),
       throwsInfo: parseSpecialSection(
         type: .throws, comment: comment, diagnostics: &diagnostics,
-        constructor: Throws.init(description:))
+        constructor: Throws.init(description:), markdownParser: markdownParser)
     )
   }
 
@@ -637,7 +642,8 @@ private func parseSpecialSection<T>(
   type: SpecialSectionType,
   comment: SourceRepresentable<LowLevelCommentInfo>,
   diagnostics: inout DiagnosticSet,
-  constructor: (Block) -> T
+  constructor: (Block) -> T,
+  markdownParser: MarkdownParser
 ) -> [T] {
   var parsedSections: [T] = []
 
@@ -651,7 +657,7 @@ private func parseSpecialSection<T>(
         title: type, text: inlineSection.name,
         comment: comment, diagnostics: &diagnostics
       )
-      parsedSections.append(constructor(MarkdownParser.standard.parse(descriptionText)))
+      parsedSections.append(constructor(markdownParser.parse(descriptionText)))
     }
   } else {
     let blockSection = comment.value.specialSections.first {

@@ -45,7 +45,7 @@ final class SimpleFullPipelineTest: XCTestCase {
       guard generateDocumentation(
         documentation: documentationDatabase,
         typedProgram: typedProgram,
-        target: outputURL
+        exportPath: outputURL
       ) else{ return XCTFail("failed to generate documentation") }
       
       print("Documentation successfully generated at \(outputURL).")

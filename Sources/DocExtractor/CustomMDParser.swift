@@ -1,6 +1,10 @@
 import Foundation
 import MarkdownKit
 
+public protocol HyloReferenceRenderer {
+  func render(hyloReference reference: HyloReference) -> String
+}
+
 public struct HyloReference: CustomTextFragment, Equatable {
   let text: String
 
@@ -18,7 +22,8 @@ public struct HyloReference: CustomTextFragment, Equatable {
   }
 
   public func generateHtml(via htmlGen: HtmlGenerator) -> String {
-    return "<code class=\"hylo-ref\">" + text + "</code>"
+    precondition(htmlGen is HyloReferenceRenderer, "HtmlGenerator must be a HyloReferenceRenderer")
+    return (htmlGen as! HyloReferenceRenderer).render(hyloReference: self)
   }
 
   public var rawDescription: String {
@@ -123,7 +128,7 @@ open class CodeRefLinkHtmlTransformer: InlineTransformer {
   }
 }
 
-final class HyloDocMarkdownParser: MarkdownParser {
+public final class HyloDocMarkdownParser: MarkdownParser {
   override public class var defaultInlineTransformers: [InlineTransformer.Type] {
     return [
       DelimiterTransformer.self,

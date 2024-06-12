@@ -11,6 +11,8 @@ public final class CustomMDParserTest: XCTestCase {
       DelimiterTransformer.self
     ])
 
+  static let hylodocMDParser = HyloDocMarkdownParser.standard
+
   func testDelimiterParserWorksForMultipleBackticks() {
     XCTAssertEqual(
       Self.delimiterParser.parse("`simple code`"),
@@ -79,7 +81,7 @@ public final class CustomMDParserTest: XCTestCase {
 
   func testNormalInlineCodeWorks() {
     XCTAssertEqual(
-      HyloDocMarkdownParser.standard.parse("`simple code`"),
+      Self.hylodocMDParser.parse("`simple code`"),
       .document([
         .paragraph(
           Text([
@@ -110,6 +112,13 @@ public final class CustomMDParserTest: XCTestCase {
       ]),
       "2+ backticks should be parsed as inline code"
     )
+  }
+
+  class DummyCustomHTMLRenderer: HtmlGenerator, HyloReferenceRenderer {
+    /// Rendering hylo references by resolving the reference to a link to the actual target.
+    func render(hyloReference reference: HyloReference) -> String {
+      return "BEGIN\(reference.rawDescription)END"
+    }
   }
 
   func testHyloCodeReferences() {
@@ -149,14 +158,14 @@ public final class CustomMDParserTest: XCTestCase {
 
   func testDummyHTMLAndDescriptionGeneration() {
     XCTAssertEqual(
-      HyloReference("MyType.Element").generateHtml(via: HtmlGenerator.standard),
-      "<code class=\"hylo-ref\">MyType.Element</code>"
+      HyloReference("MyType.Element").generateHtml(via: DummyCustomHTMLRenderer()),
+      "BEGINMyType.ElementEND"
     )
     XCTAssertEqual(
-      HtmlGenerator.standard.generate(
+      DummyCustomHTMLRenderer().generate(
         doc: HyloDocMarkdownParser.standard.parse("``MyType.Element``")
       ).trimmingSuffix(while: { $0.isWhitespace }),
-      "<p><code class=\"hylo-ref\">MyType.Element</code></p>"
+      "<p>BEGINMyType.ElementEND</p>"
     )
 
     XCTAssertEqual(
