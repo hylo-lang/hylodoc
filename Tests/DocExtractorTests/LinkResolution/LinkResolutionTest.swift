@@ -1,8 +1,8 @@
+import Foundation
 import StandardLibraryCore
 import XCTest
 
 @testable import DocExtractor
-@testable import Foundation
 @testable import FrontEnd
 
 final class NameResolutionTest: XCTestCase {
