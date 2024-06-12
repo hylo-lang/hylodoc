@@ -1,3 +1,4 @@
+import Foundation
 import PathWrangler
 
 extension RelativePath {
@@ -22,6 +23,12 @@ extension RelativePath {
       similar += 1
     }
 
+    // Remove "index.html" as it's not needed
+    if URL(path: url).lastPathComponent == "index.html" {
+      url = url / ".."
+    }
+
+    url.resolve()
     return url
   }
 
