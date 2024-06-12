@@ -23,12 +23,27 @@ public protocol AssetProcessingVisitor {
   ) -> Result<FolderAsset.ID, FolderProcessingError>
 }
 
-public enum DocExtractionError<Visitor: AssetProcessingVisitor>: Error {
+public enum DocExtractionError<Visitor: AssetProcessingVisitor>: Error, CustomStringConvertible {
   case scanningSubfoldersError(URL, Error)
   case sourceFileProcessingError(URL, Visitor.SourceFileProcessingError)
   case articleProcessingError(URL, Visitor.ArticleProcessingError)
   case otherLocalFileProcessingError(URL, Visitor.OtherLocalFileProcessingError)
   case folderProcessingError(URL, Visitor.FolderProcessingError)
+
+  public var description: String {
+    switch self {
+    case let .scanningSubfoldersError(url, error):
+      return "Error scanning subfolders of \(url):\n\(error)"
+    case let .sourceFileProcessingError(_, error):
+      return "Error processing source file:\n\(error)"
+    case let .articleProcessingError(url, error):
+      return "Error processing article at \(url):\n\(error)"
+    case let .otherLocalFileProcessingError(url, error):
+      return "Error processing other local file at \(url):\n\(error)"
+    case let .folderProcessingError(url, error):
+      return "Error processing folder at \(url):\n\(error)"
+    }
+  }
 }
 
 extension Array {

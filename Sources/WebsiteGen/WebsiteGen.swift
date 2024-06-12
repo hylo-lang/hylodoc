@@ -26,6 +26,7 @@ public func createFileSystemTemplateLoader() -> FileSystemLoader {
 public func createDefaultStencilEnvironment() -> Environment {
   return Environment(loader: createFileSystemTemplateLoader())
 }
+
 /// Render the full documentation website
 ///
 /// - Parameters:
@@ -36,7 +37,7 @@ public func generateDocumentation(
   documentation: DocumentationDatabase,
   typedProgram: TypedProgram,
   target: URL
-) {
+) -> Bool {
   // Setup Context
   let stencil = createDefaultStencilEnvironment()
   let resolver = URLResolver(baseUrl: AbsolutePath(url: target)!)
@@ -86,10 +87,21 @@ public func generateDocumentation(
   // assuming target directory exists already
   let assetsSourceLocation = Bundle.module.bundleURL.appendingPathComponent("Resources")
     .appendingPathComponent("assets")
-  try! FileManager.default.copyItem(
-    at: assetsSourceLocation,
-    to: URL(fileURLWithPath: "assets", relativeTo: target)
-  )
+  
+  let assetsExportLocation = URL(fileURLWithPath: "assets", relativeTo: target)
+  do {
+    try FileManager.default.copyItem(
+      at: assetsSourceLocation,
+      to: assetsExportLocation
+    )
+  } catch {
+    print("Error while copying webside assets")
+    print("from \"\(assetsSourceLocation)\"")
+    print("to \"\(assetsExportLocation)\":")
+    print(error)
+    return false
+  }
+  return true
 }
 
 public func generateModuleIndexDocumentation(

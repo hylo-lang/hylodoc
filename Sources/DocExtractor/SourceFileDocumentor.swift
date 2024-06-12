@@ -257,7 +257,7 @@ private func validateAllowedSpecialSections(
     if !allowedSectionTitles.contains(where: { section.name.lowercased().starts(with: $0) }) {
       diagnostics.insert(
         .error(
-          "Unexpected special section heading '\(section.name.lowercased())'. Allowed section titles are: \(allowedSectionTitles)",
+          "Unexpected special section heading '\(section.name.lowercased())'.\nApplicable section titles are: \(allowedSectionTitles.descriptions())",
           at: comment.site)
       )
     }

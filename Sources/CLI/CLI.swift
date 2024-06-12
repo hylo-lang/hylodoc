@@ -67,7 +67,7 @@ public struct CLI: ParsableCommand {
         reportingDiagnosticsTo: &diagnostics, tracingInferenceIf: { (_, _) in false })
 
       guard diagnostics.isEmpty else {
-        print("TypedProgram diagnostics errors found: \(diagnostics.description)")
+        print("TypedProgram diagnostics errors found: \(diagnostics)")
         throw NSError(
           domain: "CLIError", code: 1,
           userInfo: [NSLocalizedDescriptionKey: "TypedProgram diagnostics errors found."])
@@ -76,17 +76,20 @@ public struct CLI: ParsableCommand {
       let result = extractDocumentation(
         typedProgram: typedProgram,
         for: modules
-        )
+      )
 
       switch result {
       case .success(let documentationDatabase):
-        generateDocumentation(
+        guard generateDocumentation(
           documentation: documentationDatabase,
           typedProgram: typedProgram,
           target: outputURL
-        )
+        ) else {
+          throw NSError(
+            domain: "CLIError", code: 3,
+            userInfo: [NSLocalizedDescriptionKey: "Failed to generate website."])
+        }
       case .failure(let error):
-        print("Failed to extract documentation: \(error)")
         throw NSError(
           domain: "CLIError", code: 2,
           userInfo: [NSLocalizedDescriptionKey: "Failed to extract documentation: \(error)"])

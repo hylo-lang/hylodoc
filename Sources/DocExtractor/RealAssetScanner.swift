@@ -58,9 +58,18 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
   public enum ArticleProcessingError: Error {
     case fileReadingError(URL, Error)
   }
-  public enum SourceFileProcessingError: Error {
+  public enum SourceFileProcessingError: Error, CustomStringConvertible {
     case noTranslationUnitFound(for: URL)
     case processingIssue(DiagnosticSet)
+
+    public var description: String {
+      switch self {
+      case .noTranslationUnitFound(for: let url):
+        return "No translation unit found for source file at \(url)"
+      case .processingIssue(let diagnostics): // todo expose diagnostics rendering from the Hylo driver
+        return diagnostics.elements.map{" - \($0.description)\n\n"}.joined()
+      }
+    }
   }
   public enum OtherLocalFileProcessingError: Error {}
   public enum FolderProcessingError: Error {}
