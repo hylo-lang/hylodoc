@@ -2,8 +2,8 @@
     <div class="content-section" id="genericParameters">
         <h2>Generic Parameters</h2>
         {% for key, value in genericParameters %}
-            <div class="declaration">
-                <span style="color: white">{{ key }}</span>
+            <div class="parameter">
+                <span class="name">{{ key }}</span>
                 {{ value }}
             </div>
         {% endfor %}

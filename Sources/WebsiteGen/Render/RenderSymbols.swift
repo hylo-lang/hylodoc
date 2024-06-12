@@ -380,7 +380,7 @@ public func renderFunctionPage(
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
@@ -443,7 +443,7 @@ public func renderMethodPage(
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
@@ -519,7 +519,7 @@ public func renderSubscriptPage(
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
@@ -593,7 +593,7 @@ public func renderInitializerPage(
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (getParamLabel(ctx.typedProgram.ast[key]), ctx.htmlGenerator.generate(doc: value.description))
+      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
       (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))

@@ -2,8 +2,8 @@
     <div class="content-section" id="parameters">
         <h2>Parameters</h2>
         {% for key, value in parameters %}
-            <div class="declaration">
-                <span style="color: white">{{ key }}</span>
+            <div class="parameter">
+                <span class="name">{{ key }}</span>
                 {{ value }}
             </div>
         {% endfor %}
