@@ -3,7 +3,7 @@
     <input type="checkbox" checked>
     {% endif %}
 
-    <a class="nav-entry {{ item.typeClass }}" href="{% referTo %}">
+    <a class="nav-entry {{ item.typeClass }}" href="{% refer targetUrl item.relativePath %}">
         <div class="arrow"></div>
         {% if item.typeClass == "symbol" %}
         <code class="inline"><pre>{{ item.name }}</pre></code>

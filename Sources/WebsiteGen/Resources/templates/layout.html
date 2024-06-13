@@ -20,7 +20,7 @@
     <div class="header-breadcrumb">
       <a href="{{ pathToRoot }}">Documentation</a>
       {% for name, url in breadcrumb %}
-        <a href="{{ url }}">{{ name }}</a>
+        <a href="{% refer targetUrl url %}">{{ name }}</a>
       {% endfor %}
     </div>
   </div>

@@ -4,7 +4,7 @@ import FrontEnd
 import PathWrangler
 
 /// Generate the breadcrumb tuples for a target
-public func breadcrumb(ctx: GenerationContext, target: AnyTargetID) -> [(String, RelativePath?)] {
+public func breadcrumb(ctx: GenerationContext, target: AnyTargetID) -> [(String, RelativePath)] {
   if case .empty = target {
     return []
   }
@@ -13,7 +13,7 @@ public func breadcrumb(ctx: GenerationContext, target: AnyTargetID) -> [(String,
     pathTarget in
     (
       displayNameOfTarget(ctx: ctx, target: pathTarget),
-      ctx.urlResolver.refer(from: target, to: pathTarget)
+      ctx.urlResolver.references[pathTarget]!.path
     )
   }
 }

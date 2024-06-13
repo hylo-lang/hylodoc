@@ -11,20 +11,7 @@ extension Environment {
     let ext = Extension()
     ext.registerFilter("convertToID") { (value: Any?) in return convertToID(value) }
     ext.registerFilter("toString") { value in String(describing: value) }
-    ext.registerSimpleTag(
-      "referTo",
-      handler: { context in
-        guard let targetUrl = context["targetUrl"] as? RelativePath else {
-          return ""
-        }
-
-        guard let item = context["item"] as? TreeItem else {
-          return ""
-        }
-
-        return String(describing: targetUrl.refer(to: item.relativePath).resolved())
-      })
-    // TODO register tag to refer between items
+    ext.registerTag("refer", parser: ReferNode.parse)
 
     self.init(
       loader: loader,
