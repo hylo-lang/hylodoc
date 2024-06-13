@@ -42,12 +42,14 @@ final class SimpleFullPipelineTest: XCTestCase {
 
     switch result {
     case .success(let documentationDatabase):
-      guard generateDocumentation(
-        documentation: documentationDatabase,
-        typedProgram: typedProgram,
-        exportPath: outputURL
-      ) else{ return XCTFail("failed to generate documentation") }
-      
+      guard
+        generateDocumentation(
+          documentation: documentationDatabase,
+          typedProgram: typedProgram,
+          exportPath: outputURL
+        )
+      else { return XCTFail("failed to generate documentation") }
+
       print("Documentation successfully generated at \(outputURL).")
     case .failure(let error):
       print("Failed to extract documentation: \(error)")

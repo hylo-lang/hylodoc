@@ -1,8 +1,8 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import XCTest
 import TestUtils
+import XCTest
 
 @testable import DocExtractor
 

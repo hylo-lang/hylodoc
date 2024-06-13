@@ -1,13 +1,14 @@
 import DocExtractor
 import DocumentationDB
 import FrontEnd
-import XCTest
 import TestUtils
+import XCTest
 
 final class OperatorExtractionTest: XCTestCase {
   func testOperatorExtraction() {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-    let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
+    let sourceFileDocumentor = RealSourceFileDocumentor(
+      commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
 
     let sourceFile = SourceFile(
       synthesizedText: """

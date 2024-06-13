@@ -462,20 +462,6 @@ public func renderMethodPage(
   return try renderTemplate(ctx: ctx, targetId: target, name: "method_layout.html", env: &env)
 }
 
-/// Render the method-implementation page
-///
-/// - Parameters:
-///   - ctx: context for page generation, containing documentation database, ast and stencil templating
-///   - of: method-implementation declaration to render page of
-///   - with: parsed method-implementation documentation string
-///
-/// - Returns: contents of the rendered page
-public func renderMethodImplementationPage(
-  ctx: GenerationContext, of: MethodImpl.ID, with doc: MethodImplDocumentation?
-) throws -> String {
-  return ""
-}
-
 /// Render the subscript page
 ///
 /// - Parameters:
@@ -534,20 +520,6 @@ public func renderSubscriptPage(
     ctx: ctx)
 
   return try renderTemplate(ctx: ctx, targetId: target, name: "subscript_layout.html", env: &env)
-}
-
-/// Render the subscript-implementation page
-///
-/// - Parameters:
-///   - ctx: context for page generation, containing documentation database, ast and stencil templating
-///   - of: subscript-implementation declaration to render page of
-///   - with: parsed subscript-implementation documentation string
-///
-/// - Returns: contents of the rendered page
-public func renderSubscriptImplementationPage(
-  ctx: GenerationContext, of: SubscriptImpl.ID, with doc: SubscriptImplDocumentation?
-) throws -> String {
-  return ""
 }
 
 /// Render the initializer page

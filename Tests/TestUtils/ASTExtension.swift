@@ -1,8 +1,8 @@
 import FrontEnd
 
-public extension AST {
+extension AST {
 
-  func resolveProductType(by name: String) -> ProductTypeDecl.ID? {
+  public func resolveProductType(by name: String) -> ProductTypeDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: ProductTypeDecl.ID?
       let targetName: String
@@ -23,7 +23,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveTypeAlias(by name: String) -> TypeAliasDecl.ID? {
+  public func resolveTypeAlias(by name: String) -> TypeAliasDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: TypeAliasDecl.ID?
       let targetName: String
@@ -44,7 +44,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveAssociatedType(by name: String) -> AssociatedTypeDecl.ID? {
+  public func resolveAssociatedType(by name: String) -> AssociatedTypeDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: AssociatedTypeDecl.ID?
       var members: [AnyDeclID] = []
@@ -72,7 +72,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveAssociatedValue(by name: String) -> AssociatedValueDecl.ID? {
+  public func resolveAssociatedValue(by name: String) -> AssociatedValueDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: AssociatedValueDecl.ID?
       var members: [AnyDeclID] = []
@@ -100,7 +100,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveBinding() -> [BindingDecl.ID]? {
+  public func resolveBinding() -> [BindingDecl.ID]? {
     struct ASTWalker: ASTWalkObserver {
       var result: [BindingDecl.ID]?
 
@@ -122,7 +122,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveOperator() -> [OperatorDecl.ID]? {
+  public func resolveOperator() -> [OperatorDecl.ID]? {
     struct ASTWalker: ASTWalkObserver {
       var result: [OperatorDecl.ID]?
 
@@ -144,7 +144,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveFunc(by name: String) -> FunctionDecl.ID? {
+  public func resolveFunc(by name: String) -> FunctionDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: FunctionDecl.ID?
       let targetName: String
@@ -165,7 +165,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveMethodDecl(by name: String) -> MethodDecl.ID? {
+  public func resolveMethodDecl(by name: String) -> MethodDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: MethodDecl.ID?
       var members: [AnyDeclID] = []
@@ -193,7 +193,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveMethodImpl(by name: String) -> [MethodImpl.ID]? {
+  public func resolveMethodImpl(by name: String) -> [MethodImpl.ID]? {
     struct ASTWalker: ASTWalkObserver {
       var result: [MethodImpl.ID]?
       let targetName: String
@@ -214,7 +214,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveSubscriptDecl(by name: String) -> SubscriptDecl.ID? {
+  public func resolveSubscriptDecl(by name: String) -> SubscriptDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: SubscriptDecl.ID?
       let targetName: String
@@ -235,7 +235,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveSubscriptImpl(by name: String) -> [SubscriptImpl.ID]? {
+  public func resolveSubscriptImpl(by name: String) -> [SubscriptImpl.ID]? {
     struct ASTWalker: ASTWalkObserver {
       var result: [SubscriptImpl.ID]?
       let targetName: String
@@ -256,7 +256,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveInit(by name: String) -> InitializerDecl.ID? {
+  public func resolveInit(by name: String) -> InitializerDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: InitializerDecl.ID?
       var members: [AnyDeclID] = []
@@ -283,7 +283,7 @@ public extension AST {
     return walker.result
   }
 
-  func resolveTrait(by name: String) -> TraitDecl.ID? {
+  public func resolveTrait(by name: String) -> TraitDecl.ID? {
     struct ASTWalker: ASTWalkObserver {
       var result: TraitDecl.ID?
       let targetName: String
@@ -305,7 +305,7 @@ public extension AST {
   }
 
   /// - Parameter name: file name without extension
-  func resolveTranslationUnit(by name: String) -> TranslationUnit.ID? {
+  public func resolveTranslationUnit(by name: String) -> TranslationUnit.ID? {
     precondition(name.hasSuffix(".hylo"), "Name should be passed with extension.")
 
     struct ASTWalker: ASTWalkObserver {
@@ -331,7 +331,7 @@ public extension AST {
     return walker.result
   }
 
-  init(fromSingleSourceFile: SourceFile, diagnostics: inout DiagnosticSet) {
+  public init(fromSingleSourceFile: SourceFile, diagnostics: inout DiagnosticSet) {
     self.init(ConditionalCompilationFactors())
     let sourceFile = fromSingleSourceFile
     let _ = try! makeModule(
@@ -342,7 +342,7 @@ public extension AST {
     )
   }
 
-  mutating func addModule(
+  public mutating func addModule(
     fromSingleSourceFile: SourceFile, diagnostics: inout DiagnosticSet,
     moduleName: String = "RootModule"
   ) throws -> ModuleDecl.ID {

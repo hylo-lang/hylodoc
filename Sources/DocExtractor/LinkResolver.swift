@@ -34,10 +34,10 @@ public func parseName(name: String) -> EntityRef? {
 }
 
 /// Resolves a reference to a set of declarations in the given scope.
-/// 
+///
 /// The function currently supports qualifying by module name, namespace, product type, trait and type alias name.
 /// (All but the last identifier in the reference must be one of those declarations.)
-/// 
+///
 /// - Returns:
 ///   - `nil` if the reference had invalid syntax
 ///   - an empty set if the reference resolved to no declarations.

@@ -35,24 +35,25 @@ public struct CLI: ParsableCommand {
       var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
       var modules: [InputModuleInfo] = []
 
-
       for sourceBundlePath in sourceBundlePaths {
         let sourceURL = URL(fileURLWithPath: sourceBundlePath)
-        
+
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: sourceURL.path, isDirectory: &isDirectory),
           isDirectory.boolValue
         else {
           throw ValidationError(
             "Source path '\(sourceURL.path)' does not exist or is not a directory. ")
-        }        
-        
+        }
+
         let rootModuleId = try! ast.makeModule(
           "\(sourceURL.lastPathComponent)", sourceCode: sourceFiles(in: [sourceURL]),
           builtinModuleAccess: true, diagnostics: &diagnostics)
 
-        modules.append(.init(name: "\(sourceURL.lastPathComponent)", 
-        rootFolderPath: sourceURL, astId: rootModuleId))
+        modules.append(
+          .init(
+            name: "\(sourceURL.lastPathComponent)",
+            rootFolderPath: sourceURL, astId: rootModuleId))
       }
 
       guard !modules.isEmpty else {
@@ -80,11 +81,13 @@ public struct CLI: ParsableCommand {
 
       switch result {
       case .success(let documentationDatabase):
-        guard generateDocumentation(
-          documentation: documentationDatabase,
-          typedProgram: typedProgram,
-          exportPath: outputURL
-        ) else {
+        guard
+          generateDocumentation(
+            documentation: documentationDatabase,
+            typedProgram: typedProgram,
+            exportPath: outputURL
+          )
+        else {
           throw NSError(
             domain: "CLIError", code: 3,
             userInfo: [NSLocalizedDescriptionKey: "Failed to generate website."])

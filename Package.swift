@@ -22,7 +22,7 @@ let package = Package(
     .macOS(.v13)
   ],
   products: [
-    .executable(name: "hdc", targets: ["hdc"]),  // Hylo Documentation Compiler (hdc)
+    .executable(name: "hdc", targets: ["hdc"])  // Hylo Documentation Compiler (hdc)
     //.library(name: "FrontEnd", targets: ["DocExtractor"]), without this XCode can create a build process
   ],
   dependencies: [
@@ -52,7 +52,7 @@ let package = Package(
         "WebsiteGen",
         "StandardLibraryCore",
         .product(name: "FrontEnd", package: "hylo"),
-        .product(name: "ArgumentParser", package: "swift-argument-parser")
+        .product(name: "ArgumentParser", package: "swift-argument-parser"),
       ],
       path: "Sources/CLI",
       exclude: ["module.md"],
@@ -111,7 +111,7 @@ let package = Package(
       name: "TestUtils",
       dependencies: [
         "DocumentationDB",
-        .product(name: "FrontEnd", package: "hylo")
+        .product(name: "FrontEnd", package: "hylo"),
       ],
       exclude: [],
       swiftSettings: allTargetsSwiftSettings),

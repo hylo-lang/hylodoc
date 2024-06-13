@@ -116,24 +116,12 @@ public func renderSymbolPage(ctx: GenerationContext, of: AnyDeclID) throws -> St
     // Render page
     let declDoc = ctx.documentation.symbols.methodDeclDocs[id]
     return try renderMethodPage(ctx: ctx, of: id, with: declDoc)
-  case MethodImpl.self:
-    let id = MethodImpl.ID(of)!
-
-    // Render page
-    let declDoc = ctx.documentation.symbols.methodImplDocs[id]
-    return try renderMethodImplementationPage(ctx: ctx, of: id, with: declDoc)
   case SubscriptDecl.self:
     let id = SubscriptDecl.ID(of)!
 
     // Render page
     let declDoc = ctx.documentation.symbols.subscriptDeclDocs[id]
     return try renderSubscriptPage(ctx: ctx, of: id, with: declDoc)
-  case SubscriptImpl.self:
-    let id = SubscriptImpl.ID(of)!
-
-    // Render page
-    let declDoc = ctx.documentation.symbols.subscriptImplDocs[id]
-    return try renderSubscriptImplementationPage(ctx: ctx, of: id, with: declDoc)
   case InitializerDecl.self:
     let id = InitializerDecl.ID(of)!
 

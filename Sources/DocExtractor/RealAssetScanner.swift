@@ -66,8 +66,8 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
       switch self {
       case .noTranslationUnitFound(for: let url):
         return "No translation unit found for source file at \(url)"
-      case .processingIssue(let diagnostics): // todo expose diagnostics rendering from the Hylo driver
-        return diagnostics.elements.map{" - \($0.description)\n\n"}.joined()
+      case .processingIssue(let diagnostics):  // todo expose diagnostics rendering from the Hylo driver
+        return diagnostics.elements.map { " - \($0.description)\n\n" }.joined()
       }
     }
   }
@@ -197,7 +197,8 @@ public func extractDocumentation(typedProgram: TypedProgram, for modules: [Input
   >
 {
   let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
-  let sourceFileDocumentor = RealSourceFileDocumentor(commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
+  let sourceFileDocumentor = RealSourceFileDocumentor(
+    commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
   var builder = DocDBBuildingAssetScanner(
     modules: modules,
     typedProgram: typedProgram,
