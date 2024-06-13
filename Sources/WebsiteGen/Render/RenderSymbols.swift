@@ -144,7 +144,7 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
 ///
 /// - Returns: contents of the rendered page
 public func renderAssociatedTypePage(
-  ctx: GenerationContext, of: AssociatedTypeDecl.ID, with doc: AssociatedTypeDocumentation?
+  ctx: inout GenerationContext, of: AssociatedTypeDecl.ID, with doc: AssociatedTypeDocumentation?
 ) throws -> String {
   let decl: AssociatedTypeDecl = ctx.typedProgram.ast[of]!
 
@@ -173,7 +173,7 @@ public func renderAssociatedTypePage(
   }
 
   return try renderTemplate(
-    ctx: ctx, targetId: .symbol(AnyDeclID(of)), name: "associated_type_layout.html", env: &env)
+    ctx: &ctx, targetId: .symbol(AnyDeclID(of)), name: "associated_type_layout.html", env: &env)
 }
 
 /// Render the associated-value page
@@ -185,7 +185,7 @@ public func renderAssociatedTypePage(
 ///
 /// - Returns: contents of the rendered page
 public func renderAssociatedValuePage(
-  ctx: GenerationContext, of: AssociatedValueDecl.ID, with doc: AssociatedValueDocumentation?
+  ctx: inout GenerationContext, of: AssociatedValueDecl.ID, with doc: AssociatedValueDocumentation?
 ) throws -> String {
   let decl: AssociatedValueDecl = ctx.typedProgram.ast[of]!
 
@@ -213,7 +213,7 @@ public func renderAssociatedValuePage(
   }
 
   return try renderTemplate(
-    ctx: ctx, targetId: .symbol(AnyDeclID(of)), name: "associated_value_layout.html", env: &env)
+    ctx: &ctx, targetId: .symbol(AnyDeclID(of)), name: "associated_value_layout.html", env: &env)
 }
 
 /// Render the type-alias page
@@ -225,7 +225,7 @@ public func renderAssociatedValuePage(
 ///
 /// - Returns: contents of the rendered page
 public func renderTypeAliasPage(
-  ctx: GenerationContext, of: TypeAliasDecl.ID, with doc: TypeAliasDocumentation?
+  ctx: inout GenerationContext, of: TypeAliasDecl.ID, with doc: TypeAliasDocumentation?
 ) throws -> String {
   let decl: TypeAliasDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -250,7 +250,7 @@ public func renderTypeAliasPage(
     }
   }
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "type_alias_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "type_alias_layout.html", env: &env)
 }
 
 /// Render the binding page
@@ -262,7 +262,7 @@ public func renderTypeAliasPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderBindingPage(
-  ctx: GenerationContext, of: BindingDecl.ID, with doc: BindingDocumentation?
+  ctx: inout GenerationContext, of: BindingDecl.ID, with doc: BindingDocumentation?
 ) throws -> String {
   let decl: BindingDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -289,7 +289,7 @@ public func renderBindingPage(
     env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "binding_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "binding_layout.html", env: &env)
 }
 
 /// Render the operator page
@@ -301,7 +301,7 @@ public func renderBindingPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderOperatorPage(
-  ctx: GenerationContext, of: OperatorDecl.ID, with doc: OperatorDocumentation?
+  ctx: inout GenerationContext, of: OperatorDecl.ID, with doc: OperatorDocumentation?
 ) throws -> String {
   let decl: OperatorDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -329,7 +329,7 @@ public func renderOperatorPage(
     env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
   }
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "operator_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "operator_layout.html", env: &env)
 }
 
 /// Render the function page
@@ -341,7 +341,7 @@ public func renderOperatorPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderFunctionPage(
-  ctx: GenerationContext, of: FunctionDecl.ID, with doc: FunctionDocumentation?
+  ctx: inout GenerationContext, of: FunctionDecl.ID, with doc: FunctionDocumentation?
 ) throws -> String {
   let decl: FunctionDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -390,7 +390,7 @@ public func renderFunctionPage(
     }
   }
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "function_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "function_layout.html", env: &env)
 }
 
 /// Render the method page
@@ -402,7 +402,7 @@ public func renderFunctionPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderMethodPage(
-  ctx: GenerationContext, of: MethodDecl.ID, with doc: MethodDeclDocumentation?
+  ctx: inout GenerationContext, of: MethodDecl.ID, with doc: MethodDeclDocumentation?
 ) throws -> String {
   let decl: MethodDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -458,7 +458,7 @@ public func renderMethodPage(
     }
   }
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "method_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "method_layout.html", env: &env)
 }
 
 /// Render the subscript page
@@ -470,7 +470,7 @@ public func renderMethodPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderSubscriptPage(
-  ctx: GenerationContext, of: SubscriptDecl.ID, with doc: SubscriptDeclDocumentation?
+  ctx: inout GenerationContext, of: SubscriptDecl.ID, with doc: SubscriptDeclDocumentation?
 ) throws -> String {
   let decl: SubscriptDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -518,7 +518,7 @@ public func renderSubscriptPage(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
     ctx: ctx)
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "subscript_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "subscript_layout.html", env: &env)
 }
 
 /// Render the initializer page
@@ -530,7 +530,7 @@ public func renderSubscriptPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderInitializerPage(
-  ctx: GenerationContext, of: InitializerDecl.ID, with doc: InitializerDocumentation?
+  ctx: inout GenerationContext, of: InitializerDecl.ID, with doc: InitializerDocumentation?
 ) throws -> String {
   let decl: InitializerDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -579,7 +579,7 @@ public func renderInitializerPage(
     }
   }
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "initializer_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "initializer_layout.html", env: &env)
 }
 
 /// Render the trait page
@@ -590,7 +590,9 @@ public func renderInitializerPage(
 ///   - with: parsed trait documentation string
 ///
 /// - Returns: contents of the rendered page
-public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: TraitDocumentation?)
+public func renderTraitPage(
+  ctx: inout GenerationContext, of: TraitDecl.ID, with doc: TraitDocumentation?
+)
   throws -> String
 {
   let decl: TraitDecl = ctx.typedProgram.ast[of]!
@@ -622,7 +624,7 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
   env["members"] = prepareMembersData(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "trait_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "trait_layout.html", env: &env)
 }
 
 /// Render the product-type page
@@ -634,7 +636,7 @@ public func renderTraitPage(ctx: GenerationContext, of: TraitDecl.ID, with doc: 
 ///
 /// - Returns: contents of the rendered page
 public func renderProductTypePage(
-  ctx: GenerationContext, of: ProductTypeDecl.ID, with doc: ProductTypeDocumentation?
+  ctx: inout GenerationContext, of: ProductTypeDecl.ID, with doc: ProductTypeDocumentation?
 ) throws -> String {
   let decl: ProductTypeDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
@@ -666,5 +668,6 @@ public func renderProductTypePage(
   env["members"] = prepareMembersData(
     referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
 
-  return try renderTemplate(ctx: ctx, targetId: target, name: "product_type_layout.html", env: &env)
+  return try renderTemplate(
+    ctx: &ctx, targetId: target, name: "product_type_layout.html", env: &env)
 }

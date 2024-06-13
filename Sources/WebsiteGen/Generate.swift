@@ -17,7 +17,9 @@ public protocol Exporter {
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: asset to render page of
 ///   - with: exporter, used to handle file writes and directory creation
-public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with exporter: Exporter) throws {
+public func generateAsset(ctx: inout GenerationContext, of: AnyAssetID, with exporter: Exporter)
+  throws
+{
   guard let target = ctx.urlResolver.pathToFile(target: .asset(of)) else {
     //TODO throw exception
     return
@@ -34,7 +36,7 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with exporter:
   }
 
   // Render and export page
-  let content = try renderAssetPage(ctx: ctx, of: of)
+  let content = try renderAssetPage(ctx: &ctx, of: of)
   try exporter.html(content: content, to: target)
 }
 
@@ -43,14 +45,14 @@ public func generateAsset(ctx: GenerationContext, of: AnyAssetID, with exporter:
 /// - Parameters:
 ///   - ctx: context for page generation, containing documentation database, ast and stencil templating
 ///   - of: symbol to render page of
-public func generateSymbol(ctx: GenerationContext, of: AnyDeclID, with: Exporter) throws {
+public func generateSymbol(ctx: inout GenerationContext, of: AnyDeclID, with: Exporter) throws {
   guard let target = ctx.urlResolver.pathToFile(target: .symbol(of)) else {
     //TODO throw exception
     return
   }
 
   // Render and export page
-  let content = try renderSymbolPage(ctx: ctx, of: of)
+  let content = try renderSymbolPage(ctx: &ctx, of: of)
   try with.html(content: content, to: target)
 }
 

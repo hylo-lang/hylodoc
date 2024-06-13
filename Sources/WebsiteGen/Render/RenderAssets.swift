@@ -11,7 +11,9 @@ import Stencil
 ///   - of: source file asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID) throws -> String {
+public func renderSourceFilePage(ctx: inout GenerationContext, of: SourceFileAsset.ID) throws
+  -> String
+{
   let sourceFile: SourceFileAsset = ctx.documentation.assets[of]!
 
   var env: [String: Any] = [:]
@@ -39,7 +41,7 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
     referringFrom: .asset(AnyAssetID(from: of)), decls: translationUnit.decls, ctx: ctx)
 
   return try renderTemplate(
-    ctx: ctx, targetId: .asset(.sourceFile(of)), name: "source_file_layout.html", env: &env)
+    ctx: &ctx, targetId: .asset(.sourceFile(of)), name: "source_file_layout.html", env: &env)
 }
 
 /// Render the article page
@@ -49,7 +51,7 @@ public func renderSourceFilePage(ctx: GenerationContext, of: SourceFileAsset.ID)
 ///   - of: article asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throws -> String {
+public func renderArticlePage(ctx: inout GenerationContext, of: ArticleAsset.ID) throws -> String {
   let article = ctx.documentation.assets[of]!
 
   var env: [String: Any] = [:]
@@ -66,7 +68,7 @@ public func renderArticlePage(ctx: GenerationContext, of: ArticleAsset.ID) throw
   env["content"] = ctx.htmlGenerator.generate(doc: article.content)
 
   return try renderTemplate(
-    ctx: ctx, targetId: .asset(.article(of)), name: "article_layout.html", env: &env)
+    ctx: &ctx, targetId: .asset(.article(of)), name: "article_layout.html", env: &env)
 }
 
 extension Asset {
@@ -88,7 +90,7 @@ func isIndexPageFileName(fileName: String) -> Bool {
 ///   - of: module asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws -> String {
+public func renderFolderPage(ctx: inout GenerationContext, of: FolderAsset.ID) throws -> String {
   let folder = ctx.documentation.assets[of]!
 
   var env: [String: Any] = [:]
@@ -124,7 +126,7 @@ public func renderFolderPage(ctx: GenerationContext, of: FolderAsset.ID) throws 
   }
 
   return try renderTemplate(
-    ctx: ctx, targetId: .asset(.folder(of)), name: "folder_layout.html", env: &env)
+    ctx: &ctx, targetId: .asset(.folder(of)), name: "folder_layout.html", env: &env)
 }
 
 /// Get the title and the url of an asset

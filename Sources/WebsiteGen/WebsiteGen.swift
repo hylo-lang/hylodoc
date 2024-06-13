@@ -7,7 +7,7 @@ import Stencil
 
 public struct GenerationContext {
   public let documentation: DocumentationDatabase
-  public let stencil: Environment
+  public var stencil: Environment
   public let typedProgram: TypedProgram
   public var urlResolver: URLResolver
   public let htmlGenerator: HtmlGenerator
@@ -76,9 +76,9 @@ public func generateDocumentation(
         (path: TargetPath) in
         switch path.target {
         case .asset(let id):
-          try! generateAsset(ctx: ctx, of: id, with: exporter)
+          try! generateAsset(ctx: &ctx, of: id, with: exporter)
         case .symbol(let id):
-          try! generateSymbol(ctx: ctx, of: id, with: exporter)
+          try! generateSymbol(ctx: &ctx, of: id, with: exporter)
         case .empty:
           break
         }
@@ -86,7 +86,7 @@ public func generateDocumentation(
   }
 
   // Generate index page with all the modules
-  generateModuleIndexDocumentation(ctx: ctx, exporter: exporter, target: exportPath)
+  generateModuleIndexDocumentation(ctx: &ctx, exporter: exporter, target: exportPath)
 
   return copyPublicWebsiteAssets(exportPath: exportPath)
 }
@@ -114,7 +114,7 @@ func copyPublicWebsiteAssets(exportPath: URL) -> Bool {
 }
 
 public func generateModuleIndexDocumentation(
-  ctx: GenerationContext, exporter: Exporter, target: URL
+  ctx: inout GenerationContext, exporter: Exporter, target: URL
 ) {
   var env: [String: Any] = [:]
 
@@ -134,6 +134,6 @@ public func generateModuleIndexDocumentation(
   }
 
   let content = try! renderTemplate(
-    ctx: ctx, targetId: .empty, name: "folder_layout.html", env: &env)
+    ctx: &ctx, targetId: .empty, name: "folder_layout.html", env: &env)
   try! exporter.html(content: content, to: URL(fileURLWithPath: "index.html", relativeTo: target))
 }
