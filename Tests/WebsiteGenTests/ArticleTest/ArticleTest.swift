@@ -1,131 +1,130 @@
-// import DocumentationDB
-// import MarkdownKit
-// import PathWrangler
-// import StandardLibraryCore
-// import Stencil
-// import XCTest
+import DocumentationDB
+import MarkdownKit
+import PathWrangler
+import StandardLibraryCore
+import Stencil
+import XCTest
+import TestUtils
 
-// @testable import FrontEnd
-// @testable import WebsiteGen
+@testable import FrontEnd
+@testable import WebsiteGen
 
-// final class ArticleTest: XCTestCase {
-//   func testArticlePageGenerationWithTitle() {
+final class ArticleTest: XCTestCase {
+    func testArticlePageGenerationWithTitle() {
+        var diagnostics = DiagnosticSet()
 
-//     var diagnostics = DiagnosticSet()
+        var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
 
-//     /// An instance that includes just the standard library.
-//     var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+        // We don't really read anything from here right now, we will the documentation database manually
+        let libraryPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("TestHyloModule")
 
-//     // We don't really read anything from here right now, we will the documentation database manually
-//     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-//       .appendingPathComponent("TestHyloArticle")
+        // The module whose Hylo files were given on the command-line
+        let _ = try! ast.makeModule(
+            "TestHyloModule",
+            sourceCode: sourceFiles(in: [libraryPath]),
+            builtinModuleAccess: true,
+            diagnostics: &diagnostics
+        )
 
-//     // The module whose Hylo files were given on the command-line
-//     let _ = try! ast.makeModule(
-//       "TestHyloArticle",
-//       sourceCode: sourceFiles(in: [libraryPath]),
-//       builtinModuleAccess: true,
-//       diagnostics: &diagnostics
-//     )
+        let typedProgram = try! TypedProgram(
+            annotating: ScopedProgram(ast), inParallel: false,
+            reportingDiagnosticsTo: &diagnostics,
+            tracingInferenceIf: { (_, _) in false })
 
-//     let typedProgram = try! TypedProgram(
-//       annotating: ScopedProgram(ast), inParallel: false,
-//       reportingDiagnosticsTo: &diagnostics,
-//       tracingInferenceIf: { (_, _: TypedProgram) in false })
+        var db: DocumentationDatabase = .init()
 
-//     var db: DocumentationDatabase = .init()
+        let article1Id = db.assets.articles.insert(
+            .init(
+                location: URL(string: "root/Folder1/article1.hylodoc")!,
+                title: "I betcha you would have done the same",
+                content: .document([
+                .paragraph(
+                    Text(
+                    "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
+                    ))
+                ])
+            ))
 
-//     let stencil = Environment(loader: createFileSystemTemplateLoader())
+        var ctx = GenerationContext(
+            documentation: db,
+            stencil: createDefaultStencilEnvironment(),
+            typedProgram: typedProgram,
+            urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
+            htmlGenerator: CustomHTMLGenerator(),
+            tree: []
+        )
 
-//     let article1Id = db.assets.articles.insert(
-//       .init(
-//         location: URL(string: "root/Folder1/article1.hylodoc")!,
-//         title: "I betcha you would have done the same",
-//         content: .document([
-//           .paragraph(
-//             Text(
-//               "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
-//             ))
-//         ])
-//       ))
+        ctx.urlResolver.resolve(target: .asset(.article(article1Id)), filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"), parent: nil)
 
-//     var ctx = GenerationContext(
-//       documentation: db,
-//       stencil: stencil,
-//       typedProgram: typedProgram,
-//       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
-//     )
+        let res = try! renderArticlePage(ctx: &ctx, of: article1Id)
 
-//     ctx.urlResolver.resolve(
-//       target: .asset(.article(article1Id)),
-//       filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"),
-//       parent: nil)
+        assertPageTitle("I betcha you would have done the same", in: res, file: #file, line: #line)
+        assertContent(
+            "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!",
+            in: res,
+            file: #file, line: #line
+        )
+  }
+  
+    func testArticlePageGenerationNoTitle() {
+        
+        var diagnostics = DiagnosticSet()
 
-//     let res = try! renderArticlePage(ctx: ctx, of: article1Id)
-//     XCTAssertTrue(res.contains("<h1>I betcha you would have done the same</h1>"), res)
-//     XCTAssertTrue(
-//       res.contains(
-//         "<p>Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!</p>"
-//       ), res)
-//   }
+        var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
 
-//   func testArticlePageGenerationNoTitle() {
+        // We don't really read anything from here right now, we will the documentation database manually
+        let libraryPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("TestHyloModule")
 
-//     var diagnostics = DiagnosticSet()
+        // The module whose Hylo files were given on the command-line
+        let _ = try! ast.makeModule(
+            "TestHyloModule",
+            sourceCode: sourceFiles(in: [libraryPath]),
+            builtinModuleAccess: true,
+            diagnostics: &diagnostics
+        )
 
-//     /// An instance that includes just the standard library.
-//     var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+        let typedProgram = try! TypedProgram(
+            annotating: ScopedProgram(ast), inParallel: false,
+            reportingDiagnosticsTo: &diagnostics,
+            tracingInferenceIf: { (_, _) in false })
 
-//     // We don't really read anything from here right now, we will the documentation database manually
-//     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-//       .appendingPathComponent("TestHyloArticle")
+        var db: DocumentationDatabase = .init()
 
-//     // The module whose Hylo files were given on the command-line
-//     let _ = try! ast.makeModule(
-//       "TestHyloArticle",
-//       sourceCode: sourceFiles(in: [libraryPath]),
-//       builtinModuleAccess: true,
-//       diagnostics: &diagnostics
-//     )
+        let article1Id = db.assets.articles.insert(
+        .init(
+            location: URL(string: "root/Folder1/article1.hylodoc")!,
+            title: nil,
+            content: .document([
+            .paragraph(
+                Text(
+                "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
+                )
+            )
+            ])
+        ))
 
-//     let typedProgram = try! TypedProgram(
-//       annotating: ScopedProgram(ast), inParallel: false,
-//       reportingDiagnosticsTo: &diagnostics,
-//       tracingInferenceIf: { (_, _: TypedProgram) in false })
+        var ctx = GenerationContext(
+            documentation: db,
+            stencil: createDefaultStencilEnvironment(),
+            typedProgram: typedProgram,
+            urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
+            htmlGenerator: CustomHTMLGenerator(),
+            tree: []
+        )
 
-//     var db: DocumentationDatabase = .init()
+        ctx.urlResolver.resolve(target: .asset(.article(article1Id)), filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"), parent: nil)
 
-//     let article1Id = db.assets.articles.insert(
-//       .init(
-//         location: URL(string: "root/Folder1/article1.hylodoc")!,
-//         title: nil,
-//         content: .document([
-//           .paragraph(
-//             Text(
-//               "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
-//             )
-//           )
-//         ])
-//       ))
+        let res = try! renderArticlePage(ctx: &ctx, of: article1Id)
 
-//     var ctx = GenerationContext(
-//       documentation: db,
-//       stencil: createDefaultStencilEnvironment(),
-//       typedProgram: typedProgram,
-//       urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
-//     )
-
-//     ctx.urlResolver.resolve(
-//       target: .asset(.article(article1Id)),
-//       filePath: RelativePath(pathString: "root/Folder1/article1.hylodoc"),
-//       parent: nil)
-
-//     let res = try! renderArticlePage(ctx: ctx, of: article1Id)
-
-//     XCTAssertTrue(res.contains("<h1>article1</h1>"), res)
-//     XCTAssertTrue(
-//       res.contains(
-//         "<p>Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!</p>"
-//       ), res)
-//   }
-// }
+        assertPageTitle("article1", in: res, file: #file, line: #line)
+        assertContent(
+            "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!",
+            in: res,
+            file: #file, line: #line
+        )
+  }
+}
