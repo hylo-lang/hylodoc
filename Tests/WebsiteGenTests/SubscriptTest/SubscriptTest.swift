@@ -1,147 +1,87 @@
-// import Foundation
-// import DocumentationDB
-// import FrontEnd
-// import MarkdownKit
-// import Stencil
-// import StandardLibraryCore
-// import XCTest
-// import PathWrangler
+import Foundation
+import DocumentationDB
+import FrontEnd
+import MarkdownKit
+import Stencil
+import StandardLibraryCore
+import XCTest
+import PathWrangler
+import TestUtils
 
-// @testable import FrontEnd
-// @testable import WebsiteGen
+@testable import FrontEnd
+@testable import WebsiteGen
 
-// final class SubscriptTest : XCTestCase {
-//     func test() {
-//         var diagnostics = DiagnosticSet()
+final class SubscriptTest : XCTestCase {
+    func test() {
+        var diagnostics = DiagnosticSet()
 
-//         var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+        var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
 
-//         // We don't really read anything from here right now, we will the documentation database manually
-//         let libraryPath = URL(fileURLWithPath: #filePath)
-//             .deletingLastPathComponent()
-//             .appendingPathComponent("TestHyloSubscript")
+        // We don't really read anything from here right now, we will the documentation database manually
+        let libraryPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("TestHyloModule")
 
-//         // The module whose Hylo files were given on the command-line
-//         let moduleId = try! ast.makeModule(
-//             "TestHyloSubscript",
-//             sourceCode: sourceFiles(in: [libraryPath]),
-//             builtinModuleAccess: true,
-//             diagnostics: &diagnostics
-//         )
+        // The module whose Hylo files were given on the command-line
+        let _ = try! ast.makeModule(
+            "TestHyloModule",
+            sourceCode: sourceFiles(in: [libraryPath]),
+            builtinModuleAccess: true,
+            diagnostics: &diagnostics
+        )
 
-//         struct ASTWalkingVisitor: ASTWalkObserver {
-//           var listOfProductTypes: [SubscriptDecl.ID] = []
+        let typedProgram = try! TypedProgram(
+            annotating: ScopedProgram(ast), inParallel: false,
+            reportingDiagnosticsTo: &diagnostics,
+            tracingInferenceIf: { (_, _) in false })
 
-//           mutating func willEnter(_ n: AnyNodeID, in ast: AST) -> Bool {
-//             // pattern match the type of node:
-//             if let d = SubscriptDecl.ID(n) {
-//               listOfProductTypes.append(d)
-//             }
-//             return true
-//           }
-//         }
-//         var visitor = ASTWalkingVisitor()
-//         ast.walk(moduleId, notifying: &visitor)
+        var ctx = GenerationContext(
+            documentation: .init(),
+            stencil: createDefaultStencilEnvironment(),
+            typedProgram: typedProgram,
+            urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
+            htmlGenerator: CustomHTMLGenerator(),
+            tree: []
+        )
 
-//         let typedProgram = try! TypedProgram(
-//             annotating: ScopedProgram(ast), inParallel: false,
-//             reportingDiagnosticsTo: &diagnostics,
-//             tracingInferenceIf: { (_, _) in false })
+        // get product type by its id
+        let subscriptId = ast.resolveSubscriptDecl(by: "min")!
+        let subscriptDoc = SubscriptDeclDocumentation(
+            documentation: CommonFunctionDeclLikeDocumentation(
+                common: CommonFunctionLikeDocumentation(
+                    common: GeneralDescriptionFields(
+                        summary: .document([.paragraph(Text(
+                                "Carving up a summary for dinner, minding my own business."
+                            ))]),
+                        description: .document([.paragraph(Text(
+                                "In storms my husband Wilbur in a jealous description. He was crazy!"
+                            ))]),
+                        seeAlso: []
+                    ),
+                    preconditions: [],
+                    postconditions: [],
+                    throwsInfo: []
+                ),
+                parameters: [:],
+                genericParameters: [:]
+            ),
+            yields: []
+        )
 
-//         var ctx = GenerationContext(
-//             documentation: .init(),
-//             stencil: createDefaultStencilEnvironment(),
-//             typedProgram: typedProgram,
-//             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: ""))
-//         )
+        var targetPath = TargetPath(ctx: ctx)
+        targetPath.push(decl: AnyDeclID(subscriptId))
+        ctx.urlResolver.resolve(target: .symbol(AnyDeclID(subscriptId)), filePath: targetPath.url, parent: nil)
 
-//         //Verify we get any id at all
-//         XCTAssertTrue(visitor.listOfProductTypes.count > 0)
+        let res = try! renderSubscriptPage(ctx: &ctx, of: subscriptId, with: subscriptDoc)
 
-//         // get product type by its id
-//         let subscriptId = visitor.listOfProductTypes[0]
-//         let subscriptDoc = SubscriptDeclDocumentation(
-//             documentation: SubscriptCommonDocumentation(
-//                 generalDescription: GeneralDescriptionFields(
-//                     summary: .document([.paragraph(Text(
-//                         "Carving up a summary for dinner, minding my own business."
-//                     ))]),
-//                     description: .document([.paragraph(Text(
-//                         "In storms my husband Wilbur in a jealous description. He was crazy!"
-//                     ))]),
-//                     seeAlso: []
-//                 ),
-//                 preconditions: [],
-//                 postconditions: [],
-//                 yields: nil,
-//                 throwsInfo: nil,
-//                 parameters: [:],
-//                 genericParameters: [:]
-//             )
-//         )
+        assertPageTitle("min", in: res, file: #file, line: #line)
+        assertSummary("Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line)
+        assertDetails("In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file, line: #line)
 
-//         var targetPath = TargetPath(ctx: ctx)
-//         targetPath.push(decl: AnyDeclID(subscriptId))
-//         ctx.urlResolver.resolve(target: .symbol(AnyDeclID(subscriptId)), filePath: targetPath.url, parent: nil)
-
-//         let res = try! renderSubscriptPage(ctx: ctx, of: subscriptId, with: subscriptDoc)
-
-//         // XCTAssertTrue(res.contains("<h1>min</h1>"), res)
-//         // XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
-//         //     "<code>",
-//         //     "subscript min<T: Comparable>(_ a: T, _ b: T): T {",
-//         //     "let { yield if a > b { b } else { a } }",
-//         //     "}",
-//         //     "</code>"
-//         // ], in: res), res)
-//         XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
-//             "<p>",
-//             "Carving up a summary for dinner, minding my own business.",
-//             "</p>",
-//         ], in: res), res)
-//         XCTAssertTrue(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "Details",
-//             "</h1>",
-//             "<p>",
-//             "In storms my husband Wilbur in a jealous description. He was crazy!",
-//             "</p>",
-//         ], in: res), res)
-
-//         XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "See Also",
-//             "</h1>",
-//         ], in: res), res)
-//         XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "Preconditions",
-//             "</h1>",
-//         ], in: res), res)
-//         XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "Postconditions",
-//             "</h1>",
-//         ], in: res), res)
-//         XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "Yields",
-//             "</h1>",
-//         ], in: res), res)
-//         XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "Throws Info",
-//             "</h1>",
-//         ], in: res), res)
-//         XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "Parameters",
-//             "</h1>",
-//         ], in: res), res)
-//         XCTAssertFalse(matchWithWhitespacesInBetween(pattern: [
-//             "<h1>",
-//             "Generic Parameters",
-//             "</h1>",
-//         ], in: res), res)
-//     }
-// }
+        assertNotContains(res, what: "yields", file: #file, line: #line)
+        assertNotContains(res, what: "throwsInfo", file: #file, line: #line)
+        assertNotContains(res, what: "parameters", file: #file, line: #line)
+        assertNotContains(res, what: "genericParameters", file: #file, line: #line)
+        assertNotContains(res, what: "seeAlso", file: #file, line: #line)
+    }
+}
