@@ -1,8 +1,9 @@
 import DocExtractor
+import FrontEnd
 import MarkdownKit
 
 /// A Custom HTML generator that overrides the default behavior of the `HtmlGenerator` to render code blocks and hylo references in a custom way.
-class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer {
+public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer {
   override open func generate(block: Block, tight: Bool = false) -> String {
     // Override how to generate code blocks
     if case .indentedCode(let lines) = block {
@@ -48,8 +49,38 @@ class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer {
     return super.generate(textFragment: fragment)
   }
 
+  public struct ReferenceRenderingContext {
+    var typedProgram: TypedProgram
+    let scopeId: AnyScopeID
+  }
+
+  public var referenceContext: ReferenceRenderingContext?
+
   /// Rendering hylo references by resolving the reference to a link to the actual target.
-  func render(hyloReference reference: HyloReference) -> String {
-    return "<code class=\"hylo-reference\">\(reference.rawDescription)</code>"
+  public func render(hyloReference reference: HyloReference) -> String {
+    precondition(referenceContext != nil)
+    let nothing = "nil"
+    let resolved = referenceContext!.typedProgram.resolveReference(
+      reference.text, in: referenceContext!.scopeId)
+    return
+      "<code class=\"hylo-reference\">\(reference.rawDescription) resolved as \(resolved?.description ?? nothing)</code>"
+  }
+
+  public func generateResolvingHyloReferences(
+    document: Block, scopeId: AnyScopeID, from typedProgram: TypedProgram
+  ) -> String {
+    self.referenceContext = ReferenceRenderingContext(typedProgram: typedProgram, scopeId: scopeId)
+    defer { self.referenceContext = nil }
+
+    return self.generate(doc: document)
+  }
+
+  public func generateResolvingHyloReferences(
+    block: Block, scopeId: AnyScopeID, from typedProgram: TypedProgram
+  ) -> String {
+    self.referenceContext = ReferenceRenderingContext(typedProgram: typedProgram, scopeId: scopeId)
+    defer { self.referenceContext = nil }
+
+    return self.generate(block: block)
   }
 }

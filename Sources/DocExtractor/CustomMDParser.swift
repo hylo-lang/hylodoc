@@ -6,7 +6,7 @@ public protocol HyloReferenceRenderer {
 }
 
 public struct HyloReference: CustomTextFragment, Equatable {
-  let text: String
+  public let text: String
 
   public init(_ text: String) {
     self.text = text

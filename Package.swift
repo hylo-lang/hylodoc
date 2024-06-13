@@ -30,7 +30,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.0"),
     .package(url: "https://github.com/apple/swift-format", branch: "release/5.10"),
     // .package(url: "https://github.com/hylo-lang/hylo", branch: "main"),
-    .package(url: "https://github.com/tothambrus11/hylo.git", branch: "publish-lookup-functions"),
+    .package(url: "https://github.com/tothambrus11/hylo.git", branch: "expose-lookup-through-typed-program2"),
     .package(url: "https://github.com/objecthub/swift-markdownkit.git", from: "1.1.8"),
     .package(url: "https://github.com/pavel-trafimuk/Stencil", branch: "master"),
     .package(url: "https://github.com/sersoft-gmbh/path-wrangler", from: "2.0.0"),

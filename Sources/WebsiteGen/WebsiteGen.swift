@@ -10,7 +10,7 @@ public struct GenerationContext {
   public var stencil: Environment
   public let typedProgram: TypedProgram
   public var urlResolver: URLResolver
-  public let htmlGenerator: HtmlGenerator
+  public let htmlGenerator: CustomHTMLGenerator
   public var tree: [TreeItem]
 }
 

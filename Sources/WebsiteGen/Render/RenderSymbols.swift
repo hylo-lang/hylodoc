@@ -636,20 +636,19 @@ public func renderTraitPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderProductTypePage(
-  ctx: inout GenerationContext, of: ProductTypeDecl.ID, with doc: ProductTypeDocumentation?
+  ctx: inout GenerationContext, of declId: ProductTypeDecl.ID, with doc: ProductTypeDocumentation?
 ) throws -> String {
-  let decl: ProductTypeDecl = ctx.typedProgram.ast[of]!
-  let target = AnyTargetID.symbol(AnyDeclID(of))
+  let decl: ProductTypeDecl = ctx.typedProgram.ast[declId]!
+  let target = AnyTargetID.symbol(AnyDeclID(declId))
 
   var env: [String: Any] = [:]
 
   env["name"] = decl.identifier.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx, declId, target)
   env["pageType"] = "Product Type"
-  env["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(
-    ctx, of, target)
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(ctx, declId, target)
 
   if let doc = doc {
     if let summary = doc.common.summary {
@@ -657,7 +656,7 @@ public func renderProductTypePage(
     }
 
     if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(document: block, scopeId: AnyScopeID(declId), from: ctx.typedProgram)
     }
     env["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
     env["seeAlso"] = doc.common.seeAlso.map {
@@ -666,7 +665,7 @@ public func renderProductTypePage(
   }
 
   env["members"] = prepareMembersData(
-    referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
+    referringFrom: .symbol(AnyDeclID(declId)), decls: decl.members, ctx: ctx)
 
   return try renderTemplate(
     ctx: &ctx, targetId: target, name: "product_type_layout.html", env: &env)
