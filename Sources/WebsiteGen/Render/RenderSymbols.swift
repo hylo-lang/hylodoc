@@ -125,8 +125,7 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
     summary = ctx.documentation.symbols.productTypeDocs[docID]?.common.summary
     key = "Product Types"
   default:
-    name = ""
-    key = ""
+    return nil
   }
 
   if let summary = summary {
