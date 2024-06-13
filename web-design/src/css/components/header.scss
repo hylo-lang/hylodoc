@@ -20,14 +20,16 @@
   }
 
   .header-breadcrumb {
-    @apply flex flex-row flex-nowrap content-center gap-2 pl-4;
+    @apply flex flex-row flex-nowrap items-center gap-2 pl-4;
     color: $text-secondary;
+    overflow-x: auto;
 
     a {
       @apply content-center align-middle transition-colors duration-500 inline-block;
       font-size: $h3-size;
       font-weight: $p-weight;
       font-style: $p-style;
+      white-space: nowrap;
 
       code {
         @apply inline-block;
