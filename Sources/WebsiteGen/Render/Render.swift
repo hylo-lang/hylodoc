@@ -37,11 +37,11 @@ extension Environment {
 /// Convert a string to lowercase words separated by hyphens
 /// - Parameter value: the string to convert
 /// - Returns: the converted string, or the original value if it is not a string
-func convertToID(_ value: Any?) -> Any? {
-  guard let string = value as? String else { return value }
-
-  // taken from Tests/WebsiteGenTests/TableOfContentsHelperTest/TableOfContentsHelperTest.swift
-  return string.prefix(1).lowercased() + string.dropFirst().replacingOccurrences(of: " ", with: "")
+public func convertToID(_ value: Any?) -> Any? {
+    guard let string = value as? String else { return value }
+    
+    // taken from Tests/WebsiteGenTests/TableOfContentsHelperTest/TableOfContentsHelperTest.swift
+    return string.prefix(1).lowercased() + string.dropFirst().replacingOccurrences(of: " ", with: "")
 }
 
 /// Render an arbitrary asset page
