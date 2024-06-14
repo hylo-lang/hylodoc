@@ -555,7 +555,6 @@ public func renderMethodPage(
       )
     }
 
-    // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
     env["members"] = prepareMembersData(
       referringFrom: target,
       decls: decl.impls.map { member in AnyDeclID(member) },
@@ -626,8 +625,11 @@ public func renderSubscriptPage(
     }
     env["seeAlso"] = doc.documentation.common.common.seeAlso.map(htmlGenerator.generate(document:))
   }
+<<<<<<< HEAD
 
   // todo this should be displayed very differently, but not designed yet
+=======
+>>>>>>> e512d4a (Remove commented code)
   env["members"] = prepareMembersData(
     referringFrom: target,
     decls: decl.impls.map { member in AnyDeclID(member) },
