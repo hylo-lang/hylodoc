@@ -10,7 +10,7 @@ public struct GenerationContext {
   public var stencil: Environment
   public let typedProgram: TypedProgram
   public var urlResolver: URLResolver
-  public let htmlGenerator: CustomHTMLGenerator
+  public let htmlGenerator: some HyloReferenceResolvingGenerator = CustomHTMLGenerator()
   public var tree: [TreeItem]
 }
 
@@ -47,7 +47,6 @@ public func generateDocumentation(
     stencil: stencil,
     typedProgram: typedProgram,
     urlResolver: resolver,
-    htmlGenerator: CustomHTMLGenerator(),
     tree: []
   )
 

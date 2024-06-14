@@ -36,7 +36,7 @@ func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: Gen
     if let (name, summary, key) = getMemberNameAndSummary(
       ctx: ctx, of: declId, referringFrom: referringFrom)
     {
-      buckets[key, default: []].append((name: name, summary: summary))
+      buckets[key, default: []].append((name: name, summary: summary ?? ""))
     }
   }
   return buckets.filter { !$0.value.isEmpty }.map { $0 }
@@ -48,12 +48,8 @@ func prepareMembersData(referringFrom: AnyTargetID, decls: [AnyDeclID], ctx: Gen
 ///   - of: member declaration to get name and summary of
 /// - Returns: name, summary of the member, and key of the section it belongs to in prepareMembersData
 func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFrom: AnyTargetID) -> (
-  name: String, summary: String, key: String
+  name: String, summary: String?, key: String
 )? {
-  var name: String
-  var summary: Block?
-  var key: String
-
   switch of.kind {
   // TODO Mark needs to implement this
   // case AssociatedTypeDecl.self:
@@ -68,15 +64,27 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
   //     summary = ctx.documentation.symbols.associatedValueDocs[docID]?.common.summary
   //     key = "Associated Values"
   case TypeAliasDecl.self:
-    name = InlineSymbolDeclRenderer.renderTypeAliasDecl(ctx, TypeAliasDecl.ID(of)!, referringFrom)
-    let docID = TypeAliasDecl.ID(of)!
-    summary = ctx.documentation.symbols.typeAliasDocs[docID]?.common.summary
-    key = "Type Aliases"
+    let declId = TypeAliasDecl.ID(of)!
+    let scope = ctx.typedProgram.nodeToScope[declId]!
+    return (
+      name: InlineSymbolDeclRenderer.renderTypeAliasDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.typeAliasDocs[declId]?.common.summary.map {
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: $0, scopeId: scope, from: ctx.typedProgram)
+      },
+      key: "Type Aliases"
+    )
   case BindingDecl.self:
-    name = InlineSymbolDeclRenderer.renderBindingDecl(ctx, BindingDecl.ID(of)!, referringFrom)
-    let docID = BindingDecl.ID(of)!
-    summary = ctx.documentation.symbols.bindingDocs[docID]?.common.summary
-    key = "Bindings"
+    let declId = BindingDecl.ID(of)!
+    let scope = ctx.typedProgram.nodeToScope[declId]!
+    return (
+      name: InlineSymbolDeclRenderer.renderBindingDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.bindingDocs[declId]?.common.summary.map {
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: $0, scopeId: scope, from: ctx.typedProgram)
+      },
+      key: "Bindings"
+    )
   // TODO Mark needs to implement this
   // case OperatorDecl.self:
   //     name = InlineSymbolDeclRenderer.renderOperatorDecl(OperatorDecl.ID(of)!)
@@ -84,54 +92,85 @@ func getMemberNameAndSummary(ctx: GenerationContext, of: AnyDeclID, referringFro
   //     summary = ctx.documentation.symbols.operatorDocs[docID]?.documentation.summary
   //     key = "Operators"
   case FunctionDecl.self:
-    name = InlineSymbolDeclRenderer.renderFunctionDecl(ctx, FunctionDecl.ID(of)!, referringFrom)
-    let docID = FunctionDecl.ID(of)!
-    summary = ctx.documentation.symbols.functionDocs[docID]?.documentation.common.common.summary
-    key = "Functions"
+    let declId = FunctionDecl.ID(of)!
+    let scope = AnyScopeID(declId)
+    return (
+      name: InlineSymbolDeclRenderer.renderFunctionDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.functionDocs[declId]?.documentation.common.common.summary
+        .map {
+          ctx.htmlGenerator.generateResolvingHyloReferences(
+            document: $0, scopeId: scope, from: ctx.typedProgram)
+        },
+      key: "Functions"
+    )
   case MethodDecl.self:
-    name = InlineSymbolDeclRenderer.renderMethodDecl(ctx, MethodDecl.ID(of)!, referringFrom)
-    let docID = MethodDecl.ID(of)!
-    summary = ctx.documentation.symbols.methodDeclDocs[docID]?.documentation.common.common.summary
-    key = "Methods"
+    let declId = MethodDecl.ID(of)!
+    let scope = AnyScopeID(declId)
+    return (
+      name: InlineSymbolDeclRenderer.renderMethodDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.methodDeclDocs[declId]?.documentation.common.common.summary
+        .map {
+          ctx.htmlGenerator.generateResolvingHyloReferences(
+            document: $0, scopeId: scope, from: ctx.typedProgram)
+        },
+      key: "Methods"
+    )
   // not expected to be used, needed for exhaustive switch
   case MethodImpl.self:
     // fatalError("Method implementation should not be rendered")
     return nil
   case SubscriptDecl.self:
-    name = InlineSymbolDeclRenderer.renderSubscriptDecl(ctx, SubscriptDecl.ID(of)!, referringFrom)
-    let docID = SubscriptDecl.ID(of)!
-    summary =
-      ctx.documentation.symbols.subscriptDeclDocs[docID]?.documentation.common.common.summary
-    key = "Subscripts"
+    let declId = SubscriptDecl.ID(of)!
+    let scope = AnyScopeID(declId)
+    return (
+      name: InlineSymbolDeclRenderer.renderSubscriptDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.subscriptDeclDocs[declId]?.documentation.common.common
+        .summary.map {
+          ctx.htmlGenerator.generateResolvingHyloReferences(
+            document: $0, scopeId: scope, from: ctx.typedProgram)
+        },
+      key: "Subscripts"
+    )
   // not expected to be used, needed for exhaustive switch
   case SubscriptImpl.self:
     // fatalError("Subscript implementation should not be rendered")
     return nil
   case InitializerDecl.self:
-    name = InlineSymbolDeclRenderer.renderInitializerDecl(
-      ctx, InitializerDecl.ID(of)!, referringFrom)
-    let docID = InitializerDecl.ID(of)!
-    summary = ctx.documentation.symbols.initializerDocs[docID]?.documentation.common.common.summary
-    key = "Initializers"
+    let declId = InitializerDecl.ID(of)!
+    let scope = AnyScopeID(declId)
+    return (
+      name: InlineSymbolDeclRenderer.renderInitializerDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.initializerDocs[declId]?.documentation.common.common
+        .summary.map {
+          ctx.htmlGenerator.generateResolvingHyloReferences(
+            document: $0, scopeId: scope, from: ctx.typedProgram)
+        },
+      key: "Initializers"
+    )
   case TraitDecl.self:
-    name = InlineSymbolDeclRenderer.renderTraitDecl(ctx, TraitDecl.ID(of)!, referringFrom)
-    let docID = TraitDecl.ID(of)!
-    summary = ctx.documentation.symbols.traitDocs[docID]?.common.summary
-    key = "Traits"
+    let declId = TraitDecl.ID(of)!
+    let scope = AnyScopeID(declId)
+    return (
+      name: InlineSymbolDeclRenderer.renderTraitDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.traitDocs[declId]?.common.summary.map {
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: $0, scopeId: scope, from: ctx.typedProgram)
+      },
+      key: "Traits"
+    )
   case ProductTypeDecl.self:
-    name = InlineSymbolDeclRenderer.renderProductTypeDecl(
-      ctx, ProductTypeDecl.ID(of)!, referringFrom)
-    let docID = ProductTypeDecl.ID(of)!
-    summary = ctx.documentation.symbols.productTypeDocs[docID]?.common.summary
-    key = "Product Types"
+    let declId = ProductTypeDecl.ID(of)!
+    let scope = AnyScopeID(declId)
+    return (
+      name: InlineSymbolDeclRenderer.renderProductTypeDecl(ctx, declId, referringFrom),
+      summary: ctx.documentation.symbols.productTypeDocs[declId]?.common.summary.map {
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: $0, scopeId: scope, from: ctx.typedProgram)
+      },
+      key: "Product Types"
+    )
   default:
     return nil
-  }
-
-  if let summary = summary {
-    return (name, ctx.htmlGenerator.generate(doc: summary), key)
-  } else {
-    return (name, "", key)
   }
 }
 
@@ -147,6 +186,7 @@ public func renderAssociatedTypePage(
   ctx: inout GenerationContext, of: AssociatedTypeDecl.ID, with doc: AssociatedTypeDocumentation?
 ) throws -> String {
   let decl: AssociatedTypeDecl = ctx.typedProgram.ast[of]!
+  let scope = ctx.typedProgram.nodeToScope[of]!
 
   var env: [String: Any] = [:]
 
@@ -159,17 +199,20 @@ public func renderAssociatedTypePage(
   env["declarationPreview"] = decl.site.text  // todo
 
   if let doc = doc {
-    // Summary
     if let summary = doc.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    // Details
-    if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
-    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
+    }
   }
 
   return try renderTemplate(
@@ -188,6 +231,7 @@ public func renderAssociatedValuePage(
   ctx: inout GenerationContext, of: AssociatedValueDecl.ID, with doc: AssociatedValueDocumentation?
 ) throws -> String {
   let decl: AssociatedValueDecl = ctx.typedProgram.ast[of]!
+  let scope = ctx.typedProgram.nodeToScope[of]!
 
   var env: [String: Any] = [:]
 
@@ -199,17 +243,20 @@ public func renderAssociatedValuePage(
   env["declarationPreview"] = decl.site.text  // todo
 
   if let doc = doc {
-    // Summary
     if let summary = doc.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    // Details
-    if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
-    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
+    }
   }
 
   return try renderTemplate(
@@ -229,6 +276,7 @@ public func renderTypeAliasPage(
 ) throws -> String {
   let decl: TypeAliasDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
+  let scope = ctx.typedProgram.nodeToScope[of]!
 
   var env: [String: Any] = [:]
   env["name"] = decl.identifier.value
@@ -239,14 +287,14 @@ public func renderTypeAliasPage(
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
 
   if let doc = doc {
-    // Summary
     if let summary = doc.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    // Details
-    if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
   }
 
@@ -266,6 +314,7 @@ public func renderBindingPage(
 ) throws -> String {
   let decl: BindingDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
+  let scope = ctx.typedProgram.nodeToScope[of]!
 
   var env: [String: Any] = [:]
 
@@ -278,15 +327,23 @@ public func renderBindingPage(
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
-    if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
-    env["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
+    env["invariants"] = doc.invariants.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
+    }
 
-    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
+    }
   }
 
   return try renderTemplate(ctx: &ctx, targetId: target, name: "binding_layout.html", env: &env)
@@ -305,10 +362,10 @@ public func renderOperatorPage(
 ) throws -> String {
   let decl: OperatorDecl = ctx.typedProgram.ast[of]!
   let target = AnyTargetID.symbol(AnyDeclID(of))
+  let scope = ctx.typedProgram.nodeToScope[of]!
 
   var env: [String: Any] = [:]
 
-  // TODO address the case where the function has no name
   env["name"] = decl.name.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
@@ -317,16 +374,19 @@ public func renderOperatorPage(
   env["declarationPreview"] = decl.site.text  // todo
 
   if let doc = doc {
-    // Summary
     if let summary = doc.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    // Details
-    if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
-    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
+    }
   }
 
   return try renderTemplate(ctx: &ctx, targetId: target, name: "operator_layout.html", env: &env)
@@ -341,52 +401,67 @@ public func renderOperatorPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderFunctionPage(
-  ctx: inout GenerationContext, of: FunctionDecl.ID, with doc: FunctionDocumentation?
+  ctx: inout GenerationContext, of declId: FunctionDecl.ID, with doc: FunctionDocumentation?
 ) throws -> String {
-  let decl: FunctionDecl = ctx.typedProgram.ast[of]!
-  let target = AnyTargetID.symbol(AnyDeclID(of))
+  let decl: FunctionDecl = ctx.typedProgram.ast[declId]!
+  let target = AnyTargetID.symbol(AnyDeclID(declId))
+  let scope = AnyScopeID(declId)
 
   var env: [String: Any] = [:]
   env["name"] = decl.site.text
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx, declId, target)
   env["pageType"] = "Function"
-  env["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(ctx, of, target)
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(ctx, declId, target)
 
   if let doc = doc {
-    // Summary
     if let summary = doc.documentation.common.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
-    // Details
-    if let block = doc.documentation.common.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+
+    if let details = doc.documentation.common.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["preconditions"] = doc.documentation.common.preconditions.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
     env["postconditions"] = doc.documentation.common.postconditions.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["returns"] = doc.returns.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
 
     env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
-      ctx.htmlGenerator.generate(doc: $0)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
     }
   }
 
@@ -402,10 +477,11 @@ public func renderFunctionPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderMethodPage(
-  ctx: inout GenerationContext, of: MethodDecl.ID, with doc: MethodDeclDocumentation?
+  ctx: inout GenerationContext, of declId: MethodDecl.ID, with doc: MethodDeclDocumentation?
 ) throws -> String {
-  let decl: MethodDecl = ctx.typedProgram.ast[of]!
-  let target = AnyTargetID.symbol(AnyDeclID(of))
+  let decl: MethodDecl = ctx.typedProgram.ast[declId]!
+  let target = AnyTargetID.symbol(AnyDeclID(declId))
+  let scope = AnyScopeID(declId)
 
   var env: [String: Any] = [:]
 
@@ -413,48 +489,62 @@ public func renderMethodPage(
   env["name"] = decl.identifier.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx, declId, target)
   env["pageType"] = "Method"
-  env["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(ctx, of, target)
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(ctx, declId, target)
 
   if let doc = doc {
-    // Summary
     if let summary = doc.documentation.common.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    // Details
-    if let block = doc.documentation.common.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.documentation.common.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["preconditions"] = doc.documentation.common.preconditions.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
     env["postconditions"] = doc.documentation.common.postconditions.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
     env["returns"] = doc.returns.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
 
     // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
     env["members"] = prepareMembersData(
-      referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
+      referringFrom: .symbol(AnyDeclID(declId)),
+      decls: decl.impls.map { member in AnyDeclID(member) },
       ctx: ctx)
 
     env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
-      ctx.htmlGenerator.generate(doc: $0)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
     }
   }
 
@@ -470,10 +560,11 @@ public func renderMethodPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderSubscriptPage(
-  ctx: inout GenerationContext, of: SubscriptDecl.ID, with doc: SubscriptDeclDocumentation?
+  ctx: inout GenerationContext, of declId: SubscriptDecl.ID, with doc: SubscriptDeclDocumentation?
 ) throws -> String {
-  let decl: SubscriptDecl = ctx.typedProgram.ast[of]!
-  let target = AnyTargetID.symbol(AnyDeclID(of))
+  let decl: SubscriptDecl = ctx.typedProgram.ast[declId]!
+  let target = AnyTargetID.symbol(AnyDeclID(declId))
+  let scope = AnyScopeID(declId)
 
   var env: [String: Any] = [:]
 
@@ -481,41 +572,54 @@ public func renderSubscriptPage(
 
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx, declId, target)
   env["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
-  env["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(ctx, of, target)
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(ctx, declId, target)
 
   if let doc = doc {
-    // Summary
     if let summary = doc.documentation.common.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    // Details
-    if let block = doc.documentation.common.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.documentation.common.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["yields"] = doc.yields.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
     env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
-      ctx.htmlGenerator.generate(doc: $0)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
     }
   }
-  // args["members"] = decl.impls.map { member in getMembers(ctx: ctx, of: AnyDeclID(member)) }
+
+  // todo this should be displayed very differently, but not designed yet
   env["members"] = prepareMembersData(
-    referringFrom: .symbol(AnyDeclID(of)), decls: decl.impls.map { member in AnyDeclID(member) },
+    referringFrom: .symbol(AnyDeclID(declId)),
+    decls: decl.impls.map { member in AnyDeclID(member) },
     ctx: ctx)
 
   return try renderTemplate(ctx: &ctx, targetId: target, name: "subscript_layout.html", env: &env)
@@ -530,52 +634,64 @@ public func renderSubscriptPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderInitializerPage(
-  ctx: inout GenerationContext, of: InitializerDecl.ID, with doc: InitializerDocumentation?
+  ctx: inout GenerationContext, of declId: InitializerDecl.ID, with doc: InitializerDocumentation?
 ) throws -> String {
-  let decl: InitializerDecl = ctx.typedProgram.ast[of]!
-  let target = AnyTargetID.symbol(AnyDeclID(of))
-
+  let decl: InitializerDecl = ctx.typedProgram.ast[declId]!
+  let target = AnyTargetID.symbol(AnyDeclID(declId))
+  let scope = AnyScopeID(declId)
   var env: [String: Any] = [:]
 
   // TODO address the case where the function has no name
   env["name"] = decl.site.text
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx, declId, target)
   env["pageType"] = "Initializer"
-  env["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(ctx, of, target)
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(ctx, declId, target)
 
   if let doc = doc {
-    // Summary
     if let summary = doc.documentation.common.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    // Details
-    if let block = doc.documentation.common.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.documentation.common.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["preconditions"] = doc.documentation.common.preconditions.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
     env["postconditions"] = doc.documentation.common.postconditions.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
     env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (ctx.typedProgram.ast[key].baseName, ctx.htmlGenerator.generate(doc: value.description))
+      (
+        ctx.typedProgram.ast[key].baseName,
+        ctx.htmlGenerator.generateResolvingHyloReferences(
+          document: value.description, scopeId: scope, from: ctx.typedProgram)
+      )
     }
 
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
-      ctx.htmlGenerator.generate(doc: $0.description)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
     }
 
     env["seeAlso"] = doc.documentation.common.common.seeAlso.map {
-      ctx.htmlGenerator.generate(doc: $0)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
     }
   }
 
@@ -591,38 +707,47 @@ public func renderInitializerPage(
 ///
 /// - Returns: contents of the rendered page
 public func renderTraitPage(
-  ctx: inout GenerationContext, of: TraitDecl.ID, with doc: TraitDocumentation?
+  ctx: inout GenerationContext, of declId: TraitDecl.ID, with doc: TraitDocumentation?
 )
   throws -> String
 {
-  let decl: TraitDecl = ctx.typedProgram.ast[of]!
-  let target = AnyTargetID.symbol(AnyDeclID(of))
+  let decl: TraitDecl = ctx.typedProgram.ast[declId]!
+  let target = AnyTargetID.symbol(AnyDeclID(declId))
+  let scope = AnyScopeID(declId)
 
   var env: [String: Any] = [:]
 
   env["name"] = decl.identifier.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx, declId, target)
   env["pageType"] = "Trait"
-  env["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(ctx, of, target)
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(ctx, declId, target)
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
-    if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generate(doc: block)
+    if let details = doc.common.description {
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: details, scopeId: scope, from: ctx.typedProgram)
     }
 
-    env["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
+    env["invariants"] = doc.invariants.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
+    }
 
-    env["seeAlso"] = doc.common.seeAlso.map { ctx.htmlGenerator.generate(doc: $0) }
+    env["seeAlso"] = doc.common.seeAlso.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
+    }
   }
 
   env["members"] = prepareMembersData(
-    referringFrom: .symbol(AnyDeclID(of)), decls: decl.members, ctx: ctx)
+    referringFrom: .symbol(AnyDeclID(declId)), decls: decl.members, ctx: ctx)
 
   return try renderTemplate(ctx: &ctx, targetId: target, name: "trait_layout.html", env: &env)
 }
@@ -640,6 +765,7 @@ public func renderProductTypePage(
 ) throws -> String {
   let decl: ProductTypeDecl = ctx.typedProgram.ast[declId]!
   let target = AnyTargetID.symbol(AnyDeclID(declId))
+  let scope = AnyScopeID(declId)
 
   var env: [String: Any] = [:]
 
@@ -652,15 +778,21 @@ public func renderProductTypePage(
 
   if let doc = doc {
     if let summary = doc.common.summary {
-      env["summary"] = ctx.htmlGenerator.generate(doc: summary)
+      env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: summary, scopeId: scope, from: ctx.typedProgram)
     }
 
     if let block = doc.common.description {
-      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(document: block, scopeId: AnyScopeID(declId), from: ctx.typedProgram)
+      env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: block, scopeId: AnyScopeID(declId), from: ctx.typedProgram)
     }
-    env["invariants"] = doc.invariants.map { ctx.htmlGenerator.generate(doc: $0.description) }
+    env["invariants"] = doc.invariants.map {
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0.description, scopeId: scope, from: ctx.typedProgram)
+    }
     env["seeAlso"] = doc.common.seeAlso.map {
-      ctx.htmlGenerator.generate(doc: $0)
+      ctx.htmlGenerator.generateResolvingHyloReferences(
+        document: $0, scopeId: scope, from: ctx.typedProgram)
     }
   }
 

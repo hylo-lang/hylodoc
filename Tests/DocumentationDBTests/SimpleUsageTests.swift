@@ -12,7 +12,8 @@ final class DocumentationDBWorks: XCTestCase {
       .init(
         location: URL(fileURLWithPath: "file://C:/parent/child", isDirectory: true),
         documentation: nil,
-        children: []
+        children: [],
+        moduleId: ModuleDecl.ID(rawValue: 1)
       )
     )
 
@@ -22,7 +23,8 @@ final class DocumentationDBWorks: XCTestCase {
         documentation: nil,
         children: [
           AnyAssetID.folder(childFolderDocId)
-        ]
+        ],
+        moduleId: ModuleDecl.ID(rawValue: 1)
       )
     )
 
@@ -38,7 +40,10 @@ final class DocumentationDBWorks: XCTestCase {
 
     XCTAssertEqual(db.assets.folders[childFolderDocId]?.name, "child")
     XCTAssertEqual(
-      db.assets.folders[childFolderDocId]?.location,
-      URL(fileURLWithPath: "file://C:/parent/child", isDirectory: true))
+      db.assets[childFolderDocId]?.location,
+      URL(fileURLWithPath: "file://C:/parent/child", isDirectory: true)
+    )
+
+    XCTAssertEqual(db.assets[childFolderDocId]!.moduleId, ModuleDecl.ID(rawValue: 1))
   }
 }

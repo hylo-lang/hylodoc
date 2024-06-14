@@ -77,6 +77,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
   // Inputs:
   private let modules: [InputModuleInfo]
   private var typedProgram: TypedProgram
+  private let standardizedModulePathsToModuleIds: [(url: URL, moduleId: ModuleDecl.ID)]
 
   // Products:
   private var assets: AssetStore = .init()
@@ -101,6 +102,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
     self.markdownParser = markdownParser
     self.translationUnitsByURL = collectTranslationUnitsByURL(ast: typedProgram.ast)
     self.sourceFileDocumentor = sourceFileDocumentor
+    self.standardizedModulePathsToModuleIds = modules.map { ($0.rootFolderPath.standardized, $0.astId) }
   }
 
   public mutating func processArticle(path: URL) -> Result<ArticleAsset.ID, ArticleProcessingError>
@@ -115,7 +117,8 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
           .init(
             location: path,
             title: title,
-            content: rest
+            content: rest,
+            moduleId: moduleOf(assetUrl: path)!
           )
         )
       }
@@ -162,7 +165,8 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
         .init(
           location: path,
           documentation: documentation,
-          children: Array(children)
+          children: Array(children),
+          moduleId: moduleOf(assetUrl: path)!
         )
       )
     )
@@ -186,6 +190,14 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
           modules: .init(from: extendedModuleInfos.map(ModuleInfo.init).map { ($0, $0.astId) })
         )
       }
+  }
+  
+  func moduleOf(assetUrl: URL) -> ModuleDecl.ID? {
+    let assetPathComponents = assetUrl.standardized.pathComponents
+        
+    return standardizedModulePathsToModuleIds.first { (moduleUrl, _) in
+      return assetPathComponents.starts(with: moduleUrl.pathComponents)
+    }?.moduleId
   }
 }
 

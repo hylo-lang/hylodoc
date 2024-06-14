@@ -1,0 +1,120 @@
+/// # File-Level:
+/// There is always a summary of good ``Integer``s.
+///
+/// But if you really want to dig deep, you should read the description of ``MyType``
+
+/// This is the summary of the Integer type. It is used in ``Vector2``.
+///
+/// This is the details seciton of the Integer type. It is used in ``Vector2``.
+type Integer {}
+
+/// Summary of ``Vector2``
+/// 
+/// Description of ``Vector2`` using ``Integer``s
+type Vector2 {
+  /// Summary of a binding called ``x``
+  let x: Integer
+
+  /// summary of ``y``
+  ///
+  /// Details of ``y``, it is not ``x``
+  let y: Integer
+}
+
+trait TraitA{}
+trait TraitB{}
+/// ``min_inout``
+/// 
+/// ``radians``
+type MyType : TraitA, TraitB {
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public typealias Element = Float64
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public var radians: Float64
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public let member2 = "What"
+  
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public static let member3: Int
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public init(first m1: Float64, _ m2: Int) {}
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public static subscript(_ n: Int): Float64 {}
+  
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public subscript nice(): Int {}
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public subscript min_inout(_ x: inout Int, y: inout Int): Int {
+    inout { if y > x { &x } else { &y } }
+  }
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public subscript min(_ x: yielded Int, _ y: yielded Int): Int {
+    let   { if y > x { x } else { y } }
+    inout { if y > x { &x } else { &y } }
+  }
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public subscript min(_ x: yielded Int, _ y: yielded Int): Int {
+    inout { if y > x { &x } else { &y } }
+    set   { if y > x { &x = 1 } else { &y = 1 } }
+  }
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public fun functionLarge(hello hello: Int, _ world: Float64) inout -> Int {}
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public fun functionSmall(_ world: Float64) -> Int {}
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public static fun functionTiny() {}
+
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public fun foo(_ x: Self, n: Int) -> Float64 {
+    let   { }
+    sink  { }
+    inout { }
+  }
+
+  /// ``min_inout``
+  /// 
+  /// ``radians``
+  public property degrees: Float64 {
+    let { }
+    inout { }
+  }
+}

@@ -1,0 +1,4 @@
+/// This is in the same scope as the stuff in `a.hylo`, so we can refer to symbols like ``Vector2``
+type Database {
+
+}

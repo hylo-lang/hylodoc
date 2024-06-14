@@ -4,57 +4,66 @@ import Foundation
 import FrontEnd
 import StandardLibraryCore
 import Stencil
+import TestUtils
 import WebsiteGen
 import XCTest
 
 @testable import WebsiteGen
 
-final class SimpleFullPipelineTest: XCTestCase {
-  func test() {
-    let fileManager = FileManager.default
+func runFullPipelineWithoutErrors(at sourceUrl: URL) throws {
+  let outputURL = URL(fileURLWithPath: "./test-output/" + UUID.init().uuidString)
 
-    let sourceURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-      .appendingPathComponent("ExampleModule")
+  let fileManager = FileManager.default
 
-    let outputURL = URL(fileURLWithPath: "./dist")
+  if fileManager.fileExists(atPath: outputURL.path) {
+    try fileManager.removeItem(at: outputURL)
+  }
 
-    if fileManager.fileExists(atPath: outputURL.path) {
-      try! fileManager.removeItem(at: outputURL)
-    }
+  var diagnostics = DiagnosticSet()
+  var ast = checkNoDiagnostic { d in
+    loadStandardLibraryCore(diagnostics: &d)
+  }
 
-    var diagnostics = DiagnosticSet()
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
-    let rootModuleId = try! ast.makeModule(
-      "ExampleModule", sourceCode: sourceFiles(in: [sourceURL]),
-      builtinModuleAccess: true, diagnostics: &diagnostics)
+  let rootModuleId = try checkNoDiagnostic { d in
+    try ast.makeModule(
+      "ExampleModule", sourceCode: sourceFiles(in: [sourceUrl]),
+      builtinModuleAccess: true, diagnostics: &d)
+  }
 
-    let typedProgram = try! TypedProgram(
+  let typedProgram = try checkNoDiagnostic { d in
+    try TypedProgram(
       annotating: ScopedProgram(ast), inParallel: false,
       reportingDiagnosticsTo: &diagnostics, tracingInferenceIf: { (_, _) in false })
+  }
 
-    XCTAssert(diagnostics.isEmpty)
+  let result = extractDocumentation(
+    typedProgram: typedProgram,
+    for: [
+      .init(name: "ExampleModule", rootFolderPath: sourceUrl, astId: rootModuleId)
+    ])
 
-    let result = extractDocumentation(
-      typedProgram: typedProgram,
-      for: [
-        .init(name: "ExampleModule", rootFolderPath: sourceURL, astId: rootModuleId)
-      ])
+  switch result {
+  case .success(let documentationDatabase):
+    guard
+      generateDocumentation(
+        documentation: documentationDatabase,
+        typedProgram: typedProgram,
+        exportPath: outputURL
+      )
+    else { return XCTFail("failed to generate documentation") }
 
-    switch result {
-    case .success(let documentationDatabase):
-      guard
-        generateDocumentation(
-          documentation: documentationDatabase,
-          typedProgram: typedProgram,
-          exportPath: outputURL
-        )
-      else { return XCTFail("failed to generate documentation") }
+    print("Documentation successfully generated at \(outputURL).")
+  case .failure(let error):
+    print("Failed to extract documentation: \(error)")
 
-      print("Documentation successfully generated at \(outputURL).")
-    case .failure(let error):
-      print("Failed to extract documentation: \(error)")
+    XCTFail()
+  }
+}
 
-      XCTFail()
-    }
+final class SimpleFullPipelineTest: XCTestCase {
+  func test() throws {
+    try runFullPipelineWithoutErrors(
+      at: URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
+        "ExampleModule", isDirectory: true))
   }
 }

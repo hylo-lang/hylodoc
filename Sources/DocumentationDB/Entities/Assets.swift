@@ -32,10 +32,16 @@ public struct FolderAsset: IdentifiedEntity, Asset {
   /// The list of child assets in this folder
   public let children: [AnyAssetID]
 
-  public init(location: URL, documentation: ArticleAsset.ID?, children: [AnyAssetID]) {
+  /// Id of a module in which the folder is contained in.
+  /// 
+  /// Used for name resolution for embedded hylo references.
+  public let moduleId: ModuleDecl.ID
+
+  public init(location: URL, documentation: ArticleAsset.ID?, children: [AnyAssetID], moduleId: ModuleDecl.ID) {
     self.location = location
     self.documentation = documentation
     self.children = children
+    self.moduleId = moduleId
   }
 
   public typealias EntityStoreT = EntityStore<FolderAsset>
@@ -54,10 +60,16 @@ public struct ArticleAsset: IdentifiedEntity, Asset, Equatable {
   /// The content of the article, excluding the first-level heading at the beginning, if present.
   public let content: Block
 
-  public init(location: URL, title: String?, content: Block) {
+  /// The ID of the module in which the article is located.
+  ///
+  /// Used for name resolution for embedded hylo references.
+  public let moduleId: ModuleDecl.ID
+
+  public init(location: URL, title: String?, content: Block, moduleId: ModuleDecl.ID) {
     self.location = location
     self.title = title
     self.content = content
+    self.moduleId = moduleId
   }
 
   public typealias EntityStoreT = EntityStore<ArticleAsset>
