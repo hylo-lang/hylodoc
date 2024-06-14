@@ -74,7 +74,7 @@ final class SubscriptTest : XCTestCase {
 
         let res = try! renderSubscriptPage(ctx: &ctx, of: subscriptId, with: subscriptDoc)
 
-        assertPageTitle("min", in: res, file: #file, line: #line)
+        assertPageTitle("subscript min(_:_:)", in: res, file: #file, line: #line)
         assertSummary("Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line)
         assertDetails("In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file, line: #line)
 

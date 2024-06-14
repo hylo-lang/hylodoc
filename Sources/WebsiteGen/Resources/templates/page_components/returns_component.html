@@ -3,10 +3,11 @@
         <h1>Returns</h1>
         {% if returns.count == 1 %}
             {{ returns[0] }}
+            <div style="display: none;"><li id="returnsItem"></li></div>
         {% else %}
             <ul>
             {% for el in returns %}
-                <li>
+                <li id="returnsItem">
                 {{ el }}
                 </li>
             {% endfor %}

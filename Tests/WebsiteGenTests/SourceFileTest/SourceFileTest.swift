@@ -71,7 +71,7 @@ final class SourceFileTest: XCTestCase {
 
     let res = try! renderSourceFilePage(ctx: &ctx, of: sourceFileID)
 
-    assertPageTitle("sourceFileExample", in: res, file: #file, line: #line)
+    assertPageTitle("sourceFileExample.hylo", in: res, file: #file, line: #line)
     assertSummary("Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line)
     assertDetails("In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file, line: #line)
     assertListExistAndCount(id: "seeAlso", count: 2, in: res, file: #file, line: #line)

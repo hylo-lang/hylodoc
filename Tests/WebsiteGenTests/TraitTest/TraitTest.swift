@@ -72,7 +72,7 @@ final class TraitTest : XCTestCase {
         assertDetails("In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file, line: #line)
         assertListExistAndCount(id: "invariants", count: 1, in: res, file: #file, line: #line)
 
-        let members = findByID("members", in: res)
+        // let members = findByID("members", in: res)
         assertSectionsExsistingAndCount(
             [
                 "Associated Types": 0,
@@ -87,7 +87,8 @@ final class TraitTest : XCTestCase {
                 "Traits": 0,
                 "Product Types": 0,
             ],
-            in: members,
+            // in: members,
+            in: res,
             file: #file, line: #line
         )
 

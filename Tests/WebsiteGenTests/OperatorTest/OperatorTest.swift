@@ -63,7 +63,7 @@ final class OperatorTest : XCTestCase {
 
         let res = try! renderOperatorPage(ctx: &ctx, of: operatorId, with: operatorDoc)
 
-        assertPageTitle("public operator infix", in: res, file: #file, line: #line)
+        assertPageTitle("public operator infix<<   : shift", in: res, file: #file, line: #line)
         assertSummary("Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line)
         assertDetails("In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file, line: #line)
 

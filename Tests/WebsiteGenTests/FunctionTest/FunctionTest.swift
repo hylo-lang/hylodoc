@@ -93,7 +93,7 @@ final class FunctionTest: XCTestCase {
 
     let res = try! renderFunctionPage(ctx: &ctx, of: functionId, with: fDoc)
 
-    assertPageTitle("id", in: res, file: #file, line: #line)
+    assertPageTitle("fun id(_:)", in: res, file: #file, line: #line)
     assertSummary("Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line)
     assertDetails("In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file, line: #line)
     assertNotContains(res, what: "preconditions", file: #file, line: #line)

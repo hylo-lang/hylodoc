@@ -5,7 +5,7 @@
   <div class="content-section" id="{{ key|convertToID }}">
     <h2>{{ key }}</h2>
     {% for name, summary in values %}
-      <div class="declaration">
+      <div class="declaration" id="{{ key|convertToID }}Item">
         <code><pre>{{ name }}</pre></code>
         {{ summary }}
       </div>
