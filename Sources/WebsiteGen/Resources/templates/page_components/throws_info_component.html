@@ -3,11 +3,10 @@
         <h1>Throws</h1>
         {% if throwsInfo.count == 1 %}
             {{ throwsInfo[0] }}
-            <div style="display: none;"><li id="throwsInfoItem"></li></div>
         {% else %}
             <ul>
             {% for el in throwsInfo %}
-                <li id="throwsInfoItem">
+                <li>
                 {{ el }}
                 </li>
             {% endfor %}

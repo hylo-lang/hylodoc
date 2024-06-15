@@ -44,7 +44,8 @@ final class ArticleTest: XCTestCase {
                     Text(
                     "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
                     ))
-                ])
+                ]),
+                moduleId: ModuleDecl.ID(rawValue: 0)
             ))
 
         var ctx = GenerationContext(
@@ -52,7 +53,6 @@ final class ArticleTest: XCTestCase {
             stencil: createDefaultStencilEnvironment(),
             typedProgram: typedProgram,
             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-            htmlGenerator: CustomHTMLGenerator(),
             tree: []
         )
 
@@ -104,7 +104,8 @@ final class ArticleTest: XCTestCase {
                 "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!"
                 )
             )
-            ])
+            ]),
+            moduleId: ModuleDecl.ID(rawValue: 0)
         ))
 
         var ctx = GenerationContext(
@@ -112,7 +113,6 @@ final class ArticleTest: XCTestCase {
             stencil: createDefaultStencilEnvironment(),
             typedProgram: typedProgram,
             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-            htmlGenerator: CustomHTMLGenerator(),
             tree: []
         )
 

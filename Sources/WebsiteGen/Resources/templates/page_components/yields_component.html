@@ -3,11 +3,10 @@
         <h1>Yields</h1>
         {% if yields.count == 1 %}
             {{ yields[0] }}
-            <div style="display: none;"><li id="yieldsItem"></li></div>
         {% else %}
             <ul>
             {% for el in yields %}
-                <li id="yieldsItem">{{ el }}</li>
+                <li>{{ el }}</li>
             {% endfor %}
             </ul>
         {% endif %}

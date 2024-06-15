@@ -10,7 +10,7 @@ import XCTest
 @testable import FrontEnd
 @testable import WebsiteGen
 
-final class AssociatedTypeTest: XCTestCase {
+final class AssociatedTypeReferenceTest: XCTestCase {
   func test() throws {
     try runFullPipelineWithoutErrors(
       at: URL(fileURLWithPath: #filePath).deletingLastPathComponent()

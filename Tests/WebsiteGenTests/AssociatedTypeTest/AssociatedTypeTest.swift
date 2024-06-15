@@ -40,7 +40,6 @@ final class AssociatedTypeTest : XCTestCase {
             stencil: createDefaultStencilEnvironment(),
             typedProgram: typedProgram,
             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-            htmlGenerator: CustomHTMLGenerator(),
             tree: []
         )
 

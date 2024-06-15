@@ -40,7 +40,6 @@ final class FunctionTest: XCTestCase {
             stencil: createDefaultStencilEnvironment(),
             typedProgram: typedProgram,
             urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-            htmlGenerator: CustomHTMLGenerator(),
             tree: []
         )
 

@@ -40,7 +40,8 @@ final class FolderTest: XCTestCase {
       .init(
         location: URL(string: "root/Folder1")!,
         documentation: nil,
-        children: []
+        children: [],
+        moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
     var ctx = GenerationContext(
@@ -48,7 +49,6 @@ final class FolderTest: XCTestCase {
         stencil: createDefaultStencilEnvironment(),
         typedProgram: typedProgram,
         urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-        htmlGenerator: CustomHTMLGenerator(),
         tree: []
     )
 
@@ -93,14 +93,16 @@ final class FolderTest: XCTestCase {
       .init(
         location: URL(string: "root/Folder1/index.hylodoc")!,
         title: "Info Article",
-        content: .document([.paragraph(Text("lorem ipsum"))])
+        content: .document([.paragraph(Text("lorem ipsum"))]),
+        moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
     let folder1Id = db.assets.folders.insert(
       .init(
         location: URL(string: "root/Folder1")!,
         documentation: documentationArticleId,
-        children: []
+        children: [],
+        moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
     var ctx = GenerationContext(
@@ -108,7 +110,6 @@ final class FolderTest: XCTestCase {
         stencil: createDefaultStencilEnvironment(),
         typedProgram: typedProgram,
         urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-        htmlGenerator: CustomHTMLGenerator(),
         tree: []
     )
 
@@ -154,28 +155,32 @@ final class FolderTest: XCTestCase {
       .init(
         location: URL(string: "root/Folder1/index.hylodoc")!,
         title: "Info Article",
-        content: .document([.paragraph(Text("lorem ipsum"))])
+        content: .document([.paragraph(Text("lorem ipsum"))]),
+        moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
     let child1ArticleId = db.assets.articles.insert(
       .init(
         location: URL(string: "root/Folder1/child1.hylodoc")!,
         title: "First News",
-        content: .document([.paragraph(Text("This is first child"))])
+        content: .document([.paragraph(Text("This is first child"))]),
+        moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
     let child2FolderId = db.assets.folders.insert(
       .init(
         location: URL(string: "root/Folder1/Folder2")!,
         documentation: nil,
-        children: []
+        children: [],
+        moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
     let folder1Id = db.assets.folders.insert(
       .init(
         location: URL(string: "root/Folder1")!,
         documentation: documentationArticleId,  // <- important connection
-        children: [AnyAssetID.article(child1ArticleId), AnyAssetID.folder(child2FolderId)]
+        children: [AnyAssetID.article(child1ArticleId), AnyAssetID.folder(child2FolderId)],
+        moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
     var ctx = GenerationContext(
@@ -183,7 +188,6 @@ final class FolderTest: XCTestCase {
         stencil: createDefaultStencilEnvironment(),
         typedProgram: typedProgram,
         urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-        htmlGenerator: CustomHTMLGenerator(),
         tree: []
     )
 

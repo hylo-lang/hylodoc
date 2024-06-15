@@ -9,35 +9,35 @@ public struct ANSIColors {
   static let _cyan: String = "\u{001B}[0;36m"
   static let _white: String = "\u{001B}[0;37m"
 
-  static func black(_ text: String) -> String {
+  public static func black(_ text: String) -> String {
     return _black + text + _reset
   }
 
-  static func red(_ text: String) -> String {
+  public static func red(_ text: String) -> String {
     return _red + text + _reset
   }
 
-  static func green(_ text: String) -> String {
+  public static func green(_ text: String) -> String {
     return _green + text + _reset
   }
 
-  static func yellow(_ text: String) -> String {
+  public static func yellow(_ text: String) -> String {
     return _yellow + text + _reset
   }
 
-  static func blue(_ text: String) -> String {
+  public static func blue(_ text: String) -> String {
     return _blue + text + _reset
   }
 
-  static func magenta(_ text: String) -> String {
+  public static func magenta(_ text: String) -> String {
     return _magenta + text + _reset
   }
 
-  static func cyan(_ text: String) -> String {
+  public static func cyan(_ text: String) -> String {
     return _cyan + text + _reset
   }
 
-  static func white(_ text: String) -> String {
+  public static func white(_ text: String) -> String {
     return _white + text + _reset
   }
 }
