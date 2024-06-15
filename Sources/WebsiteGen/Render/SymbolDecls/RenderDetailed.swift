@@ -52,7 +52,7 @@ func renderDetailedProductType(
     let nameExpr = productType.conformances[0]
     result += renderDetailedType(ctx, AnyExprID(nameExpr), referringFrom)!
 
-    for i in (1..<productType.conformances.count) {
+    for i in (1 ..< productType.conformances.count) {
       result += ","
       result += inline ? " " : "\n\(wrapIndentation(baseLength))"
 

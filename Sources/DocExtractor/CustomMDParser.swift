@@ -67,7 +67,7 @@ open class CodeRefLinkHtmlTransformer: InlineTransformer {
           case .delimiter("`", n, _):
             var scanner2 = iterator
             var code = ""
-            for _ in 1..<count {
+            for _ in 1 ..< count {
               code += scanner2.next()?.rawDescription ?? ""
             }
             if n == 2 {
@@ -98,7 +98,7 @@ open class CodeRefLinkHtmlTransformer: InlineTransformer {
           case .delimiter(">", n, _):
             var scanner2 = iterator
             var content = ""
-            for _ in 1..<count {
+            for _ in 1 ..< count {
               content += scanner2.next()?.rawDescription ?? ""
             }
             if isURI(content) {

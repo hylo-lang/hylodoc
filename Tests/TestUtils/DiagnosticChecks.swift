@@ -20,7 +20,7 @@ public func checkNoDiagnostic<R>(
     checkEmpty(d)
     throw d
   }
-} 
+}
 
 /// Reports any diagnostics in `s` as XCTest issues.
 public func checkEmpty(_ s: DiagnosticSet) {

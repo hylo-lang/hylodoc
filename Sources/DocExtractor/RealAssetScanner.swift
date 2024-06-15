@@ -102,7 +102,9 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
     self.markdownParser = markdownParser
     self.translationUnitsByURL = collectTranslationUnitsByURL(ast: typedProgram.ast)
     self.sourceFileDocumentor = sourceFileDocumentor
-    self.standardizedModulePathsToModuleIds = modules.map { ($0.rootFolderPath.standardized, $0.astId) }
+    self.standardizedModulePathsToModuleIds = modules.map {
+      ($0.rootFolderPath.standardized, $0.astId)
+    }
   }
 
   public mutating func processArticle(path: URL) -> Result<ArticleAsset.ID, ArticleProcessingError>
@@ -191,10 +193,10 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
         )
       }
   }
-  
+
   func moduleOf(assetUrl: URL) -> ModuleDecl.ID? {
     let assetPathComponents = assetUrl.standardized.pathComponents
-        
+
     return standardizedModulePathsToModuleIds.first { (moduleUrl, _) in
       return assetPathComponents.starts(with: moduleUrl.pathComponents)
     }?.moduleId

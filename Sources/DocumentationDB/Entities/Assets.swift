@@ -33,11 +33,13 @@ public struct FolderAsset: IdentifiedEntity, Asset {
   public let children: [AnyAssetID]
 
   /// Id of a module in which the folder is contained in.
-  /// 
+  ///
   /// Used for name resolution for embedded hylo references.
   public let moduleId: ModuleDecl.ID
 
-  public init(location: URL, documentation: ArticleAsset.ID?, children: [AnyAssetID], moduleId: ModuleDecl.ID) {
+  public init(
+    location: URL, documentation: ArticleAsset.ID?, children: [AnyAssetID], moduleId: ModuleDecl.ID
+  ) {
     self.location = location
     self.documentation = documentation
     self.children = children
