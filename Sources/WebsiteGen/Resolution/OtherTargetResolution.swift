@@ -2,11 +2,7 @@ import DocumentationDB
 
 extension DocumentationID<OtherLocalFileAsset> {
   public init?(_ targetId: AnyTargetID) {
-    guard case .asset(let assetId) = targetId else {
-      return nil
-    }
-
-    guard case .otherFile(let otherFileId) = assetId else {
+    guard case .asset(let assetId) = targetId, case .otherFile(let otherFileId) = assetId else {
       return nil
     }
 
