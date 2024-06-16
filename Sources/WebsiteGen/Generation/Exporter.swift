@@ -3,9 +3,9 @@ import PathWrangler
 
 /// Protocol responsible for how to store assets and other pages
 public protocol Exporter {
-  func file(from: URL, to: RelativePath) throws
-  func html(_ content: String, at: RelativePath) throws
-  func directory(at: RelativePath) throws
+  func copyFromFile(from: URL, to: RelativePath) throws
+  func exportHtml(_ content: String, at: RelativePath) throws
+  func createDirectory(at: RelativePath) throws
 }
 
 public struct DefaultExporter: Exporter {
@@ -19,7 +19,7 @@ public struct DefaultExporter: Exporter {
     return URL(path: path.absolute(in: absolute))
   }
 
-  public func file(from: URL, to: RelativePath) throws {
+  public func copyFromFile(from: URL, to: RelativePath) throws {
     let url = relativeToUrl(to)
 
     // Copy file
@@ -28,7 +28,7 @@ public struct DefaultExporter: Exporter {
     try FileManager.default.copyItem(at: from, to: url)
   }
 
-  public func html(_ content: String, at: RelativePath) throws {
+  public func exportHtml(_ content: String, at: RelativePath) throws {
     let url = relativeToUrl(at)
 
     // Write file
@@ -37,7 +37,7 @@ public struct DefaultExporter: Exporter {
     try content.write(to: url, atomically: false, encoding: String.Encoding.utf8)
   }
 
-  public func directory(at: RelativePath) throws {
+  public func createDirectory(at: RelativePath) throws {
     let url = relativeToUrl(at)
 
     // Create directory and parents

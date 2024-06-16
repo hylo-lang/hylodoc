@@ -11,15 +11,15 @@ extension DocumentationID<OtherLocalFileAsset> {
 }
 
 /// Check if the target is of type "other" since these should be excluded from regular resolution
-func isOtherTarget(_ targetId: AnyTargetID) -> Bool {
+func isDirectlyCopiedAssetTarget(_ targetId: AnyTargetID) -> Bool {
   let otherFileId: OtherLocalFileAsset.ID? = DocumentationID.init(targetId)
   return otherFileId != nil
 }
 
-func resolveOtherTarget(
+func resolveDirectlyCopiedAssetTarget(
   _ documentationDatabase: DocumentationDatabase, _ targetResolver: TargetResolver,
   targetId: AnyTargetID, parentId: AnyTargetID?
-) -> OtherResolvedTarget {
+) -> ResolvedDirectlyCopiedAssetTarget {
   guard let otherFileId: OtherLocalFileAsset.ID = DocumentationID.init(targetId) else {
     fatalError("unexpected target " + String(describing: targetId))
   }
@@ -31,7 +31,7 @@ func resolveOtherTarget(
     with: otherFile.name
   )
 
-  return OtherResolvedTarget(
+  return ResolvedDirectlyCopiedAssetTarget(
     sourceUrl: otherFile.location,
     relativePath: relativePath
   )

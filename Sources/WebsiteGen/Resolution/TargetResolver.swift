@@ -28,7 +28,7 @@ public struct ResolvedTarget {
   }
 }
 
-public struct OtherResolvedTarget {
+public struct ResolvedDirectlyCopiedAssetTarget {
   let sourceUrl: URL
   let relativePath: RelativePath
 
@@ -39,7 +39,7 @@ public struct OtherResolvedTarget {
 }
 
 public struct TargetResolver {
-  public var otherTargets: [AnyTargetID: OtherResolvedTarget] = [:]
+  public var otherTargets: [AnyTargetID: ResolvedDirectlyCopiedAssetTarget] = [:]
   public var targets: [AnyTargetID: ResolvedTarget] = [:]
   public var rootTargets: [AnyTargetID] = []
 
@@ -82,7 +82,9 @@ public struct TargetResolver {
   }
 
   /// Resolve any other target with just the relative path as these will just be copied directly
-  public mutating func resolveOther(targetId: AnyTargetID, _ resolved: OtherResolvedTarget) {
+  public mutating func resolveOther(
+    targetId: AnyTargetID, _ resolved: ResolvedDirectlyCopiedAssetTarget
+  ) {
     otherTargets[targetId] = resolved
   }
 

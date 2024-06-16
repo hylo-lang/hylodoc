@@ -45,7 +45,7 @@ public func generateDocumentation(
 
     // Export other targets
     try context.targetResolver.otherTargets.forEach {
-      try exporter.file(
+      try exporter.copyFromFile(
         from: $0.value.sourceUrl,
         to: $0.value.relativePath
       )
@@ -65,7 +65,7 @@ func copyPublicWebsiteAssets(exporter: Exporter) -> Bool {
     .appendingPathComponent("assets")
 
   do {
-    try exporter.file(from: assetsSourceLocation, to: RelativePath(pathString: "assets"))
+    try exporter.copyFromFile(from: assetsSourceLocation, to: RelativePath(pathString: "assets"))
   } catch {
     print("Error while copying website assets")
     print("from \"\(assetsSourceLocation)\"")

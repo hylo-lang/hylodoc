@@ -94,7 +94,7 @@ func generatePageForAnyAsset(
 
   // Render page and export content
   let content = try renderPage(&context, stencilContext, of: .asset(assetId))
-  try context.exporter.html(content, at: resolvedTarget.relativePath)
+  try context.exporter.exportHtml(content, at: resolvedTarget.relativePath)
 }
 
 func generatePageForAnyDecl(
@@ -133,7 +133,7 @@ func generatePageForAnyDecl(
 
   // Render page and export content
   let content = try renderPage(&context, stencilContext, of: .decl(declId))
-  try context.exporter.html(content, at: resolvedTarget.relativePath)
+  try context.exporter.exportHtml(content, at: resolvedTarget.relativePath)
 }
 
 public func generateModuleIndex(_ context: inout GenerationContext) throws {
@@ -158,5 +158,5 @@ public func generateModuleIndex(_ context: inout GenerationContext) throws {
     StencilContext(templateName: "folder_layout.html", context: env),
     of: .empty
   )
-  try context.exporter.html(content, at: RelativePath.current)
+  try context.exporter.exportHtml(content, at: RelativePath.current)
 }

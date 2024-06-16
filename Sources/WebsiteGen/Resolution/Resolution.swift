@@ -23,8 +23,8 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
     let targetItem = queue.popLast()!
 
     // Resolve only the path to an asset of type "other file" as they don't show up anywhere else
-    if isOtherTarget(targetItem.targetId) {
-      let otherResolved = resolveOtherTarget(
+    if isDirectlyCopiedAssetTarget(targetItem.targetId) {
+      let otherResolved = resolveDirectlyCopiedAssetTarget(
         documentationDatabase,
         targetResolver,
         targetId: targetItem.targetId,
@@ -60,7 +60,7 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
         parent: targetItem.parentId,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
-        children: partialResolved.children.filter { !isOtherTarget($0) },  // other files should not show up anywhere
+        children: partialResolved.children.filter { !isDirectlyCopiedAssetTarget($0) },  // other files should not show up anywhere
         relativePath: relativePath
       )
     )
