@@ -2,6 +2,7 @@
 /.*-build
 /Packages
 /swift-format
+/test-output
 
 **.lcov
 **.profdata

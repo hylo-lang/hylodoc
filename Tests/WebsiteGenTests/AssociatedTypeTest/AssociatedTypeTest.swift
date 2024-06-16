@@ -66,6 +66,7 @@ final class AssociatedTypeTest: XCTestCase {
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
+        id: targetId,
         parent: nil,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
@@ -82,7 +83,8 @@ final class AssociatedTypeTest: XCTestCase {
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
       exporter: DefaultExporter(AbsolutePath.current),
-      breadcrumb: []
+      breadcrumb: [],
+      tree: []
     )
 
     let stencilContext = try prepareAssociatedTypePage(context, of: associatedTypeId)

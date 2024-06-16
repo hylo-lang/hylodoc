@@ -71,6 +71,7 @@ final class SourceFileTest: XCTestCase {
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
+        id: targetId,
         parent: nil,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
@@ -87,7 +88,8 @@ final class SourceFileTest: XCTestCase {
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
       exporter: DefaultExporter(AbsolutePath.current),
-      breadcrumb: []
+      breadcrumb: [],
+      tree: []
     )
 
     let stencilContext = try prepareSourceFilePage(context, of: sourceFileID)

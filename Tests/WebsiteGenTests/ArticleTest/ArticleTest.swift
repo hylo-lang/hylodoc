@@ -55,6 +55,7 @@ final class ArticleTest: XCTestCase {
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
+        id: targetId,
         parent: nil,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
@@ -71,7 +72,8 @@ final class ArticleTest: XCTestCase {
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
       exporter: DefaultExporter(AbsolutePath.current),
-      breadcrumb: []
+      breadcrumb: [],
+      tree: []
     )
 
     let stencilContext = try prepareArticlePage(context, of: articleId)
@@ -131,6 +133,7 @@ final class ArticleTest: XCTestCase {
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
+        id: targetId,
         parent: nil,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
@@ -147,7 +150,8 @@ final class ArticleTest: XCTestCase {
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
       exporter: DefaultExporter(AbsolutePath.current),
-      breadcrumb: []
+      breadcrumb: [],
+      tree: []
     )
 
     let stencilContext = try prepareArticlePage(context, of: article1Id)

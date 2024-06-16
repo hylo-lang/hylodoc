@@ -52,6 +52,7 @@ final class FolderTest: XCTestCase {
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
+        id: targetId,
         parent: nil,
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
@@ -68,7 +69,8 @@ final class FolderTest: XCTestCase {
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
       exporter: DefaultExporter(AbsolutePath.current),
-      breadcrumb: []
+      breadcrumb: [],
+      tree: []
     )
 
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
@@ -131,6 +133,7 @@ final class FolderTest: XCTestCase {
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
+        id: targetId,
         parent: nil,
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
@@ -147,7 +150,8 @@ final class FolderTest: XCTestCase {
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
       exporter: DefaultExporter(AbsolutePath.current),
-      breadcrumb: []
+      breadcrumb: [],
+      tree: []
     )
 
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
@@ -228,6 +232,7 @@ final class FolderTest: XCTestCase {
     targetResolver.resolve(
       targetId: .asset(.article(child1ArticleId)),
       ResolvedTarget(
+        id: .asset(.article(child1ArticleId)),
         parent: .asset(.folder(folder1Id)),
         simpleName: partialResolvedChild1.simpleName,
         navigationName: partialResolvedChild1.navigationName,
@@ -242,6 +247,7 @@ final class FolderTest: XCTestCase {
     targetResolver.resolve(
       targetId: .asset(.folder(child2FolderId)),
       ResolvedTarget(
+        id: .asset(.folder(child2FolderId)),
         parent: targetId,
         simpleName: partialResolvedChild2.simpleName,
         navigationName: partialResolvedChild2.navigationName,
@@ -255,6 +261,7 @@ final class FolderTest: XCTestCase {
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
+        id: targetId,
         parent: nil,
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
@@ -271,7 +278,8 @@ final class FolderTest: XCTestCase {
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
       exporter: DefaultExporter(AbsolutePath.current),
-      breadcrumb: []
+      breadcrumb: [],
+      tree: []
     )
 
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
