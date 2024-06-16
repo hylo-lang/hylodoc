@@ -99,8 +99,27 @@ final class RelativePathTest: XCTestCase {
     )
   }
 
+  func testPathToRootOfDirectory() {
+    assertEqual(
+      RelativePath(pathString: "some/path/to/directory/").pathToRoot,
+      RelativePath(pathString: "../../../../")
+    )
+  }
+
+  func testPathToRootOfFile() {
+    assertEqual(
+      RelativePath(pathString: "some/path/to/directory/index.html").pathToRoot,
+      RelativePath(pathString: "../../../../")
+    )
+  }
+
   func assertReferEqual(_ from: RelativePath, _ to: RelativePath, _ expected: RelativePath) {
     let refer = from.refer(to: to)
     XCTAssertEqual(refer.pathString, expected.pathString)
   }
+
+  func assertEqual(_ relativePath: RelativePath, _ expected: RelativePath) {
+    XCTAssertEqual(relativePath.pathString, expected.pathString)
+  }
+
 }

@@ -17,22 +17,9 @@ final class ReferTagTest: XCTestCase {
     XCTAssertThrowsError(try render("{% refer a b c %}", [:]))
   }
 
-  func testSimpleStringString() {
-    XCTAssertEqual(
-      try! render(
-        "{% refer a b %}",
-        [
-          "a": "some/path/file.html",
-          "b": "some/path/article.html",
-        ]
-      ),
-      "article.html"
-    )
-  }
-
-  func testSimpleRelativePathRelativePath() {
-    XCTAssertEqual(
-      try! render(
+  func testCorrectInputs() throws {
+    try XCTAssertEqual(
+      try render(
         "{% refer a b %}",
         [
           "a": RelativePath(pathString: "some/path/file.html"),
@@ -43,25 +30,12 @@ final class ReferTagTest: XCTestCase {
     )
   }
 
-  func testMixedStringRelativePath() {
-    XCTAssertEqual(
-      try! render(
+  func testIncorrectFrom() {
+    XCTAssertThrowsError(
+      try render(
         "{% refer a b %}",
         [
-          "a": "some/path/to/file.html",
-          "b": RelativePath(pathString: "some/path/folder/file.html"),
-        ]
-      ),
-      "../folder/file.html"
-    )
-  }
-
-  func testUnsupportedFrom() {
-    XCTAssertEqual(
-      try! render(
-        "{% refer a b %}",
-        [
-          "a": 42,
+          "a": "/my/path/index.html",
           "b": RelativePath(pathString: "some/path/folder/file.html"),
         ]
       ),
@@ -69,26 +43,26 @@ final class ReferTagTest: XCTestCase {
     )
   }
 
-  func testUnsupportedTo() {
-    XCTAssertEqual(
-      try! render(
+  func testIncorrectTo() {
+    XCTAssertThrowsError(
+      try render(
         "{% refer a b %}",
         [
           "a": RelativePath(pathString: "some/path/folder/file.html"),
-          "b": 42,
+          "b": "/my/path/index.html",
         ]
       ),
       "."
     )
   }
 
-  func testBothUnsupported() {
-    XCTAssertEqual(
-      try! render(
+  func testBothIncorrect() {
+    XCTAssertThrowsError(
+      try render(
         "{% refer a b %}",
         [
-          "a": 42,
-          "b": 42,
+          "a": "/my/path/index.html",
+          "b": "oh/no/anyway.html",
         ]
       ),
       "."

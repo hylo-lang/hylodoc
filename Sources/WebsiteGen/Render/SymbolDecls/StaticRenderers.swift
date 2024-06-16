@@ -1,7 +1,8 @@
 import Foundation
 import FrontEnd
 
-public protocol SymbolStaticDeclRenderer {
+/// Static rendering of declarations using the typed program to render their signature
+public protocol StaticSymbolDeclRenderer {
   static func renderTraitDecl(
     _ typedProgram: TypedProgram, _ n: TraitDecl.ID
   ) -> String
@@ -28,7 +29,7 @@ public protocol SymbolStaticDeclRenderer {
   ) -> String
 }
 
-public struct SimpleSymbolDeclRenderer: SymbolStaticDeclRenderer {
+public struct SimpleSymbolDeclRenderer: StaticSymbolDeclRenderer {
 
   public static func renderTraitDecl(
     _ typedProgram: TypedProgram, _ n: TraitDecl.ID
@@ -79,7 +80,7 @@ public struct SimpleSymbolDeclRenderer: SymbolStaticDeclRenderer {
   }
 }
 
-public struct NavigationSymbolDecRenderer: SymbolStaticDeclRenderer {
+public struct NavigationSymbolDecRenderer: StaticSymbolDeclRenderer {
 
   public static func renderTraitDecl(
     _ typedProgram: TypedProgram, _ n: TraitDecl.ID

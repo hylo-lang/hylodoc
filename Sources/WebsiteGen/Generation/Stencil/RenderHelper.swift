@@ -7,7 +7,8 @@ import Stencil
 public typealias StencilContext = (templateName: String, context: [String: Any])
 
 /// Extension to the Stencil Environment struct to allow for default behavior of whitespace control and custom filters
-/// Removes whitespace before a block and whitespace and a single newline after a block (from https://github.com/stencilproject/Stencil/blob/master/Sources/Stencil/TrimBehaviour.swift)
+/// Removes whitespace before a block and whitespace and a single newline after a block
+/// Other trim options can be found at: https://github.com/stencilproject/Stencil/blob/master/Sources/Stencil/TrimBehaviour.swift
 extension Environment {
   public init(loader: Loader?) {
     let ext = Extension()
@@ -49,13 +50,14 @@ func convertToID(_ value: Any?) -> Any? {
 
 /// Render a page with the render and stencil context for a target
 public func renderPage(
-  _ render: inout RenderContext, _ stencil: StencilContext, targetId: AnyTargetID
+  _ render: inout GenerationContext, _ stencil: StencilContext, of targetId: AnyTargetID
 ) throws -> String {
   var completeContext: [String: Any] = stencil.context
-  completeContext["target"] = render.resolved.targetResolver[targetId]
+  let target = render.documentation.targetResolver[targetId]
+  completeContext["target"] = target
   completeContext["breadcrumb"] = render.breadcrumb
   completeContext["toc"] = tableOfContents(stencilContext: stencil.context)
-  completeContext["pathToRoot"] = String(repeating: "../", count: render.breadcrumb.count - 1)
+  completeContext["pathToRoot"] = target?.relativePath.pathToRoot ?? RelativePath.current
   //TODO Tree navigation
 
   return try render.stencilEnvironment.renderTemplate(

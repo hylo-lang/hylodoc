@@ -5,7 +5,8 @@ import MarkdownKit
 import PathWrangler
 import Stencil
 
-public struct ResolvedDocumentation {
+/// Context containing all the documentation used in the Website Generation phase
+public struct DocumentationContext {
   public let documentation: DocumentationDatabase
   public let typedProgram: TypedProgram
   public var targetResolver: TargetResolver
@@ -23,32 +24,30 @@ public func generateDocumentation(
   exportPath: URL
 ) -> Bool {
   // Resolve documentation
-  let resolved = ResolvedDocumentation(
+  let context = DocumentationContext(
     documentation: documentation,
     typedProgram: typedProgram,
-    targetResolver: resolve(
+    targetResolver: resolveTargets(
       documentationDatabase: documentation,
       typedProgram: typedProgram
     )
   )
 
   // Initialize exporter
-  let exporter: DefaultExporter = .init()
-  let absoluteExportPath = AbsolutePath(url: exportPath)!
+  let exporter: DefaultExporter = .init(AbsolutePath(url: exportPath)!)
 
   do {
     // Generate content
-    try generate(
-      resolved: resolved,
-      exportPath: absoluteExportPath,
+    try generateIndexAndTargetPages(
+      documentation: context,
       exporter: exporter
     )
 
     // Export other targets
-    try resolved.targetResolver.otherTargets.forEach {
+    try context.targetResolver.otherTargets.forEach {
       try exporter.file(
         from: $0.value.sourceUrl,
-        to: URL(path: $0.value.relativePath.absolute(in: absoluteExportPath))
+        to: $0.value.relativePath
       )
     }
   } catch {
@@ -56,25 +55,20 @@ public func generateDocumentation(
     print(error)
   }
 
-  return copyPublicWebsiteAssets(exportPath: exportPath)
+  return copyPublicWebsiteAssets(exporter: exporter)
 }
 
 /// Precondition: directory exists at `exportPath`
-func copyPublicWebsiteAssets(exportPath: URL) -> Bool {
+func copyPublicWebsiteAssets(exporter: Exporter) -> Bool {
   let assetsSourceLocation = Bundle.module.bundleURL
     .appendingPathComponent("Resources")
     .appendingPathComponent("assets")
 
-  let assetsExportLocation = exportPath.appendingPathComponent("assets")
   do {
-    try FileManager.default.copyItem(
-      at: assetsSourceLocation,
-      to: assetsExportLocation
-    )
+    try exporter.file(from: assetsSourceLocation, to: RelativePath(pathString: "assets"))
   } catch {
     print("Error while copying website assets")
     print("from \"\(assetsSourceLocation)\"")
-    print("to \"\(assetsExportLocation)\":")
     print(error)
     return false
   }

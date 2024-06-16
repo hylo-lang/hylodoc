@@ -9,22 +9,22 @@ public struct PartialResolvedTarget {
 }
 
 /// Partially resolve a target
-func resolveTargetPartial(
+func partialResolveTarget(
   _ documentationDatabase: DocumentationDatabase, _ typedProgram: TypedProgram,
   targetId: AnyTargetID
 ) -> PartialResolvedTarget {
   switch targetId {
   case .asset(let assetId):
-    return resolveAssetPartial(documentationDatabase, typedProgram, assetId: assetId)
+    return partialResolveAsset(documentationDatabase, typedProgram, assetId: assetId)
   case .decl(let declId):
-    return resolveDeclPartial(documentationDatabase, typedProgram, declId: declId)
+    return partialResolveDecl(documentationDatabase, typedProgram, declId: declId)
   case .empty:
     fatalError("unexpected empty target")
   }
 }
 
 /// Partially resolve an asset
-func resolveAssetPartial(
+func partialResolveAsset(
   _ documentationDatabase: DocumentationDatabase, _ typedProgram: TypedProgram, assetId: AnyAssetID
 ) -> PartialResolvedTarget {
   switch assetId {
@@ -73,7 +73,7 @@ func resolveAssetPartial(
 }
 
 /// Get the name of a declaration
-func resolveDeclPartial(
+func partialResolveDecl(
   _ documentationDatabase: DocumentationDatabase, _ typedProgram: TypedProgram, declId: AnyDeclID
 ) -> PartialResolvedTarget {
   switch declId.kind {

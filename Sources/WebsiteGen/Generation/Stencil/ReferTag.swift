@@ -32,27 +32,20 @@ class ReferNode: NodeType {
 
   // Render the reference between two RelativePaths
   func render(_ context: Context) throws -> String {
-    guard let to = try resolve(context, toResolvable) else {
-      return "."
-    }
-
-    guard let from = try resolve(context, fromResolvable) else {
-      return to.pathString
-    }
+    let from = try resolve(context, fromResolvable)
+    let to = try resolve(context, toResolvable)
 
     return from.refer(to: to).pathString
   }
 
   // Resolve Resolvable from Context into an optional RelativePath
-  private func resolve(_ context: Context, _ resolvable: Resolvable) throws -> RelativePath? {
+  private func resolve(_ context: Context, _ resolvable: Resolvable) throws -> RelativePath {
     let resolved = try resolvable.resolve(context)
 
-    if let path = resolved as? String {
-      return RelativePath(pathString: path)
-    } else if let relativePath = resolved as? RelativePath {
+    if let relativePath = resolved as? RelativePath {
       return relativePath
     }
 
-    return nil
+    fatalError("unexpected value: " + String(describing: resolved))
   }
 }

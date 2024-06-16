@@ -4,7 +4,7 @@ public struct NavigationItem {
   // General Information
   let name: String
   let relativePath: RelativePath
-  let typeClass: String
+  let cssClassOfTarget: String
 
   // Relations
   let children: [AnyTargetID]
@@ -13,7 +13,7 @@ public struct NavigationItem {
 public typealias BreadcrumbItem = (name: String, relativePath: RelativePath)
 
 // Get the class used for the navigation item
-func classOfTarget(_ targetId: AnyTargetID) -> String {
+func getCssClassOfTarget(_ targetId: AnyTargetID) -> String {
   return switch targetId {
   case .asset(let assetId):
     switch assetId {

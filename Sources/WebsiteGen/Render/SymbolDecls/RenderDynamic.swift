@@ -2,7 +2,7 @@ import Foundation
 import FrontEnd
 
 func renderDetailedTrait(
-  _ ctx: ResolvedDocumentation, _ n: TraitDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ n: TraitDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -17,7 +17,7 @@ func renderDetailedTrait(
 }
 
 func renderDetailedTypeAlias(
-  _ ctx: ResolvedDocumentation, _ n: TypeAliasDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ n: TypeAliasDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -36,7 +36,7 @@ func renderDetailedTypeAlias(
 }
 
 func renderDetailedProductType(
-  _ ctx: ResolvedDocumentation, _ n: ProductTypeDecl.ID,
+  _ ctx: DocumentationContext, _ n: ProductTypeDecl.ID,
   _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
@@ -68,7 +68,7 @@ func renderDetailedProductType(
 }
 
 func renderDetailedBinding(
-  _ ctx: ResolvedDocumentation, _ n: BindingDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ n: BindingDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 ) -> String {
   let binding = ctx.typedProgram.ast[n]
   let bindingPattern = ctx.typedProgram.ast[binding.pattern]
@@ -98,7 +98,7 @@ func renderDetailedBinding(
 }
 
 func renderDetailedInitializer(
-  _ ctx: ResolvedDocumentation, _ n: InitializerDecl.ID, _ inline: Bool,
+  _ ctx: DocumentationContext, _ n: InitializerDecl.ID, _ inline: Bool,
   _ referringFrom: AnyTargetID
 )
   -> String
@@ -114,7 +114,7 @@ func renderDetailedInitializer(
 }
 
 func renderDetailedFunction(
-  _ ctx: ResolvedDocumentation, _ n: FunctionDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ n: FunctionDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -146,7 +146,7 @@ func renderDetailedFunction(
 }
 
 func renderDetailedMethod(
-  _ ctx: ResolvedDocumentation, _ n: MethodDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ n: MethodDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -180,7 +180,7 @@ func renderDetailedMethod(
 }
 
 func renderDetailedSubscript(
-  _ ctx: ResolvedDocumentation, _ n: SubscriptDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ n: SubscriptDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -225,7 +225,7 @@ func renderDetailedSubscript(
 }
 
 func renderDetailedParams(
-  _ ctx: ResolvedDocumentation, _ ns: [ParameterDecl.ID], _ inline: Bool,
+  _ ctx: DocumentationContext, _ ns: [ParameterDecl.ID], _ inline: Bool,
   _ referringFrom: AnyTargetID
 )
   -> String
@@ -256,7 +256,7 @@ func renderDetailedParams(
 }
 
 func renderDetailedParam(
-  _ ctx: ResolvedDocumentation, _ n: ParameterDecl.ID, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ n: ParameterDecl.ID, _ referringFrom: AnyTargetID
 ) -> String {
   let parameter = ctx.typedProgram.ast[n]
   let label = getParamLabel(parameter)
@@ -283,7 +283,7 @@ func renderDetailedParam(
 }
 
 func renderDetailedType(
-  _ ctx: ResolvedDocumentation, _ type: AnyExprID?, _ referringFrom: AnyTargetID
+  _ ctx: DocumentationContext, _ type: AnyExprID?, _ referringFrom: AnyTargetID
 )
   -> String?
 {

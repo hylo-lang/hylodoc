@@ -11,9 +11,10 @@ import Stencil
 ///   - of: source file asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderSourceFilePage(_ context: RenderContext, of: SourceFileAsset.ID) -> StencilContext
+public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAsset.ID)
+  -> StencilContext
 {
-  let sourceFile: SourceFileAsset = context.resolved.documentation.assets[of]!
+  let sourceFile: SourceFileAsset = context.documentation.documentation.assets[of]!
   let scope = ctx.typedProgram.nodeToScope[sourceFile.translationUnit]!
   let target = AnyTargetID.asset(AnyAssetID(of))
   let htmlGenerator = SimpleHTMLGenerator(
@@ -44,8 +45,9 @@ public func renderSourceFilePage(_ context: RenderContext, of: SourceFileAsset.I
 ///   - of: article asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderArticlePage(_ context: RenderContext, of: ArticleAsset.ID) -> StencilContext {
-  let article = context.resolved.documentation.assets[of]!
+public func prepareArticlePage(_ context: GenerationContext, of: ArticleAsset.ID) -> StencilContext
+{
+  let article = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(article.moduleId)
   let target = AnyTargetID.asset(AnyAssetID(of))
 
@@ -85,8 +87,8 @@ func isIndexPageFileName(fileName: String) -> Bool {
 ///   - of: module asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func renderFolderPage(_ context: RenderContext, of: FolderAsset.ID) -> StencilContext {
-  let folder = context.resolved.documentation.assets[of]!
+public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) -> StencilContext {
+  let folder = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(folder.moduleId)
   let target = AnyTargetID.asset(.folder(of))
 
@@ -95,7 +97,7 @@ public func renderFolderPage(_ context: RenderContext, of: FolderAsset.ID) -> St
 
   // check if folder has documentation
   if let detailsId = folder.documentation {
-    let detailsArticle = context.resolved.documentation.assets[detailsId]!
+    let detailsArticle = context.documentation.documentation.assets[detailsId]!
 
     env["articleContent"] = context.htmlGenerator.generateResolvingHyloReferences(
       document: detailsArticle.content,
@@ -112,18 +114,10 @@ public func renderFolderPage(_ context: RenderContext, of: FolderAsset.ID) -> St
     //    }
   }
 
-  env["contents"] = folder.children
-    .filter { childId in
-      let childAsset = context.resolved.documentation.assets[childId]!
-      return !childAsset.isIndexPage && !(childAsset is OtherLocalFileAsset)
-    }
-    .map {
-      childId in
-      (
-        getAssetTitle(childId, context.resolved.documentation.assets),
-        context.resolved.targetResolver.refer(from: target, to: .asset(childId))
-      )
-    }
+  // Map children to an array of [(name, relativePath)]
+  env["contents"] = context.documentation.targetResolver[.asset(.folder(of))]!.children
+    .map { context.documentation.targetResolver[$0]! }
+    .map { ($0.simpleName, $0.relativePath) }
 
   return StencilContext(templateName: "folder_layout.html", context: env)
 }

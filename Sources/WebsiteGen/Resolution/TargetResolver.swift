@@ -11,8 +11,8 @@ public enum AnyTargetID: Equatable, Hashable {
 
 public struct ResolvedTarget {
   let parent: AnyTargetID?
-  let simpleName: String
-  let navigationName: String
+  let simpleName: String  // name as seen in the breadcrumb and page title, without additional styling/tags
+  let navigationName: String  // name as seen in the tree navigation, which has highlighting of some sort
   let children: [AnyTargetID]
   let relativePath: RelativePath
 
@@ -65,7 +65,7 @@ public struct TargetResolver {
     return NavigationItem(
       name: resolved.navigationName,
       relativePath: resolved.relativePath,
-      typeClass: classOfTarget(targetId!),
+      cssClassOfTarget: getCssClassOfTarget(targetId!),
       children: resolved.children
     )
   }
