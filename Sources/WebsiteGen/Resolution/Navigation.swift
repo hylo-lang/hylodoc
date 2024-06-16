@@ -2,15 +2,24 @@ import PathWrangler
 
 public struct NavigationItem {
   // General Information
+  let id: AnyTargetID
   let name: String
   let relativePath: RelativePath
   let cssClassOfTarget: String
 
   // Relations
-  let children: [AnyTargetID]
+  let children: [NavigationItem]
 }
 
-public typealias BreadcrumbItem = (name: String, relativePath: RelativePath)
+public struct BreadcrumbItem {
+  let name: String
+  let relativePath: RelativePath
+
+  public init(name: String, relativePath: RelativePath) {
+    self.name = name
+    self.relativePath = relativePath
+  }
+}
 
 // Get the class used for the navigation item
 func getCssClassOfTarget(_ targetId: AnyTargetID) -> String {

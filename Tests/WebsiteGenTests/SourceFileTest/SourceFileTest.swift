@@ -4,8 +4,8 @@ import MarkdownKit
 import PathWrangler
 import StandardLibraryCore
 import Stencil
-import XCTest
 import TestUtils
+import XCTest
 
 @testable import FrontEnd
 @testable import WebsiteGen
@@ -17,21 +17,25 @@ func assetNameIs(_ name: String, _ assets: AssetStore) -> ((AnyAssetID) -> Bool)
 final class SourceFileTest: XCTestCase {
 
   // check renderSourceFilePage function using SourceFileAsset created manually
-  func test() {
+  func test() throws {
 
     var diagnostics = DiagnosticSet()
 
     var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
-    let myModuleId = try! ast.makeModule("MyModule", sourceCode: [
-      SourceFile(synthesizedText: """
+    let myModuleId = try! ast.makeModule(
+      "MyModule",
+      sourceCode: [
+        SourceFile(
+          synthesizedText: """
 
-      """, named: "sourceFileExample.hylo")
-    ], builtinModuleAccess: false, diagnostics: &diagnostics)
+            """, named: "sourceFileExample.hylo")
+      ], builtinModuleAccess: false, diagnostics: &diagnostics)
 
     let typedProgram = try! TypedProgram(
       annotating: ScopedProgram(ast), inParallel: false,
       reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _) in false })
+      tracingInferenceIf: { (_, _) in false }
+    )
 
     let translationUnitId = ast[myModuleId].sources.first!
 
@@ -60,19 +64,42 @@ final class SourceFileTest: XCTestCase {
 
     var db = DocumentationDatabase.init()
     let sourceFileID = db.assets.sourceFiles.insert(sourceFile, for: translationUnitId)
-    var ctx = GenerationContext(
-      documentation: db,
-      stencil: createDefaultStencilEnvironment(),
-      typedProgram: typedProgram,
-      urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "/")),
-      tree: []
+    let targetId: AnyTargetID = .asset(.sourceFile(sourceFileID))
+
+    var targetResolver: TargetResolver = .init()
+    let partialResolved = partialResolveAsset(db, typedProgram, assetId: .sourceFile(sourceFileID))
+    targetResolver.resolve(
+      targetId: targetId,
+      ResolvedTarget(
+        parent: nil,
+        simpleName: partialResolved.simpleName,
+        navigationName: partialResolved.navigationName,
+        children: partialResolved.children,
+        relativePath: RelativePath.current
+      )
     )
 
-    let res = try! renderSourceFilePage(ctx: &ctx, of: sourceFileID)
+    var context = GenerationContext(
+      documentation: DocumentationContext(
+        documentation: db,
+        typedProgram: typedProgram,
+        targetResolver: targetResolver
+      ),
+      stencilEnvironment: createDefaultStencilEnvironment(),
+      exporter: DefaultExporter(AbsolutePath.current),
+      breadcrumb: []
+    )
+
+    let stencilContext = try prepareSourceFilePage(context, of: sourceFileID)
+    let res = try renderPage(&context, stencilContext, of: targetId)
 
     assertPageTitle("sourceFileExample.hylo", in: res, file: #file, line: #line)
-    assertSummary("Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line)
-    assertDetails("In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file, line: #line)
+    assertSummary(
+      "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
+    )
+    assertDetails(
+      "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
+      line: #line)
     assertListExistAndCount(id: "seeAlso", count: 2, in: res, file: #file, line: #line)
 
     assertNotContains(res, what: "members", file: #file, line: #line)

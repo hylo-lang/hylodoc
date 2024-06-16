@@ -9,7 +9,7 @@ import Stencil
 public struct DocumentationContext {
   public let documentation: DocumentationDatabase
   public let typedProgram: TypedProgram
-  public var targetResolver: TargetResolver
+  public let targetResolver: TargetResolver
 }
 
 /// Render the full documentation website

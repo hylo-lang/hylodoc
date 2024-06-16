@@ -102,7 +102,7 @@ final class RelativePathTest: XCTestCase {
   func testPathToRootOfDirectory() {
     assertEqual(
       RelativePath(pathString: "some/path/to/directory/").pathToRoot,
-      RelativePath(pathString: "../../../../")
+      RelativePath(pathString: "../../../")
     )
   }
 

@@ -20,7 +20,7 @@
             <h1>Contents</h1>
             <ul>
                 {% for childTitle,childUrl in contents %}
-                <li><a href="{{ childUrl }}" style="color: #21E5E5">{{ childTitle }}</a></li>
+                <li><a href="{% refer target.relativePath childUrl %}" style="color: #21E5E5">{{ childTitle }}</a></li>
                 {% endfor %}
             </ul>
         </div>

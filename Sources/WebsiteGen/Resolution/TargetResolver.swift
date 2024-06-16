@@ -10,6 +10,7 @@ public enum AnyTargetID: Equatable, Hashable {
 }
 
 public struct ResolvedTarget {
+  let id: AnyTargetID
   let parent: AnyTargetID?
   let simpleName: String  // name as seen in the breadcrumb and page title, without additional styling/tags
   let navigationName: String  // name as seen in the tree navigation, which has highlighting of some sort
@@ -17,9 +18,10 @@ public struct ResolvedTarget {
   let relativePath: RelativePath
 
   public init(
-    parent: AnyTargetID?, simpleName: String, navigationName: String, children: [AnyTargetID],
-    relativePath: RelativePath
+    id: AnyTargetID, parent: AnyTargetID?, simpleName: String, navigationName: String,
+    children: [AnyTargetID], relativePath: RelativePath
   ) {
+    self.id = id
     self.parent = parent
     self.simpleName = simpleName
     self.navigationName = navigationName
@@ -39,8 +41,8 @@ public struct ResolvedDirectlyCopiedAssetTarget {
 }
 
 public struct TargetResolver {
-  public var otherTargets: [AnyTargetID: ResolvedDirectlyCopiedAssetTarget] = [:]
-  public var targets: [AnyTargetID: ResolvedTarget] = [:]
+  var otherTargets: [AnyTargetID: ResolvedDirectlyCopiedAssetTarget] = [:]
+  var targets: [AnyTargetID: ResolvedTarget] = [:]
   public var rootTargets: [AnyTargetID] = []
 
   /// Get the resolved target of a target identity
@@ -50,24 +52,6 @@ public struct TargetResolver {
     }
 
     return targets[targetId!]
-  }
-
-  /// Get the navigation item of a target identity
-  public subscript(navigation targetId: AnyTargetID?) -> NavigationItem? {
-    if targetId == nil {
-      return nil
-    }
-
-    guard let resolved = targets[targetId!] else {
-      return nil
-    }
-
-    return NavigationItem(
-      name: resolved.navigationName,
-      relativePath: resolved.relativePath,
-      cssClassOfTarget: getCssClassOfTarget(targetId!),
-      children: resolved.children
-    )
   }
 
   /// Resolve a target by matching its identity with a ResolvedTarget element
@@ -116,5 +100,21 @@ public struct TargetResolver {
     }
 
     return relativePath.absolute(in: absolutePath)
+  }
+
+  public func navigationItemFromTarget(targetId: AnyTargetID) -> NavigationItem? {
+    guard let resolved = targets[targetId] else {
+      return nil
+    }
+
+    return NavigationItem(
+      id: targetId,
+      name: resolved.navigationName,
+      relativePath: resolved.relativePath,
+      cssClassOfTarget: getCssClassOfTarget(targetId),
+      children: resolved.children.map { navigationItemFromTarget(targetId: $0) }.filter {
+        $0 != nil
+      }.map { $0! }
+    )
   }
 }

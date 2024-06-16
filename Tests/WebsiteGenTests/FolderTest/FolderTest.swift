@@ -3,14 +3,14 @@ import MarkdownKit
 import PathWrangler
 import StandardLibraryCore
 import Stencil
-import XCTest
 import TestUtils
+import XCTest
 
 @testable import FrontEnd
 @testable import WebsiteGen
 
 final class FolderTest: XCTestCase {
-  func testFolderPageGenerationNoDetailsNoChildren() {
+  func testFolderPageGenerationNoDetailsNoChildren() throws {
 
     var diagnostics = DiagnosticSet()
 
@@ -44,17 +44,35 @@ final class FolderTest: XCTestCase {
         moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
-    var ctx = GenerationContext(
-        documentation: db,
-        stencil: createDefaultStencilEnvironment(),
-        typedProgram: typedProgram,
-        urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-        tree: []
+    var targetResolver: TargetResolver = .init()
+    let targetId: AnyTargetID = .asset(.folder(folder1Id))
+
+    // folder1Id
+    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    targetResolver.resolve(
+      targetId: targetId,
+      ResolvedTarget(
+        parent: nil,
+        simpleName: partialResolvedParent.simpleName,
+        navigationName: partialResolvedParent.navigationName,
+        children: partialResolvedParent.children,
+        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+      )
     )
 
-    ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"), parent: nil)
+    var context = GenerationContext(
+      documentation: DocumentationContext(
+        documentation: db,
+        typedProgram: typedProgram,
+        targetResolver: targetResolver
+      ),
+      stencilEnvironment: createDefaultStencilEnvironment(),
+      exporter: DefaultExporter(AbsolutePath.current),
+      breadcrumb: []
+    )
 
-    let res = try! renderFolderPage(ctx: &ctx, of: folder1Id)
+    let stencilContext = try prepareFolderPage(context, of: folder1Id)
+    let res = try renderPage(&context, stencilContext, of: targetId)
 
     assertPageTitle("Folder1", in: res, file: #file, line: #line)
 
@@ -62,7 +80,7 @@ final class FolderTest: XCTestCase {
     assertNotContains("contents", what: res, file: #file, line: #line)
   }
 
-  func testFolderPageGenerationWithDetailsNoChildren() {
+  func testFolderPageGenerationWithDetailsNoChildren() throws {
 
     var diagnostics = DiagnosticSet()
 
@@ -105,17 +123,35 @@ final class FolderTest: XCTestCase {
         moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
-    var ctx = GenerationContext(
-        documentation: db,
-        stencil: createDefaultStencilEnvironment(),
-        typedProgram: typedProgram,
-        urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-        tree: []
+    var targetResolver: TargetResolver = .init()
+    let targetId: AnyTargetID = .asset(.folder(folder1Id))
+
+    // folder1Id
+    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    targetResolver.resolve(
+      targetId: targetId,
+      ResolvedTarget(
+        parent: nil,
+        simpleName: partialResolvedParent.simpleName,
+        navigationName: partialResolvedParent.navigationName,
+        children: partialResolvedParent.children,
+        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+      )
     )
 
-    ctx.urlResolver.resolve(target: .asset(.folder(folder1Id)), filePath: RelativePath(pathString: "root/Folder1/index.html"), parent: nil)
+    var context = GenerationContext(
+      documentation: DocumentationContext(
+        documentation: db,
+        typedProgram: typedProgram,
+        targetResolver: targetResolver
+      ),
+      stencilEnvironment: createDefaultStencilEnvironment(),
+      exporter: DefaultExporter(AbsolutePath.current),
+      breadcrumb: []
+    )
 
-    let res = try! renderFolderPage(ctx: &ctx, of: folder1Id)
+    let stencilContext = try prepareFolderPage(context, of: folder1Id)
+    let res = try renderPage(&context, stencilContext, of: targetId)
 
     assertPageTitle("Info Article", in: res, file: #file, line: #line)
     assertContent("lorem ipsum", in: res, file: #file, line: #line)
@@ -124,7 +160,7 @@ final class FolderTest: XCTestCase {
     assertNotContains("contents", what: res, file: #file, line: #line)
   }
 
-  func testFolderPageGenerationWithDetailsWithChildren() {
+  func testFolderPageGenerationWithDetailsWithChildren() throws {
 
     var diagnostics = DiagnosticSet()
 
@@ -183,25 +219,63 @@ final class FolderTest: XCTestCase {
         moduleId: ModuleDecl.ID(rawValue: 0)
       ))
 
-    var ctx = GenerationContext(
-        documentation: db,
-        stencil: createDefaultStencilEnvironment(),
-        typedProgram: typedProgram,
-        urlResolver: URLResolver(baseUrl: AbsolutePath(pathString: "")),
-        tree: []
+    var targetResolver: TargetResolver = .init()
+    let targetId: AnyTargetID = .asset(.folder(folder1Id))
+
+    // child1ArticleId
+    let partialResolvedChild1 = partialResolveAsset(
+      db, typedProgram, assetId: .article(child1ArticleId))
+    targetResolver.resolve(
+      targetId: .asset(.article(child1ArticleId)),
+      ResolvedTarget(
+        parent: .asset(.folder(folder1Id)),
+        simpleName: partialResolvedChild1.simpleName,
+        navigationName: partialResolvedChild1.navigationName,
+        children: partialResolvedChild1.children,
+        relativePath: RelativePath(pathString: "root/Folder1/child1.hylodoc")
+      )
     )
 
-    ctx.urlResolver.resolve(
-      target: .asset(.folder(folder1Id)),
-      filePath: RelativePath(pathString: "root/Folder1/index.html"), parent: nil)
-    ctx.urlResolver.resolve(
-      target: .asset(.folder(child2FolderId)),
-      filePath: RelativePath(pathString: "root/Folder1/Folder2/index.html"), parent: nil)
-    ctx.urlResolver.resolve(
-      target: .asset(.article(child1ArticleId)),
-      filePath: RelativePath(pathString: "root/Folder1/child1.hylodoc"), parent: nil)
+    // child2FolderId
+    let partialResolvedChild2 = partialResolveAsset(
+      db, typedProgram, assetId: .folder(child2FolderId))
+    targetResolver.resolve(
+      targetId: .asset(.folder(child2FolderId)),
+      ResolvedTarget(
+        parent: targetId,
+        simpleName: partialResolvedChild2.simpleName,
+        navigationName: partialResolvedChild2.navigationName,
+        children: partialResolvedChild2.children,
+        relativePath: RelativePath(pathString: "root/Folder1/Folder2/index.html")
+      )
+    )
 
-    let res = try! renderFolderPage(ctx: &ctx, of: folder1Id)
+    // folder1Id
+    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    targetResolver.resolve(
+      targetId: targetId,
+      ResolvedTarget(
+        parent: nil,
+        simpleName: partialResolvedParent.simpleName,
+        navigationName: partialResolvedParent.navigationName,
+        children: partialResolvedParent.children,
+        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+      )
+    )
+
+    var context = GenerationContext(
+      documentation: DocumentationContext(
+        documentation: db,
+        typedProgram: typedProgram,
+        targetResolver: targetResolver
+      ),
+      stencilEnvironment: createDefaultStencilEnvironment(),
+      exporter: DefaultExporter(AbsolutePath.current),
+      breadcrumb: []
+    )
+
+    let stencilContext = try prepareFolderPage(context, of: folder1Id)
+    let res = try renderPage(&context, stencilContext, of: targetId)
 
     assertPageTitle("Info Article", in: res, file: #file, line: #line)
     assertContent("lorem ipsum", in: res, file: #file, line: #line)

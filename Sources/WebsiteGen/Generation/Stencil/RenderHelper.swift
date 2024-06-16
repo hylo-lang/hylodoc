@@ -41,7 +41,7 @@ public func createDefaultStencilEnvironment() -> Environment {
 /// Convert a string to lowercase words separated by hyphens
 /// - Parameter value: the string to convert
 /// - Returns: the converted string, or the original value if it is not a string
-func convertToID(_ value: Any?) -> Any? {
+public func convertToID(_ value: Any?) -> Any? {
   guard let string = value as? String else { return value }
 
   // taken from Tests/WebsiteGenTests/TableOfContentsHelperTest/TableOfContentsHelperTest.swift
@@ -50,16 +50,18 @@ func convertToID(_ value: Any?) -> Any? {
 
 /// Render a page with the render and stencil context for a target
 public func renderPage(
-  _ render: inout GenerationContext, _ stencil: StencilContext, of targetId: AnyTargetID
+  _ context: inout GenerationContext, _ stencil: StencilContext, of targetId: AnyTargetID
 ) throws -> String {
   var completeContext: [String: Any] = stencil.context
-  let target = render.documentation.targetResolver[targetId]
+  let target = context.documentation.targetResolver[targetId]
   completeContext["target"] = target
-  completeContext["breadcrumb"] = render.breadcrumb
+  completeContext["breadcrumbs"] = context.breadcrumb
   completeContext["toc"] = tableOfContents(stencilContext: stencil.context)
   completeContext["pathToRoot"] = target?.relativePath.pathToRoot ?? RelativePath.current
-  //TODO Tree navigation
+  completeContext["treeRoot"] = context.tree
 
-  return try render.stencilEnvironment.renderTemplate(
-    name: stencil.templateName, context: completeContext)
+  return try context.stencilEnvironment.renderTemplate(
+    name: stencil.templateName,
+    context: completeContext
+  )
 }

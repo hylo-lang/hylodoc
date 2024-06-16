@@ -16,31 +16,30 @@ public struct DefaultExporter: Exporter {
   }
 
   public func relativeToUrl(_ path: RelativePath) -> URL {
-    return URL(path: path.absolute(in: absolute))
+    return URL(path: path.absolute(in: absolute).resolved())
   }
 
   public func copyFromFile(from: URL, to: RelativePath) throws {
-    let url = relativeToUrl(to)
+    // Create parent directories
+    try createDirectory(at: to / "..")
 
     // Copy file
-    try FileManager.default.createDirectory(
-      at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+    let url = relativeToUrl(to)
     try FileManager.default.copyItem(at: from, to: url)
   }
 
   public func exportHtml(_ content: String, at: RelativePath) throws {
-    let url = relativeToUrl(at)
+    // Create parent directories
+    try createDirectory(at: at / "..")
 
-    // Write file
-    try FileManager.default.createDirectory(
-      at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+    // Write to file
+    let url = relativeToUrl(at)
     try content.write(to: url, atomically: false, encoding: String.Encoding.utf8)
   }
 
+  /// Create directory and its parents
   public func createDirectory(at: RelativePath) throws {
     let url = relativeToUrl(at)
-
-    // Create directory and parents
     try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
   }
 }

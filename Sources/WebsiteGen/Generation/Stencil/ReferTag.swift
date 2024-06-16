@@ -11,7 +11,7 @@ class ReferNode: NodeType {
   class func parse(_ parser: TokenParser, token: Token) throws -> NodeType {
     let components = token.components
     if components.count != 3 {
-      throw TemplateSyntaxError("'refer' statements should use the syntax: `refer <from> <to>`.")
+      throw TemplateSyntaxError("'refer' tag should have the format: `refer <from> <to>`.")
     }
 
     let fromResolvable = try parser.compileResolvable(components[1], containedIn: token)
@@ -41,11 +41,27 @@ class ReferNode: NodeType {
   // Resolve Resolvable from Context into an optional RelativePath
   private func resolve(_ context: Context, _ resolvable: Resolvable) throws -> RelativePath {
     let resolved = try resolvable.resolve(context)
+    if resolved == nil {
+      return RelativePath.current
+    }
 
     if let relativePath = resolved as? RelativePath {
       return relativePath
     }
 
-    fatalError("unexpected value: " + String(describing: resolved))
+    throw RuntimeError("unexpected value: " + String(describing: resolved))
+  }
+}
+
+/// From https://stackoverflow.com/a/45833131
+struct RuntimeError: LocalizedError {
+  let description: String
+
+  init(_ description: String) {
+    self.description = description
+  }
+
+  var errorDescription: String? {
+    description
   }
 }

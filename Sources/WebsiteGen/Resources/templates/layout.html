@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="{{ pathToRoot }}/assets/logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ name }}</title>
+  <title>{{ target.simpleName }}</title>
   <link rel="stylesheet" crossorigin href="{{ pathToRoot }}/assets/index-DflmdryA.css">
 </head>
 
@@ -18,9 +18,8 @@
     </div>
 
     <div class="header-breadcrumb">
-      <a href="{{ pathToRoot }}">Documentation</a>
-      {% for name, url in breadcrumb %}
-        <a href="{% refer targetUrl url %}">{{ name }}</a>
+      {% for item in breadcrumbs %}
+        <a href="{% refer target.relativePath item.relativePath %}">{{ item.name }}</a>
       {% endfor %}
     </div>
   </div>
@@ -38,7 +37,7 @@
           <!-- Navigation -->
           <div id="navigation-tree-container">
             <ul>
-              {% for item in tree %}
+              {% for item in treeRoot %}
               {% include "page_components/tree_item.html" %}
               {% endfor %}
             </ul>

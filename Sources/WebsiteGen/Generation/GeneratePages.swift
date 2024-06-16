@@ -1,4 +1,3 @@
-import DequeModule
 import DocumentationDB
 import Foundation
 import FrontEnd
@@ -13,7 +12,8 @@ public struct GenerationContext {
   let htmlGenerator: some HyloReferenceResolvingGenerator = CustomHTMLGenerator()
   let exporter: Exporter
 
-  var breadcrumb: Deque<BreadcrumbItem>
+  var breadcrumb: [BreadcrumbItem]
+  let tree: [NavigationItem]
 }
 
 public func generateIndexAndTargetPages(
@@ -23,7 +23,10 @@ public func generateIndexAndTargetPages(
     documentation: documentation,
     stencilEnvironment: createDefaultStencilEnvironment(),
     exporter: exporter,
-    breadcrumb: []
+    breadcrumb: [],
+    tree: documentation.targetResolver.rootTargets.map {
+      documentation.targetResolver.navigationItemFromTarget(targetId: $0)
+    }.filter { $0 != nil }.map { $0! }
   )
 
   // Add name of the root to the breadcrumb stack
@@ -70,7 +73,7 @@ func generatePageForAnyTarget(_ context: inout GenerationContext, of targetId: A
   try resolvedTarget.children.forEach { try generatePageForAnyTarget(&context, of: $0) }
 
   // Pop breadcrumb item from stack
-  let _ = context.breadcrumb.popLast()
+  let _ = context.breadcrumb.removeLast()
 }
 
 /// Generate the page belonging to this asset
@@ -83,11 +86,11 @@ func generatePageForAnyAsset(
   let stencilContext =
     switch assetId {
     case .folder(let folderId):
-      prepareFolderPage(context, of: folderId)
+      try prepareFolderPage(context, of: folderId)
     case .article(let articleId):
-      prepareArticlePage(context, of: articleId)
+      try prepareArticlePage(context, of: articleId)
     case .sourceFile(let sourceFileId):
-      prepareSourceFilePage(context, of: sourceFileId)
+      try prepareSourceFilePage(context, of: sourceFileId)
     default:
       fatalError("unexpected asset")
     }
@@ -158,5 +161,5 @@ public func generateModuleIndex(_ context: inout GenerationContext) throws {
     StencilContext(templateName: "folder_layout.html", context: env),
     of: .empty
   )
-  try context.exporter.exportHtml(content, at: RelativePath.current)
+  try context.exporter.exportHtml(content, at: RelativePath(pathString: "index.html"))
 }

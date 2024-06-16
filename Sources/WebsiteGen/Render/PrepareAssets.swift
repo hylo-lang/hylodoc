@@ -11,7 +11,7 @@ import Stencil
 ///   - of: source file asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAsset.ID)
+public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAsset.ID) throws
   -> StencilContext
 {
   let sourceFile: SourceFileAsset = context.documentation.documentation.assets[of]!
@@ -48,7 +48,8 @@ public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAs
 ///   - of: article asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func prepareArticlePage(_ context: GenerationContext, of: ArticleAsset.ID) -> StencilContext
+public func prepareArticlePage(_ context: GenerationContext, of: ArticleAsset.ID) throws
+  -> StencilContext
 {
   let article = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(article.moduleId)
@@ -88,7 +89,9 @@ func isIndexPageFileName(fileName: String) -> Bool {
 ///   - of: module asset to render page of
 ///
 /// - Returns: the contents of the rendered page
-public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) -> StencilContext {
+public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) throws
+  -> StencilContext
+{
   let folder = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(folder.moduleId)
   let target = AnyTargetID.asset(.folder(of))

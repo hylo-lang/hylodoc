@@ -31,10 +31,17 @@ func partialResolveAsset(
   case .folder(let folderId):
     let folder: FolderAsset = documentationDatabase.assets[folderId]!
 
+    let name =
+      if let articleId = folder.documentation {
+        documentationDatabase.assets[articleId]?.title ?? folder.name
+      } else {
+        folder.name
+      }
+
     return PartialResolvedTarget(
       pathName: folder.name + "/index.html",
-      simpleName: folder.name,
-      navigationName: folder.name,
+      simpleName: name,
+      navigationName: name,
       children: folder.children
         .filter { folder.documentation == nil || $0 != .article(folder.documentation!) }
         .map { .asset($0) }
@@ -78,8 +85,8 @@ func partialResolveDecl(
 ) -> PartialResolvedTarget {
   switch declId.kind {
   case AssociatedTypeDecl.self:
-    let id = AssociatedTypeDecl.ID(declId)!
-    let name = String(describing: id)  //SimpleSymbolDeclRenderer.renderAssociatedTypeDecl(typedProgram, id)
+    //let id = AssociatedTypeDecl.ID(declId)!
+    let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderAssociatedTypeDecl(typedProgram, id)
 
     return PartialResolvedTarget(
       pathName: name + "/index.html",
@@ -88,8 +95,8 @@ func partialResolveDecl(
       children: []
     )
   case AssociatedValueDecl.self:
-    let id = AssociatedValueDecl.ID(declId)!
-    let name = String(describing: id)  //SimpleSymbolDeclRenderer.renderAssociatedValueDecl(typedProgram, id)
+    //let id = AssociatedValueDecl.ID(declId)!
+    let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderAssociatedValueDecl(typedProgram, id)
 
     return PartialResolvedTarget(
       pathName: name + "/index.html",
@@ -118,8 +125,8 @@ func partialResolveDecl(
       children: []
     )
   case OperatorDecl.self:
-    let id = OperatorDecl.ID(declId)!
-    let name = String(describing: id)  //SimpleSymbolDeclRenderer.renderOperatorDecl(typedProgram, id)
+    //let id = OperatorDecl.ID(declId)!
+    let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderOperatorDecl(typedProgram, id)
 
     return PartialResolvedTarget(
       pathName: name + "/index.html",

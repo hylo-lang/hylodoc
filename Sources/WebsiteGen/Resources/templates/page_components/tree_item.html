@@ -1,11 +1,11 @@
-<li {% if item.id|toString == targetId|toString %} class="active"{% endif %}>
+<li {% if item.id|toString == target.id|toString %} class="active"{% endif %}>
     {% if item.children %}
     <input type="checkbox" checked>
     {% endif %}
 
-    <a class="nav-entry {{ item.typeClass }}" href="{% refer targetUrl item.relativePath %}">
+    <a class="nav-entry {{ item.typeClass }}" href="{% refer target.relativePath item.relativePath %}">
         <div class="arrow"></div>
-        {% if item.typeClass == "symbol" %}
+        {% if item.cssClassOfTarget == "symbol" %}
         <code class="inline"><pre>{{ item.name }}</pre></code>
         {% else %}
         <div class="icon"></div>

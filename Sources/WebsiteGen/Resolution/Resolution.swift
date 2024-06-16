@@ -57,6 +57,7 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
     targetResolver.resolve(
       targetId: targetItem.targetId,
       ResolvedTarget(
+        id: targetItem.targetId,
         parent: targetItem.parentId,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,

@@ -18,7 +18,7 @@ final class ReferTagTest: XCTestCase {
   }
 
   func testCorrectInputs() throws {
-    try XCTAssertEqual(
+    XCTAssertEqual(
       try render(
         "{% refer a b %}",
         [
