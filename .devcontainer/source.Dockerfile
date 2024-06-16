@@ -56,3 +56,20 @@ ENV PATH="/swift-format/.build/release:$PATH"
 # Tool for coverage reports inside Gitlab
 RUN pip3 install lcov_cobertura
 RUN pip3 install pycobertura
+
+# Install node 22
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    build-essential
+
+# Add NodeSource APT repository for Node 22.x (replace with the correct URL if available)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+
+# Install Node.js and npm
+RUN apt-get install -y nodejs
+
+# Verify installation
+RUN node -v && npm -v
+
+RUN apt-get install libxml2-dev
