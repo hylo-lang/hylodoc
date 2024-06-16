@@ -5,27 +5,10 @@ import MarkdownKit
 import PathWrangler
 import Stencil
 
-public struct GenerationContext {
+public struct ResolvedDocumentation {
   public let documentation: DocumentationDatabase
-  public var stencil: Environment
   public let typedProgram: TypedProgram
-  public var urlResolver: URLResolver
-  public let htmlGenerator: some HyloReferenceResolvingGenerator = CustomHTMLGenerator()
-  public var tree: [TreeItem]
-}
-
-extension FileSystemLoader {
-  public convenience init(path: URL) {
-    self.init(paths: [.init(path.fileSystemPath)])
-  }
-}
-
-public func createFileSystemTemplateLoader() -> FileSystemLoader {
-  return FileSystemLoader(
-    path: Bundle.module.bundleURL.appendingPathComponent("Resources/templates"))
-}
-public func createDefaultStencilEnvironment() -> Environment {
-  return Environment(loader: createFileSystemTemplateLoader())
+  public var targetResolver: TargetResolver
 }
 
 /// Render the full documentation website
@@ -39,53 +22,39 @@ public func generateDocumentation(
   typedProgram: TypedProgram,
   exportPath: URL
 ) -> Bool {
-  // Setup Context
-  let stencil = createDefaultStencilEnvironment()
-  let resolver = URLResolver(baseUrl: AbsolutePath(url: exportPath)!)
-  var ctx = GenerationContext(
+  // Resolve documentation
+  let resolved = ResolvedDocumentation(
     documentation: documentation,
-    stencil: stencil,
     typedProgram: typedProgram,
-    urlResolver: resolver,
-    tree: []
+    targetResolver: resolve(
+      documentationDatabase: documentation,
+      typedProgram: typedProgram
+    )
   )
 
-  // Resolve URL's
-  //var resolvingVisitor: DocumentationVisitor = URLResolvingVisitor(urlResolver: &ctx.urlResolver)
-  documentation.modules.forEach {
-    module in
-    traverse(
-      ctx: ctx, root: .folder(module.rootFolder),
-      visitor: {
-        (path: TargetPath) in
-        ctx.urlResolver.resolve(target: path.target, filePath: path.url, parent: path.parent)
-      })
-  }
-  ctx.tree = documentation.modules.map {
-    treeItemFromAsset(ctx: ctx, assetId: .folder($0.rootFolder))
-  }
-
-  // Generate assets and symbols
+  // Initialize exporter
   let exporter: DefaultExporter = .init()
-  documentation.modules.forEach {
-    module in
-    traverse(
-      ctx: ctx, root: .folder(module.rootFolder),
-      visitor: {
-        (path: TargetPath) in
-        switch path.target {
-        case .asset(let id):
-          try! generateAsset(ctx: &ctx, of: id, with: exporter)
-        case .symbol(let id):
-          try! generateSymbol(ctx: &ctx, of: id, with: exporter)
-        case .empty:
-          break
-        }
-      })
-  }
+  let absoluteExportPath = AbsolutePath(url: exportPath)!
 
-  // Generate index page with all the modules
-  generateModuleIndexDocumentation(ctx: &ctx, exporter: exporter, target: exportPath)
+  do {
+    // Generate content
+    try generate(
+      resolved: resolved,
+      exportPath: absoluteExportPath,
+      exporter: exporter
+    )
+
+    // Export other targets
+    try resolved.targetResolver.otherTargets.forEach {
+      try exporter.file(
+        from: $0.value.sourceUrl,
+        to: URL(path: $0.value.relativePath.absolute(in: absoluteExportPath))
+      )
+    }
+  } catch {
+    print("Error while generating website content")
+    print(error)
+  }
 
   return copyPublicWebsiteAssets(exportPath: exportPath)
 }
@@ -103,36 +72,11 @@ func copyPublicWebsiteAssets(exportPath: URL) -> Bool {
       to: assetsExportLocation
     )
   } catch {
-    print("Error while copying webside assets")
+    print("Error while copying website assets")
     print("from \"\(assetsSourceLocation)\"")
     print("to \"\(assetsExportLocation)\":")
     print(error)
     return false
   }
   return true
-}
-
-public func generateModuleIndexDocumentation(
-  ctx: inout GenerationContext, exporter: Exporter, target: URL
-) {
-  var env: [String: Any] = [:]
-
-  env["pathToRoot"] = "."
-  env["pageType"] = "Folder"
-
-  // check if folder has documentation
-  env["pageTitle"] = "Documentation"
-  env["name"] = env["pageTitle"]
-
-  env["contents"] = ctx.documentation.modules.map {
-    module in
-    (
-      getAssetTitle(.folder(module.rootFolder), ctx.documentation.assets),
-      ctx.urlResolver.refer(from: .empty, to: .asset(.folder(module.rootFolder)))
-    )
-  }
-
-  let content = try! renderTemplate(
-    ctx: &ctx, targetId: .empty, name: "folder_layout.html", env: &env)
-  try! exporter.html(content: content, to: URL(fileURLWithPath: "index.html", relativeTo: target))
 }

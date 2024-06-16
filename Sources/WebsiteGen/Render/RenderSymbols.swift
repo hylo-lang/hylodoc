@@ -329,7 +329,7 @@ public func renderTypeAliasPage(
   env["name"] = decl.identifier.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTypeAliasDecl(ctx.typedProgram, of)
   env["pageType"] = "Type Alias"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderTypeAliasDecl(ctx, of, target)
 
@@ -369,7 +369,7 @@ public func renderBindingPage(
   env["name"] = "binding"
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderBindingDecl(ctx.typedProgram, of)
   env["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderBindingDecl(ctx, of, target)
 
@@ -451,7 +451,7 @@ public func renderFunctionPage(
   env["name"] = decl.site.text
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx, declId, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderFunctionDecl(ctx.typedProgram, declId)
   env["pageType"] = "Function"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(ctx, declId, target)
 
@@ -521,7 +521,7 @@ public func renderMethodPage(
   env["name"] = decl.identifier.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx, declId, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderMethodDecl(ctx.typedProgram, declId)
   env["pageType"] = "Method"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(ctx, declId, target)
 
@@ -596,7 +596,7 @@ public func renderSubscriptPage(
 
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx, declId, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderSubscriptDecl(ctx.typedProgram, declId)
   env["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(ctx, declId, target)
 
@@ -663,7 +663,7 @@ public func renderInitializerPage(
   env["name"] = decl.site.text
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx, declId, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderInitializerDecl(ctx.typedProgram, declId)
   env["pageType"] = "Initializer"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(ctx, declId, target)
 
@@ -732,7 +732,7 @@ public func renderTraitPage(
   env["name"] = decl.identifier.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx, declId, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderTraitDecl(ctx.typedProgram, declId)
   env["pageType"] = "Trait"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(ctx, declId, target)
 
@@ -782,7 +782,7 @@ public func renderProductTypePage(
   env["name"] = decl.identifier.value
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
 
-  env["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx, declId, target)
+  env["pageTitle"] = SimpleSymbolDeclRenderer.renderProductTypeDecl(ctx.typedProgram, declId)
   env["pageType"] = "Product Type"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(ctx, declId, target)
 
@@ -790,7 +790,8 @@ public func renderProductTypePage(
     env["summary"] = doc.common.summary.map(htmlGenerator.generate(document:))
     env["details"] = doc.common.description.map(htmlGenerator.generate(document:))
     env["invariants"] = doc.invariants.map {
-      htmlGenerator.generate(document: $0.description)
+      htmlGenerator.generate(
+        document: $0.description)
     }
     env["seeAlso"] = doc.common.seeAlso.map(htmlGenerator.generate(document:))
   }

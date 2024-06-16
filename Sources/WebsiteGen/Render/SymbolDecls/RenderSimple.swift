@@ -2,11 +2,11 @@ import Foundation
 import FrontEnd
 
 func renderSimpleTrait(
-  _ ctx: GenerationContext, _ n: TraitDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: TraitDecl.ID, _ raw: Bool
 )
   -> String
 {
-  let trait = ctx.typedProgram.ast[n]
+  let trait = typedProgram.ast[n]
   let identifier = trait.identifier.value
 
   var result = raw ? "trait" : wrapKeyword("trait")
@@ -17,11 +17,11 @@ func renderSimpleTrait(
 }
 
 func renderSimpleTypeAlias(
-  _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: TypeAliasDecl.ID, _ raw: Bool
 )
   -> String
 {
-  let typeAlias = ctx.typedProgram.ast[n]
+  let typeAlias = typedProgram.ast[n]
   let identifier = typeAlias.identifier.value
 
   var result = raw ? "typealias" : wrapKeyword("typealias")
@@ -32,11 +32,11 @@ func renderSimpleTypeAlias(
 }
 
 func renderSimpleProductType(
-  _ ctx: GenerationContext, _ n: ProductTypeDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: ProductTypeDecl.ID, _ raw: Bool
 )
   -> String
 {
-  let productType = ctx.typedProgram.ast[n]
+  let productType = typedProgram.ast[n]
   var result = raw ? "type" : wrapKeyword("type")
   result += " "
   result += raw ? productType.baseName : wrapName(productType.baseName)
@@ -44,13 +44,13 @@ func renderSimpleProductType(
 }
 
 func renderSimpleBinding(
-  _ ctx: GenerationContext, _ n: BindingDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: BindingDecl.ID, _ raw: Bool
 ) -> String {
-  let binding = ctx.typedProgram.ast[n]
-  let bindingPattern = ctx.typedProgram.ast[binding.pattern]
+  let binding = typedProgram.ast[n]
+  let bindingPattern = typedProgram.ast[binding.pattern]
 
-  let subpattern = ctx.typedProgram.ast[NamePattern.ID(bindingPattern.subpattern)]!
-  let variable = ctx.typedProgram.ast[subpattern.decl]
+  let subpattern = typedProgram.ast[NamePattern.ID(bindingPattern.subpattern)]!
+  let variable = typedProgram.ast[subpattern.decl]
   let introducer = String(describing: bindingPattern.introducer.value)
 
   var result = ""
@@ -66,12 +66,12 @@ func renderSimpleBinding(
 }
 
 func renderSimpleInitializer(
-  _ ctx: GenerationContext, _ n: InitializerDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: InitializerDecl.ID, _ raw: Bool
 )
   -> String
 {
-  let initializer = ctx.typedProgram.ast[n]
-  let params = renderSimpleParams(ctx, initializer.parameters, referringFrom)
+  let initializer = typedProgram.ast[n]
+  let params = renderSimpleParams(typedProgram, initializer.parameters)
 
   var result = raw ? "init" : wrapKeyword("init")
   let tail = "(\(params))"
@@ -81,11 +81,11 @@ func renderSimpleInitializer(
 }
 
 func renderSimpleFunction(
-  _ ctx: GenerationContext, _ n: FunctionDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: FunctionDecl.ID, _ raw: Bool
 )
   -> String
 {
-  let function = ctx.typedProgram.ast[n]
+  let function = typedProgram.ast[n]
   let identifier = function.identifier!.value
 
   var result = ""
@@ -97,34 +97,34 @@ func renderSimpleFunction(
 
   result += raw ? "fun" : wrapKeyword("fun")
   result += " "
-  let tail = "\(identifier)(\(renderSimpleParams(ctx, function.parameters, referringFrom)))"
+  let tail = "\(identifier)(\(renderSimpleParams(typedProgram, function.parameters)))"
   result += raw ? tail : wrapName(tail)
 
   return result
 }
 
 func renderSimpleMethod(
-  _ ctx: GenerationContext, _ n: MethodDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: MethodDecl.ID, _ raw: Bool
 )
   -> String
 {
-  let method = ctx.typedProgram.ast[n]
+  let method = typedProgram.ast[n]
   let identifier = method.identifier.value
 
   var result = ""
 
   result += raw ? "fun" : wrapKeyword("fun")
   result += " "
-  let tail = "\(identifier)(\(renderSimpleParams(ctx, method.parameters, referringFrom)))"
+  let tail = "\(identifier)(\(renderSimpleParams(typedProgram, method.parameters)))"
   result += raw ? tail : wrapName(tail)
 
   return result
 }
 
 func renderSimpleSubscript(
-  _ ctx: GenerationContext, _ n: SubscriptDecl.ID, _ raw: Bool, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: SubscriptDecl.ID, _ raw: Bool
 ) -> String {
-  let sub: SubscriptDecl = ctx.typedProgram.ast[n]
+  let sub: SubscriptDecl = typedProgram.ast[n]
   var result = ""
 
   if sub.isStatic {
@@ -141,7 +141,7 @@ func renderSimpleSubscript(
   }
 
   if sub.introducer.value == SubscriptDecl.Introducer.subscript {
-    tail += "(\(renderSimpleParams(ctx, sub.parameters, referringFrom)))"
+    tail += "(\(renderSimpleParams(typedProgram, sub.parameters)))"
   }
 
   result += raw ? tail : wrapName(tail)
@@ -150,25 +150,25 @@ func renderSimpleSubscript(
 }
 
 func renderSimpleParams(
-  _ ctx: GenerationContext, _ ns: [ParameterDecl.ID], _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ ns: [ParameterDecl.ID]
 )
   -> String
 {
   var result = ""
 
   for p in ns {
-    result += renderSimpleParam(ctx, p, referringFrom)
+    result += renderSimpleParam(typedProgram, p)
   }
 
   return result
 }
 
 func renderSimpleParam(
-  _ ctx: GenerationContext, _ n: ParameterDecl.ID, _ referringFrom: AnyTargetID
+  _ typedProgram: TypedProgram, _ n: ParameterDecl.ID
 )
   -> String
 {
-  let parameter: ParameterDecl = ctx.typedProgram.ast[n]
+  let parameter: ParameterDecl = typedProgram.ast[n]
   let label = getParamLabel(parameter)
   return "\(label):"
 }

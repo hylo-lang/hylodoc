@@ -29,6 +29,7 @@ public struct DocumentationID<T: IdentifiedEntity>: DocumentationIDProtocol,
 public protocol ReadableEntityStoreProtocol: Sequence {
   associatedtype Entity: IdentifiedEntity
   subscript(_ id: DocumentationID<Entity>) -> Entity? { get }
+  var count: Int { get }
 }
 
 /// A store of entities that supports insertion and lookup by ID, both in O(1) time.
@@ -47,6 +48,8 @@ public struct EntityStore<T: IdentifiedEntity>: ReadableEntityStoreProtocol {
     }
     return entities[Int(id.raw)]
   }
+
+  public var count: Int { entities.count }
 
   /// Inserts the given entity into the store and returns the documentation entity ID of the inserted entity.
   public mutating func insert(_ entity: T) -> DocumentationID<T> {
@@ -100,6 +103,8 @@ public struct AdaptedEntityStore<ASTNodeType: Node, StoredDataT: IdentifiedEntit
   public subscript(_ id: StoredDataT.ID) -> StoredDataT? {
     return entityStore[id]
   }
+
+  public var count: Int { entityStore.count }
 
   /// Inserts the given documentation entity for the given AST node ID, and returns the documentation ID of the inserted entity.
   public mutating func insert(_ entity: StoredDataT, for id: ASTNodeType.ID) -> StoredDataT.ID {

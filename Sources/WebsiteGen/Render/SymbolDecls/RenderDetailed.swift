@@ -2,13 +2,14 @@ import Foundation
 import FrontEnd
 
 func renderDetailedTrait(
-  _ ctx: GenerationContext, _ n: TraitDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: TraitDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
   let trait = ctx.typedProgram.ast[n]
   let identifier = trait.identifier.value
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
 
   let result = wrapLink("\(wrapKeyword("trait")) \(identifier)", href: symbolUrl)
 
@@ -16,13 +17,14 @@ func renderDetailedTrait(
 }
 
 func renderDetailedTypeAlias(
-  _ ctx: GenerationContext, _ n: TypeAliasDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: TypeAliasDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
   let typeAlias = ctx.typedProgram.ast[n]
   let identifier = typeAlias.identifier.value
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
 
   var result = wrapLink("\(wrapKeyword("typealias")) \(identifier)", href: symbolUrl)
 
@@ -34,14 +36,15 @@ func renderDetailedTypeAlias(
 }
 
 func renderDetailedProductType(
-  _ ctx: GenerationContext, _ n: ProductTypeDecl.ID,
+  _ ctx: ResolvedDocumentation, _ n: ProductTypeDecl.ID,
   _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
   let productType = ctx.typedProgram.ast[n]
   let identifier = productType.identifier.value
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
 
   var result = wrapLink("\(wrapKeyword("type")) \(identifier)", href: symbolUrl)
   let baseLength = productType.baseName.count + 8
@@ -52,7 +55,7 @@ func renderDetailedProductType(
     let nameExpr = productType.conformances[0]
     result += renderDetailedType(ctx, AnyExprID(nameExpr), referringFrom)!
 
-    for i in (1 ..< productType.conformances.count) {
+    for i in (1..<productType.conformances.count) {
       result += ","
       result += inline ? " " : "\n\(wrapIndentation(baseLength))"
 
@@ -65,7 +68,7 @@ func renderDetailedProductType(
 }
 
 func renderDetailedBinding(
-  _ ctx: GenerationContext, _ n: BindingDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: BindingDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 ) -> String {
   let binding = ctx.typedProgram.ast[n]
   let bindingPattern = ctx.typedProgram.ast[binding.pattern]
@@ -81,7 +84,8 @@ func renderDetailedBinding(
   }
 
   let identifier = variable.baseName
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
 
   result += "\(wrapKeyword(introducer)) \(identifier)"
   result = wrapLink(result, href: symbolUrl)
@@ -94,12 +98,14 @@ func renderDetailedBinding(
 }
 
 func renderDetailedInitializer(
-  _ ctx: GenerationContext, _ n: InitializerDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: InitializerDecl.ID, _ inline: Bool,
+  _ referringFrom: AnyTargetID
 )
   -> String
 {
   let initializer = ctx.typedProgram.ast[n]
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
 
   var result = wrapLink(wrapKeyword("init"), href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, initializer.parameters, inline, referringFrom)))"
@@ -108,7 +114,7 @@ func renderDetailedInitializer(
 }
 
 func renderDetailedFunction(
-  _ ctx: GenerationContext, _ n: FunctionDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: FunctionDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -120,7 +126,8 @@ func renderDetailedFunction(
     result += "\(wrapKeyword("static")) "
   }
 
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
 
   result += "\(wrapKeyword("fun")) \(identifier)"
   result = wrapLink(result, href: symbolUrl)
@@ -139,7 +146,7 @@ func renderDetailedFunction(
 }
 
 func renderDetailedMethod(
-  _ ctx: GenerationContext, _ n: MethodDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: MethodDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -147,7 +154,8 @@ func renderDetailedMethod(
   let identifier = method.identifier.value
   var result = ""
 
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
 
   result += wrapLink("\(wrapKeyword("fun")) \(identifier)", href: symbolUrl)
   result += "(\(renderDetailedParams(ctx, method.parameters, inline, referringFrom)))"
@@ -172,7 +180,7 @@ func renderDetailedMethod(
 }
 
 func renderDetailedSubscript(
-  _ ctx: GenerationContext, _ n: SubscriptDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: SubscriptDecl.ID, _ inline: Bool, _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -189,7 +197,8 @@ func renderDetailedSubscript(
     result += " \(identifier.value)"
   }
 
-  let symbolUrl = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(n)))?.description
+  let symbolUrl = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(n)))?
+    .description
   result = wrapLink(result, href: symbolUrl)
 
   if sub.introducer.value == SubscriptDecl.Introducer.subscript {
@@ -216,7 +225,8 @@ func renderDetailedSubscript(
 }
 
 func renderDetailedParams(
-  _ ctx: GenerationContext, _ ns: [ParameterDecl.ID], _ inline: Bool, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ ns: [ParameterDecl.ID], _ inline: Bool,
+  _ referringFrom: AnyTargetID
 )
   -> String
 {
@@ -246,7 +256,7 @@ func renderDetailedParams(
 }
 
 func renderDetailedParam(
-  _ ctx: GenerationContext, _ n: ParameterDecl.ID, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ n: ParameterDecl.ID, _ referringFrom: AnyTargetID
 ) -> String {
   let parameter = ctx.typedProgram.ast[n]
   let label = getParamLabel(parameter)
@@ -273,7 +283,7 @@ func renderDetailedParam(
 }
 
 func renderDetailedType(
-  _ ctx: GenerationContext, _ type: AnyExprID?, _ referringFrom: AnyTargetID
+  _ ctx: ResolvedDocumentation, _ type: AnyExprID?, _ referringFrom: AnyTargetID
 )
   -> String?
 {
@@ -281,7 +291,7 @@ func renderDetailedType(
     var url: String? = nil
 
     if let decl = getExprDecl(ctx.typedProgram, type) {
-      url = ctx.urlResolver.refer(from: referringFrom, to: .symbol(AnyDeclID(decl)))?.description
+      url = ctx.targetResolver.refer(from: referringFrom, to: .decl(AnyDeclID(decl)))?.description
     }
 
     return wrapType(name, href: url)
