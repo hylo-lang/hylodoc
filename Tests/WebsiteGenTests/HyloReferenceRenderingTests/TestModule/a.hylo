@@ -1,0 +1,31 @@
+trait TraitA{}
+trait TraitB{}
+
+/// ``min_inout`` and ``radians``
+/// 
+/// ``min_inout`` and ``radians``
+type MyType : TraitA, TraitB {
+
+  public var radians: Float64
+
+  /// ``min_inout`` and ``radians``
+  public subscript min_inout(_ x: inout Int, y: inout Int): Int {
+    inout { if y > x { &x } else { &y } }
+  }
+
+  /// ``min_inout`` and ``radians``
+  /// 
+  /// ``min_inout`` and ``radians``
+  public subscript min(_ x: yielded Int, _ y: yielded Int): Int {
+    let   { if y > x { x } else { y } }
+    inout { if y > x { &x } else { &y } }
+  }
+
+  /// ``min_inout`` and ``radians``
+  /// 
+  /// ``min_inout`` and ``radians``
+  public subscript min(_ x: yielded Int, _ y: yielded Int): Int {
+    inout { if y > x { &x } else { &y } }
+    set   { if y > x { &x = 1 } else { &y = 1 } }
+  }
+}

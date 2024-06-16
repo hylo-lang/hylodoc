@@ -1,0 +1,4 @@
+let varDeclOutsideTheFunction = 5
+fun varDeclInsideFunctionTest(parameterHere: Int) {
+  var myVarInsideTheFunction = 3
+}

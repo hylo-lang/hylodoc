@@ -78,26 +78,26 @@ func processChild<Visitor: AssetProcessingVisitor>(
 ) -> Result<(AnyAssetID, folderDoc: ArticleAsset.ID?), DocExtractionError<Visitor>> {
   if path.hasDirectoryPath {
     return recursivelyVisitFolder(folderPath: path, visitor: &visitor, fileManager: fileManager)
-      .map { (AnyAssetID(from: $0), folderDoc: nil) }
+      .map { (AnyAssetID($0), folderDoc: nil) }
   }
 
   switch path.pathExtension {
   case "hylo":
     return visitor.processSourceFile(path: path)
-      .map { (AnyAssetID(from: $0), folderDoc: nil) }
+      .map { (AnyAssetID($0), folderDoc: nil) }
       .mapError { .sourceFileProcessingError(path, $0) }
   case "hylodoc":
     return visitor.processArticle(path: path)
       .map {
         (
-          AnyAssetID(from: $0),
+          AnyAssetID($0),
           folderDoc: path.lastPathComponent == "index.hylodoc" ? $0 : nil
         )
       }
       .mapError { .articleProcessingError(path, $0) }
   default:
     return visitor.processOtherAsset(path: path)
-      .map { (AnyAssetID(from: $0), folderDoc: nil) }
+      .map { (AnyAssetID($0), folderDoc: nil) }
       .mapError { .otherLocalFileProcessingError(path, $0) }
   }
 }

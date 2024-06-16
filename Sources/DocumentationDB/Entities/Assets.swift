@@ -130,16 +130,16 @@ public enum AnyAssetID: Equatable, Hashable {
   case folder(FolderAsset.ID)
   case otherFile(OtherLocalFileAsset.ID)
 
-  public init(from: SourceFileAsset.ID) {
+  public init(_ from: SourceFileAsset.ID) {
     self = .sourceFile(from)
   }
-  public init(from: ArticleAsset.ID) {
+  public init(_ from: ArticleAsset.ID) {
     self = .article(from)
   }
-  public init(from: FolderAsset.ID) {
+  public init(_ from: FolderAsset.ID) {
     self = .folder(from)
   }
-  public init(from: OtherLocalFileAsset.ID) {
+  public init(_ from: OtherLocalFileAsset.ID) {
     self = .otherFile(from)
   }
 }

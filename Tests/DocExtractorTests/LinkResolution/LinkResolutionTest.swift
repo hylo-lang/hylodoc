@@ -1,31 +1,36 @@
 import Foundation
 import StandardLibraryCore
+import TestUtils
 import XCTest
 
 @testable import DocExtractor
 @testable import FrontEnd
 
 final class NameResolutionTest: XCTestCase {
-  func testNameResolution() {
-    var diagnostics = DiagnosticSet()
+  func testNameResolution() throws {
 
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = checkNoDiagnostic { d in loadStandardLibraryCore(diagnostics: &d) }
 
     // The module whose Hylo files were given on the command-line
-    let _ = try! ast.makeModule(
-      "RootModule",
-      sourceCode: sourceFiles(in: [
-        URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
-          "RootModule")
-      ]),
-      builtinModuleAccess: true,
-      diagnostics: &diagnostics
-    )
+    let _ = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "RootModule",
+        sourceCode: sourceFiles(in: [
+          URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
+            "RootModule")
+        ]),
+        builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
-    let typedProgram = try! TypedProgram(
-      annotating: ScopedProgram(ast), inParallel: false,
-      reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _) in return false })
+    let typedProgram = try checkNoDiagnostic { d in
+      try TypedProgram(
+        annotating: ScopedProgram(ast), inParallel: false,
+        reportingDiagnosticsTo: &d,
+        tracingInferenceIf: { (_, _) in return false }
+      )
+    }
 
     let vectorScope = AnyScopeID(ast.resolveProductType(by: "Vector")!)
 
@@ -224,6 +229,34 @@ final class NameResolutionTest: XCTestCase {
     else { return XCTFail("parsing error") }
     XCTAssertTrue(_collapsibleDotCollapse.contains(where: isFunction("collapse", [])))
     XCTAssertEqual(_collapsibleDotCollapse.count, 1)
+
+    // VarDecl inside a function should not be visible
+    let outerFuncId = ast.resolveFunc(by: "varDeclInsideFunctionTest")!
+    guard
+      let innerResolved = typedProgram.resolveReference(
+        "myVarInsideTheFunction", in: AnyScopeID(outerFuncId))
+    else {
+      return XCTFail("parsing error")
+    }
+    XCTAssertEqual(innerResolved.count, 0)
+
+    // but outside it should
+    guard
+      let outerResolved = typedProgram.resolveReference(
+        "varDeclOutsideTheFunction", in: AnyScopeID(outerFuncId))
+    else {
+      return XCTFail("parsing error")
+    }
+    XCTAssertEqual(outerResolved.count, 1)
+
+    // parameters should be resolved in function scope
+    guard
+      let paramResolved = typedProgram.resolveReference(
+        "parameterHere", in: AnyScopeID(outerFuncId))
+    else {
+      return XCTFail("parsing error")
+    }
+    XCTAssertEqual(paramResolved.count, 1)
   }
 
   func testManualLinkResolutionUsingHyloTypeChecker() {

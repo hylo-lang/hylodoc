@@ -16,6 +16,14 @@ public func renderSourceFilePage(ctx: inout GenerationContext, of: SourceFileAss
 {
   let sourceFile: SourceFileAsset = ctx.documentation.assets[of]!
   let scope = ctx.typedProgram.nodeToScope[sourceFile.translationUnit]!
+  let target = AnyTargetID.asset(AnyAssetID(of))
+  let htmlGenerator = SimpleHTMLGenerator(
+    context: .init(
+      typedProgram: ctx.typedProgram, scopeId: scope,
+      resolveUrls: referWithSource(ctx.urlResolver, from: target)
+    ),
+    generator: ctx.htmlGenerator
+  )
 
   var env: [String: Any] = [:]
 
@@ -23,27 +31,14 @@ public func renderSourceFilePage(ctx: inout GenerationContext, of: SourceFileAss
   env["pageTitle"] = sourceFile.name
   env["pageType"] = "Source File"
 
-  if let summary = sourceFile.generalDescription.summary {
-    env["summary"] = ctx.htmlGenerator.generateResolvingHyloReferences(
-      document: summary, scopeId: scope, from: ctx.typedProgram)
-  }
-
-  if let details = sourceFile.generalDescription.description {
-    env["details"] = ctx.htmlGenerator.generateResolvingHyloReferences(
-      document: details, scopeId: scope, from: ctx.typedProgram)
-  }
-
-  env["seeAlso"] = sourceFile.generalDescription.seeAlso.map {
-    ctx.htmlGenerator.generateResolvingHyloReferences(
-      document: $0, scopeId: scope, from: ctx.typedProgram)
-  }
+  env["summary"] = sourceFile.generalDescription.summary.map(htmlGenerator.generate(document:))
+  env["details"] = sourceFile.generalDescription.description.map(htmlGenerator.generate(document:))
+  env["seeAlso"] = sourceFile.generalDescription.seeAlso.map(htmlGenerator.generate(document:))
 
   let translationUnit = ctx.typedProgram.ast[sourceFile.translationUnit]
-  env["members"] = prepareMembersData(
-    referringFrom: .asset(AnyAssetID(from: of)), decls: translationUnit.decls, ctx: ctx)
+  env["members"] = prepareMembersData(referringFrom: target, decls: translationUnit.decls, ctx: ctx)
 
-  return try renderTemplate(
-    ctx: &ctx, targetId: .asset(.sourceFile(of)), name: "source_file_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "source_file_layout.html", env: &env)
 }
 
 /// Render the article page
@@ -56,6 +51,8 @@ public func renderSourceFilePage(ctx: inout GenerationContext, of: SourceFileAss
 public func renderArticlePage(ctx: inout GenerationContext, of: ArticleAsset.ID) throws -> String {
   let article = ctx.documentation.assets[of]!
   let scope = AnyScopeID(article.moduleId)
+  let target = AnyTargetID.asset(AnyAssetID(of))
+
   var env: [String: Any] = [:]
 
   if let title = article.title {
@@ -68,10 +65,15 @@ public func renderArticlePage(ctx: inout GenerationContext, of: ArticleAsset.ID)
 
   env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.article(of)))
   env["content"] = ctx.htmlGenerator.generateResolvingHyloReferences(
-    document: article.content, scopeId: scope, from: ctx.typedProgram)
+    document: article.content,
+    context: .init(
+      typedProgram: ctx.typedProgram,
+      scopeId: scope,
+      resolveUrls: referWithSource(ctx.urlResolver, from: target)
+    )
+  )
 
-  return try renderTemplate(
-    ctx: &ctx, targetId: .asset(.article(of)), name: "article_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "article_layout.html", env: &env)
 }
 
 extension Asset {
@@ -96,27 +98,36 @@ func isIndexPageFileName(fileName: String) -> Bool {
 public func renderFolderPage(ctx: inout GenerationContext, of: FolderAsset.ID) throws -> String {
   let folder = ctx.documentation.assets[of]!
   let scope = AnyScopeID(folder.moduleId)
+  let target = AnyTargetID.asset(.folder(of))
 
   var env: [String: Any] = [:]
 
-  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.folder(of)))
+  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: target)
   env["pageType"] = "Folder"
 
   // check if folder has documentation
   env["pageTitle"] = folder.name
+
   if let detailsId = folder.documentation {
     let detailsArticle = ctx.documentation.assets[detailsId]!
-    env["articleContent"] = ctx.htmlGenerator.generateResolvingHyloReferences(
-      document: detailsArticle.content, scopeId: scope, from: ctx.typedProgram)
-    // todo refactor title handling to be at one place
 
+    env["articleContent"] = ctx.htmlGenerator.generateResolvingHyloReferences(
+      document: detailsArticle.content,
+      context: .init(
+        typedProgram: ctx.typedProgram,
+        scopeId: scope,
+        resolveUrls: referWithSource(ctx.urlResolver, from: target)
+      )
+    )
+
+    // todo refactor title handling to be at one place
     if let title = detailsArticle.title {
       env["pageTitle"] = title
     }
   }
   env["name"] = env["pageTitle"]
 
-  let children = folder.children
+  env["contents"] = folder.children
     .filter { childId in
       let childAsset = ctx.documentation.assets[childId]!
       return !childAsset.isIndexPage && !(childAsset is OtherLocalFileAsset)
@@ -125,15 +136,11 @@ public func renderFolderPage(ctx: inout GenerationContext, of: FolderAsset.ID) t
       childId in
       (
         getAssetTitle(childId, ctx.documentation.assets),
-        ctx.urlResolver.refer(from: .asset(.folder(of)), to: .asset(childId))
+        ctx.urlResolver.refer(from: target, to: .asset(childId))
       )
     }
-  if !children.isEmpty {
-    env["contents"] = children
-  }
 
-  return try renderTemplate(
-    ctx: &ctx, targetId: .asset(.folder(of)), name: "folder_layout.html", env: &env)
+  return try renderTemplate(ctx: &ctx, targetId: target, name: "folder_layout.html", env: &env)
 }
 
 /// Get the title and the url of an asset

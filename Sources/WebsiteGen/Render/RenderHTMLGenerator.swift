@@ -1,15 +1,18 @@
 import DocExtractor
 import FrontEnd
 import MarkdownKit
+import PathWrangler
+
+public struct ReferenceRenderingContext {
+  let typedProgram: TypedProgram
+  let scopeId: AnyScopeID
+  let resolveUrls: (AnyTargetID) -> RelativePath?
+}
 
 public protocol HyloReferenceResolvingGenerator {
-  func generateResolvingHyloReferences(
-    document: Block, scopeId: AnyScopeID, from typedProgram: TypedProgram
-  ) -> String
-
-  func generateResolvingHyloReferences(
-    block: Block, scopeId: AnyScopeID, from typedProgram: TypedProgram
-  ) -> String
+  func generateResolvingHyloReferences(document: Block, context: ReferenceRenderingContext)
+    -> String
+  func generateResolvingHyloReferences(block: Block, context: ReferenceRenderingContext) -> String
 }
 
 /// A Custom HTML generator that overrides the default behavior of the `HtmlGenerator` to render code blocks and hylo references in a custom way.
@@ -61,38 +64,81 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
     return super.generate(textFragment: fragment)
   }
 
-  public struct ReferenceRenderingContext {
-    var typedProgram: TypedProgram
-    let scopeId: AnyScopeID
-  }
-
   public var referenceContext: ReferenceRenderingContext?
 
   /// Rendering hylo references by resolving the reference to a link to the actual target.
   public func render(hyloReference reference: HyloReference) -> String {
     precondition(referenceContext != nil)
-    let nothing = "nil"
+
     let resolved = referenceContext!.typedProgram.resolveReference(
       reference.text, in: referenceContext!.scopeId)
-    return
-      "<code class=\"hylo-reference\">\(reference.rawDescription) resolved as \(resolved?.description ?? nothing)</code>"
+
+    // Todo improve error handling
+    guard let resolved = resolved else {
+      fatalError("[ERROR] Reference \"\(reference.text)\" could not be parsed.")
+    }
+    guard !resolved.isEmpty else {
+      fatalError(
+        "[ERROR] Unable to resolve reference \(reference.text) in \(referenceContext!.scopeId).")
+    }
+    guard resolved.count == 1 else {
+      fatalError("[ERROR] Reference \(reference.text) resolved to multiple targets: \n\(resolved)")
+    }
+
+    if let link = referenceContext!.resolveUrls(.symbol(resolved.first!))?.description {
+      return "<code class=\"hylo-reference\"><a href=\"\(link)\">\(reference.text)</a></code>"
+    }
+    return "<code class=\"hylo-reference\">\(reference.text)</code>"
+    // return "<code class=\"hylo-reference\">\(reference.text) in \(resolved)</code>"
   }
 
-  public func generateResolvingHyloReferences(
-    document: Block, scopeId: AnyScopeID, from typedProgram: TypedProgram
-  ) -> String {
-    self.referenceContext = ReferenceRenderingContext(typedProgram: typedProgram, scopeId: scopeId)
+  public func generateResolvingHyloReferences(document: Block, context: ReferenceRenderingContext)
+    -> String
+  {
+    self.referenceContext = context
     defer { self.referenceContext = nil }
-
     return self.generate(doc: document)
   }
 
-  public func generateResolvingHyloReferences(
-    block: Block, scopeId: AnyScopeID, from typedProgram: TypedProgram
-  ) -> String {
-    self.referenceContext = ReferenceRenderingContext(typedProgram: typedProgram, scopeId: scopeId)
+  public func generateResolvingHyloReferences(block: Block, context: ReferenceRenderingContext)
+    -> String
+  {
+    self.referenceContext = context
     defer { self.referenceContext = nil }
-
     return self.generate(block: block)
+  }
+}
+
+/// Returns a facade closure that is able to resolve urls to arbitrary
+/// targets from the given source in `from`
+func referWithSource(
+  _ urlResolver: URLResolver,
+  from: AnyTargetID
+) -> (AnyTargetID) -> RelativePath? {
+  return { to in
+    urlResolver.refer(from: from, to: to)
+  }
+}
+
+/// A facade struct that wraps the necessary context and the generator to ease
+/// the generation of html content from markdown
+///
+/// Once constructed, we only need to call the `generate` method with the markdown
+/// content to get the html content which is easier than calling the generator
+/// directly creating the context every time.
+struct SimpleHTMLGenerator<T: HyloReferenceResolvingGenerator> {
+  let context: ReferenceRenderingContext
+  let generator: T
+
+  init(context: ReferenceRenderingContext, generator: T) {
+    self.context = context
+    self.generator = generator
+  }
+
+  func generate(block: Block) -> String {
+    generator.generateResolvingHyloReferences(block: block, context: context)
+  }
+  func generate(document: Block) -> String {
+    generator.generateResolvingHyloReferences(document: document, context: context)
   }
 }
