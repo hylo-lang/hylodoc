@@ -85,7 +85,7 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
       fatalError("[ERROR] Reference \(reference.text) resolved to multiple targets: \n\(resolved)")
     }
 
-    if let link = referenceContext!.resolveUrls(.symbol(resolved.first!))?.description {
+    if let link = referenceContext!.resolveUrls(.decl(resolved.first!))?.description {
       return "<code class=\"hylo-reference\"><a href=\"\(link)\">\(reference.text)</a></code>"
     }
     return "<code class=\"hylo-reference\">\(reference.text)</code>"
@@ -112,11 +112,11 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
 /// Returns a facade closure that is able to resolve urls to arbitrary
 /// targets from the given source in `from`
 func referWithSource(
-  _ urlResolver: URLResolver,
+  _ targetResolver: TargetResolver,
   from: AnyTargetID
 ) -> (AnyTargetID) -> RelativePath? {
   return { to in
-    urlResolver.refer(from: from, to: to)
+    targetResolver.refer(from: from, to: to)
   }
 }
 

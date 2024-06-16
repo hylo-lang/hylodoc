@@ -15,14 +15,15 @@ public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAs
   -> StencilContext
 {
   let sourceFile: SourceFileAsset = context.documentation.documentation.assets[of]!
-  let scope = ctx.typedProgram.nodeToScope[sourceFile.translationUnit]!
+  let scope = context.documentation.typedProgram.nodeToScope[sourceFile.translationUnit]!
   let target = AnyTargetID.asset(AnyAssetID(of))
   let htmlGenerator = SimpleHTMLGenerator(
     context: .init(
-      typedProgram: context.resolved.typedProgram, scopeId: scope,
-      resolveUrls: referWithSource(context.resolved.targetResolver, from: target)
+      typedProgram: context.documentation.typedProgram,
+      scopeId: scope,
+      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
     ),
-    generator: ctx.htmlGenerator
+    generator: context.htmlGenerator
   )
 
   var env: [String: Any] = [:]
@@ -31,9 +32,11 @@ public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAs
   env["summary"] = sourceFile.generalDescription.summary.map(htmlGenerator.generate(document:))
   env["details"] = sourceFile.generalDescription.description.map(htmlGenerator.generate(document:))
   env["seeAlso"] = sourceFile.generalDescription.seeAlso.map(htmlGenerator.generate(document:))
-
-  let translationUnit = ctx.typedProgram.ast[sourceFile.translationUnit]
-  env["members"] = prepareMembersData(context, referringFrom: target, decls: translationUnit.decls)
+  env["members"] = prepareMembersData(
+    context,
+    referringFrom: target,
+    decls: convertTargetsToDecls(context.documentation.targetResolver[target]!.children)
+  )
 
   return StencilContext(templateName: "source_file_layout.html", context: env)
 }
@@ -50,20 +53,18 @@ public func prepareArticlePage(_ context: GenerationContext, of: ArticleAsset.ID
   let article = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(article.moduleId)
   let target = AnyTargetID.asset(AnyAssetID(of))
+  let htmlGenerator = SimpleHTMLGenerator(
+    context: .init(
+      typedProgram: context.documentation.typedProgram,
+      scopeId: scope,
+      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+    ),
+    generator: context.htmlGenerator
+  )
 
   var env: [String: Any] = [:]
   env["pageType"] = "Article"
-  env["content"] = context.htmlGenerator.generate(doc: article.content)
-
-  env["pathToRoot"] = ctx.urlResolver.pathToRoot(target: .asset(.article(of)))
-  env["content"] = ctx.htmlGenerator.generateResolvingHyloReferences(
-    document: article.content,
-    context: .init(
-      typedProgram: context.resolved.typedProgram,
-      scopeId: scope,
-      resolveUrls: referWithSource(context.resolved.targetResolver, from: target)
-    )
-  )
+  env["content"] = htmlGenerator.generate(document: article.content)
 
   return StencilContext(templateName: "article_layout.html", context: env)
 }
@@ -91,6 +92,14 @@ public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) 
   let folder = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(folder.moduleId)
   let target = AnyTargetID.asset(.folder(of))
+  let htmlGenerator = SimpleHTMLGenerator(
+    context: .init(
+      typedProgram: context.documentation.typedProgram,
+      scopeId: scope,
+      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+    ),
+    generator: context.htmlGenerator
+  )
 
   var env: [String: Any] = [:]
   env["pageType"] = "Folder"
@@ -99,14 +108,7 @@ public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) 
   if let detailsId = folder.documentation {
     let detailsArticle = context.documentation.documentation.assets[detailsId]!
 
-    env["articleContent"] = context.htmlGenerator.generateResolvingHyloReferences(
-      document: detailsArticle.content,
-      context: .init(
-        typedProgram: ctx.typedProgram,
-        scopeId: scope,
-        resolveUrls: referWithSource(ctx.urlResolver, from: target)
-      )
-    )
+    env["articleContent"] = htmlGenerator.generate(document: detailsArticle.content)
 
     // todo refactor title handling to be at one place
     //    if let title = detailsArticle.title {

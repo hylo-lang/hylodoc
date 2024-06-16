@@ -59,6 +59,7 @@ func getMemberNameAndSummary(
   var name: String
   var summary: Block?
   var key: String
+  var scope: AnyScopeID?
 
   switch of.kind {
   // TODO Mark needs to implement this
@@ -75,11 +76,13 @@ func getMemberNameAndSummary(
   //     key = "Associated Values"
   case TypeAliasDecl.self:
     let docID = TypeAliasDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderTypeAliasDecl(context.documentation, docID, referringFrom)
     summary = context.documentation.documentation.symbols.typeAliasDocs[docID]?.common.summary
     key = "Type Aliases"
   case BindingDecl.self:
     let docID = BindingDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderBindingDecl(context.documentation, docID, referringFrom)
     summary = context.documentation.documentation.symbols.bindingDocs[docID]?.common.summary
     key = "Bindings"
@@ -91,6 +94,7 @@ func getMemberNameAndSummary(
   //     key = "Operators"
   case FunctionDecl.self:
     let docID = FunctionDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderFunctionDecl(context.documentation, docID, referringFrom)
     summary =
       context.documentation.documentation.symbols.functionDocs[docID]?.documentation.common.common
@@ -98,6 +102,7 @@ func getMemberNameAndSummary(
     key = "Functions"
   case MethodDecl.self:
     let docID = MethodDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderMethodDecl(context.documentation, docID, referringFrom)
     summary =
       context.documentation.documentation.symbols.methodDeclDocs[docID]?.documentation.common.common
@@ -109,6 +114,7 @@ func getMemberNameAndSummary(
     return nil
   case SubscriptDecl.self:
     let docID = SubscriptDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderSubscriptDecl(context.documentation, docID, referringFrom)
     summary =
       context.documentation.documentation.symbols.subscriptDeclDocs[docID]?.documentation.common
@@ -121,6 +127,7 @@ func getMemberNameAndSummary(
     return nil
   case InitializerDecl.self:
     let docID = InitializerDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderInitializerDecl(
       context.documentation, docID, referringFrom)
     summary =
@@ -130,11 +137,13 @@ func getMemberNameAndSummary(
     key = "Initializers"
   case TraitDecl.self:
     let docID = TraitDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderTraitDecl(context.documentation, docID, referringFrom)
     summary = context.documentation.documentation.symbols.traitDocs[docID]?.common.summary
     key = "Traits"
   case ProductTypeDecl.self:
     let docID = ProductTypeDecl.ID(of)!
+    scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderProductTypeDecl(
       context.documentation, docID, referringFrom)
     summary = context.documentation.documentation.symbols.productTypeDocs[docID]?.common.summary
@@ -143,9 +152,34 @@ func getMemberNameAndSummary(
     return nil
   }
 
-  if let summary = summary {
-    return (name, context.htmlGenerator.generate(doc: summary), key)
+  if let summary = summary, let scope = scope {
+    return (
+      name,
+      context.htmlGenerator.generateResolvingHyloReferences(
+        document: summary,
+        context: ReferenceRenderingContext(
+          typedProgram: context.documentation.typedProgram,
+          scopeId: scope,
+          resolveUrls: referWithSource(
+            context.documentation.targetResolver,
+            from: .decl(of)
+          )
+        )
+      ),
+      key
+    )
   } else {
     return (name, "", key)
+  }
+}
+
+/// Converts an array of targets into an array of decls if a target is a decl
+func convertTargetsToDecls(_ array: [AnyTargetID]) -> [AnyDeclID] {
+  return array.compactMap {
+    if case .decl(let declId) = $0 {
+      return declId
+    }
+
+    return nil
   }
 }

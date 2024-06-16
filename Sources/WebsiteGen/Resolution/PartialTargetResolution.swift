@@ -77,8 +77,26 @@ func partialResolveDecl(
   _ documentationDatabase: DocumentationDatabase, _ typedProgram: TypedProgram, declId: AnyDeclID
 ) -> PartialResolvedTarget {
   switch declId.kind {
-  //case AssociatedTypeDecl.self
-  //case AssociatedValueDecl.self
+  case AssociatedTypeDecl.self:
+    let id = AssociatedTypeDecl.ID(declId)!
+    let name = String(describing: id)  //SimpleSymbolDeclRenderer.renderAssociatedTypeDecl(typedProgram, id)
+
+    return PartialResolvedTarget(
+      pathName: name + "/index.html",
+      simpleName: name,
+      navigationName: name,  //NavigationSymbolDecRenderer.renderAssociatedTypeDecl(typedProgram, id),
+      children: []
+    )
+  case AssociatedValueDecl.self:
+    let id = AssociatedValueDecl.ID(declId)!
+    let name = String(describing: id)  //SimpleSymbolDeclRenderer.renderAssociatedValueDecl(typedProgram, id)
+
+    return PartialResolvedTarget(
+      pathName: name + "/index.html",
+      simpleName: name,
+      navigationName: name,  //NavigationSymbolDecRenderer.renderAssociatedValueDecl(typedProgram, id),
+      children: []
+    )
   case TypeAliasDecl.self:
     let id = TypeAliasDecl.ID(declId)!
     let name = SimpleSymbolDeclRenderer.renderTypeAliasDecl(typedProgram, id)
@@ -99,7 +117,16 @@ func partialResolveDecl(
       navigationName: NavigationSymbolDecRenderer.renderBindingDecl(typedProgram, id),
       children: []
     )
-  //case OperatorDecl.self
+  case OperatorDecl.self:
+    let id = OperatorDecl.ID(declId)!
+    let name = String(describing: id)  //SimpleSymbolDeclRenderer.renderOperatorDecl(typedProgram, id)
+
+    return PartialResolvedTarget(
+      pathName: name + "/index.html",
+      simpleName: name,
+      navigationName: name,  //NavigationSymbolDecRenderer.renderOperatorDecl(typedProgram, id),
+      children: []
+    )
   case FunctionDecl.self:
     let id = FunctionDecl.ID(declId)!
     let name = SimpleSymbolDeclRenderer.renderFunctionDecl(typedProgram, id)

@@ -10,7 +10,7 @@ import Stencil
 public struct GenerationContext {
   let documentation: DocumentationContext
   var stencilEnvironment: Environment
-  let htmlGenerator: some HyloReferenceResolvingGenerator
+  let htmlGenerator: some HyloReferenceResolvingGenerator = CustomHTMLGenerator()
   let exporter: Exporter
 
   var breadcrumb: Deque<BreadcrumbItem>
@@ -22,7 +22,6 @@ public func generateIndexAndTargetPages(
   var context = GenerationContext(
     documentation: documentation,
     stencilEnvironment: createDefaultStencilEnvironment(),
-    htmlGenerator: CustomHTMLGenerator(),
     exporter: exporter,
     breadcrumb: []
   )
@@ -142,10 +141,12 @@ public func generateModuleIndex(_ context: inout GenerationContext) throws {
   env["pageType"] = "Folder"
 
   // Article Content
-  env["articleContent"] = context.htmlGenerator.generate(
-    doc: .document([
-      .paragraph(Text("Bellow you can find a list of the modules that have been documented"))
-    ]))
+  if let htmlGenerator = context.htmlGenerator as? HtmlGenerator {
+    env["articleContent"] = htmlGenerator.generate(
+      doc: .document([
+        Block.paragraph(Text("Bellow you can find a list of the modules that have been documented"))
+      ]))
+  }
 
   // Map children to an array of [(name, relativePath)]
   env["contents"] = context.documentation.documentation.modules
