@@ -122,6 +122,36 @@ extension AST {
     return walker.result
   }
 
+  public func resolveBinding(by name: String) -> BindingDecl.ID? {
+    struct ASTWalker: ASTWalkObserver {
+      var result: BindingDecl.ID?
+      var members: [AnyDeclID] = []
+      let targetName: String
+
+      mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
+        if let e: BindingDecl.ID = BindingDecl.ID(id) {
+          let binding = ast[e]
+          let pattern = ast[binding.pattern]
+          if let subPattern = ast[NamePattern.ID(pattern.subpattern)] {
+            let varDecl = ast[subPattern.decl]
+            if varDecl.identifier.value == targetName {
+              result = e
+              return false
+            }
+          }
+        }
+
+        return true
+      }
+    }
+
+    var walker = ASTWalker(result: nil, targetName: name)
+    for m in modules {
+      walk(m, notifying: &walker)
+    }
+    return walker.result
+  }
+
   public func resolveOperator() -> [OperatorDecl.ID]? {
     struct ASTWalker: ASTWalkObserver {
       var result: [OperatorDecl.ID]?

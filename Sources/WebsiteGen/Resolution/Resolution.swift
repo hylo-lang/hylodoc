@@ -65,6 +65,13 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
         relativePath: relativePath
       )
     )
+
+    // Resolve any references back to this target that are not supposed to have their own page
+    if let backReferences = backReferencesOfTarget(typedProgram, targetId: targetItem.targetId) {
+      backReferences.forEach {
+        targetResolver.resolveBackReference(from: $0, backTo: targetItem.targetId)
+      }
+    }
   }
 
   return targetResolver

@@ -43,6 +43,7 @@ public struct ResolvedDirectlyCopiedAssetTarget {
 public struct TargetResolver {
   var otherTargets: [AnyTargetID: ResolvedDirectlyCopiedAssetTarget] = [:]
   var targets: [AnyTargetID: ResolvedTarget] = [:]
+  var backReferences: [AnyTargetID: AnyTargetID] = [:]
   public var rootTargets: [AnyTargetID] = []
 
   /// Get the resolved target of a target identity
@@ -72,8 +73,19 @@ public struct TargetResolver {
     otherTargets[targetId] = resolved
   }
 
+  /// Resolve targets referencing back to another target
+  public mutating func resolveBackReference(from: AnyTargetID, backTo: AnyTargetID) {
+    backReferences[from] = backTo
+  }
+
   /// Get a url referencing from one target to another
   public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath? {
+    // Resolve back reference
+    if let referBack = backReferences[to] {
+      print(referBack)
+      return refer(from: from, to: referBack)
+    }
+
     // same target
     if from == to {
       return nil

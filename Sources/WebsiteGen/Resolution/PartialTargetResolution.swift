@@ -230,3 +230,19 @@ public func isSupportedDecl(declId: AnyDeclID) -> Bool {
     return false
   }
 }
+
+/// Get all the targets that should refer back to the provided target
+public func backReferencesOfTarget(_ typedProgram: TypedProgram, targetId: AnyTargetID)
+  -> [AnyTargetID]?
+{
+  if case .decl(let declId) = targetId, let bindingId = BindingDecl.ID(declId) {
+    let binding = typedProgram.ast[bindingId]!
+    let pattern = typedProgram.ast[binding.pattern]
+    if let subPattern = typedProgram.ast[NamePattern.ID(pattern.subpattern)] {
+      let varDecl = subPattern.decl
+      return [.decl(AnyDeclID(varDecl))]
+    }
+  }
+
+  return nil
+}
