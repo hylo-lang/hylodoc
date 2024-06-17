@@ -76,10 +76,10 @@ final class FolderTest: XCTestCase {
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("Folder1", in: res, file: #file, line: #line)
+    assertPageTitle("Folder1", in: res)
 
-    assertNotContains("content", what: res, file: #file, line: #line)
-    assertNotContains("contents", what: res, file: #file, line: #line)
+    assertNotContains("content", what: res)
+    assertNotContains("contents", what: res)
   }
 
   func testFolderPageGenerationWithDetailsNoChildren() throws {
@@ -157,11 +157,11 @@ final class FolderTest: XCTestCase {
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("Info Article", in: res, file: #file, line: #line)
-    assertContent("lorem ipsum", in: res, file: #file, line: #line)
+    assertPageTitle("Info Article", in: res)
+    assertContent("lorem ipsum", in: res)
 
-    assertNotContains("Folder1", what: res, file: #file, line: #line)
-    assertNotContains("contents", what: res, file: #file, line: #line)
+    assertNotContains("Folder1", what: res)
+    assertNotContains("contents", what: res)
   }
 
   func testFolderPageGenerationWithDetailsWithChildren() throws {
@@ -285,11 +285,11 @@ final class FolderTest: XCTestCase {
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("Info Article", in: res, file: #file, line: #line)
-    assertContent("lorem ipsum", in: res, file: #file, line: #line)
-    assertListExistAndCount(id: "contents", count: 2, in: res, file: #file, line: #line)
+    assertPageTitle("Info Article", in: res)
+    assertContent("lorem ipsum", in: res)
+    assertListExistAndCount(id: "contents", count: 2, in: res)
 
-    assertNotContains("Folder1", what: res, file: #file, line: #line)
+    assertNotContains("Folder1", what: res)
   }
 
   func testFolderPageGenerationWithInternalDetailsWithInternalChildren() throws {
@@ -375,8 +375,8 @@ final class FolderTest: XCTestCase {
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("Folder1", in: res, file: #file, line: #line)
-    assertNotContains("content", what: res, file: #file, line: #line)
-    assertNotContains("contents", what: res, file: #file, line: #line)
+    assertPageTitle("Folder1", in: res)
+    assertNotContains("content", what: res)
+    assertNotContains("contents", what: res)
   }
 }

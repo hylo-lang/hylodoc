@@ -90,7 +90,7 @@ final class AssociatedValueTest: XCTestCase {
     let stencilContext = try prepareAssociatedValuePage(context, of: associatedValueId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("B", in: res, file: #file, line: #line)
+    assertPageTitle("B", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
@@ -98,6 +98,6 @@ final class AssociatedValueTest: XCTestCase {
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
 
-    assertNotContains(res, what: "seeAlso", file: #file, line: #line)
+    assertNotContains(res, what: "seeAlso")
   }
 }

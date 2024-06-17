@@ -98,18 +98,18 @@ final class InitializerTest: XCTestCase {
     let stencilContext = try prepareInitializerPage(context, of: initializerId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("init()", in: res, file: #file, line: #line)
+    assertPageTitle("init()", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
     assertDetails(
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
-    assertNotContains(res, what: "preconditions", file: #file, line: #line)
-    assertNotContains(res, what: "postconditions", file: #file, line: #line)
-    assertNotContains(res, what: "parameters", file: #file, line: #line)
-    assertNotContains(res, what: "generic parameters", file: #file, line: #line)
-    assertNotContains(res, what: "throwsInfo", file: #file, line: #line)
+    assertNotContains(res, what: "preconditions")
+    assertNotContains(res, what: "postconditions")
+    assertNotContains(res, what: "parameters")
+    assertNotContains(res, what: "generic parameters")
+    assertNotContains(res, what: "throwsInfo")
 
   }
 }

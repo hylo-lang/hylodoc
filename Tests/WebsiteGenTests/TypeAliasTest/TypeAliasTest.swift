@@ -89,7 +89,7 @@ final class TypeAliasTest: XCTestCase {
     let stencilContext = try prepareTypeAliasPage(context, of: typeAliasId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("typealias Vector2", in: res, file: #file, line: #line)
+    assertPageTitle("typealias Vector2", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
@@ -97,6 +97,6 @@ final class TypeAliasTest: XCTestCase {
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
 
-    assertNotContains(res, what: "seeAlso", file: #file, line: #line)
+    assertNotContains(res, what: "seeAlso")
   }
 }

@@ -89,7 +89,7 @@ final class OperatorTest: XCTestCase {
     let stencilContext = try prepareOperatorPage(context, of: operatorId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("public operator infix", in: res, file: #file, line: #line)
+    assertPageTitle("public operator infix", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
@@ -97,6 +97,6 @@ final class OperatorTest: XCTestCase {
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
 
-    assertNotContains(res, what: "seeAlso", file: #file, line: #line)
+    assertNotContains(res, what: "seeAlso")
   }
 }

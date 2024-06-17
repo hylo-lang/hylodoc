@@ -100,7 +100,7 @@ final class SubscriptTest: XCTestCase {
     let stencilContext = try prepareSubscriptPage(context, of: subscriptId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("subscript min(_:_:)", in: res, file: #file, line: #line)
+    assertPageTitle("subscript min(_:_:)", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
@@ -108,10 +108,10 @@ final class SubscriptTest: XCTestCase {
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
 
-    assertNotContains(res, what: "yields", file: #file, line: #line)
-    assertNotContains(res, what: "throwsInfo", file: #file, line: #line)
-    assertNotContains(res, what: "parameters", file: #file, line: #line)
-    assertNotContains(res, what: "genericParameters", file: #file, line: #line)
-    assertNotContains(res, what: "seeAlso", file: #file, line: #line)
+    assertNotContains(res, what: "yields")
+    assertNotContains(res, what: "throwsInfo")
+    assertNotContains(res, what: "parameters")
+    assertNotContains(res, what: "genericParameters")
+    assertNotContains(res, what: "seeAlso")
   }
 }

@@ -93,14 +93,14 @@ final class TraitTest: XCTestCase {
     let stencilContext = try prepareTraitPage(context, of: traitId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("trait Shape", in: res, file: #file, line: #line)
+    assertPageTitle("trait Shape", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
     assertDetails(
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
-    assertListExistAndCount(id: "invariants", count: 1, in: res, file: #file, line: #line)
+    assertListExistAndCount(id: "invariants", count: 1, in: res)
 
     // let members = findByID("members", in: res)
     assertSectionsExsistingAndCount(
@@ -122,6 +122,6 @@ final class TraitTest: XCTestCase {
       file: #file, line: #line
     )
 
-    assertNotContains(res, what: "seeAlso", file: #file, line: #line)
+    assertNotContains(res, what: "seeAlso")
   }
 }

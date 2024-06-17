@@ -113,20 +113,20 @@ final class FunctionTest: XCTestCase {
     let stencilContext = try prepareFunctionPage(context, of: functionId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("fun id(_:)", in: res, file: #file, line: #line)
+    assertPageTitle("fun id(_:)", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
     assertDetails(
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
-    assertNotContains(res, what: "preconditions", file: #file, line: #line)
-    assertNotContains(res, what: "postconditions", file: #file, line: #line)
-    assertNotContains(res, what: "returns", file: #file, line: #line)
-    assertNotContains(res, what: "throwsInfo", file: #file, line: #line)
-    assertNotContains(res, what: "parameters", file: #file, line: #line)
-    assertNotContains(res, what: "genericParameters", file: #file, line: #line)
-    assertListExistAndCount(id: "seeAlso", count: 2, in: res, file: #file, line: #line)
+    assertNotContains(res, what: "preconditions")
+    assertNotContains(res, what: "postconditions")
+    assertNotContains(res, what: "returns")
+    assertNotContains(res, what: "throwsInfo")
+    assertNotContains(res, what: "parameters")
+    assertNotContains(res, what: "genericParameters")
+    assertListExistAndCount(id: "seeAlso", count: 2, in: res)
 
   }
 }

@@ -79,7 +79,7 @@ final class ArticleTest: XCTestCase {
     let stencilContext = try prepareArticlePage(context, of: articleId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("I betcha you would have done the same", in: res, file: #file, line: #line)
+    assertPageTitle("I betcha you would have done the same", in: res)
     assertContent(
       "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!",
       in: res,
@@ -157,7 +157,7 @@ final class ArticleTest: XCTestCase {
     let stencilContext = try prepareArticlePage(context, of: article1Id)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("article1", in: res, file: #file, line: #line)
+    assertPageTitle("article1", in: res)
     assertContent(
       "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!",
       in: res,
