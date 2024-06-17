@@ -9,7 +9,7 @@ type MyType : TraitA, TraitB {
 
   /// My summary for this function
   ///
-  /// Details go here
+  /// Details go here, reference to ``member2``
   /// ```hylo
   /// let example = functionLarge(hello: 0, world: 0.0)
   /// print(example)
