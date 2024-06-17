@@ -45,7 +45,16 @@ func partialResolveAsset(
       navigationName: name,
       children: folder.children
         .filter { folder.documentation == nil || $0 != .article(folder.documentation!) }
-        .filter { !documentationDatabase.assets[$0]!.isInternal }
+        .filter {
+          // Filter out internal articles
+          if case .article(let articleId) = $0,
+            let article = documentationDatabase.assets[articleId]
+          {
+            return !article.isInternal
+          }
+
+          return true
+        }
         .map { .asset($0) }
     )
   case .sourceFile(let sourceFileId):

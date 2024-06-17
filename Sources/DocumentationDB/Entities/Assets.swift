@@ -11,8 +11,6 @@ public protocol Asset: IdentifiedEntity {
   /// Either the file or folder name of the asset.
   var name: String { get }
 
-  var isInternal: Bool { get }
-
   associatedtype EntityStoreT: ReadableEntityStoreProtocol where EntityStoreT.Entity == Self
   static func specificStore(from: AssetStore) -> EntityStoreT
 }
@@ -21,11 +19,6 @@ public protocol Asset: IdentifiedEntity {
 extension Asset {
   public var name: String {
     return location.lastPathComponent
-  }
-
-  /// Check if the asset is internal
-  public var isInternal: Bool {
-    return location.lastPathComponent.contains(".internal.")
   }
 }
 
@@ -73,6 +66,11 @@ public struct ArticleAsset: IdentifiedEntity, Asset, Equatable {
   ///
   /// Used for name resolution for embedded hylo references.
   public let moduleId: ModuleDecl.ID
+
+  /// Check if the article is internal
+  public var isInternal: Bool {
+    return location.lastPathComponent.hasSuffix(".internal.hylodoc")
+  }
 
   public init(location: URL, title: String?, content: Block, moduleId: ModuleDecl.ID) {
     self.location = location
