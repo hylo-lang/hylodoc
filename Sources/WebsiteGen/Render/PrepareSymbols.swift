@@ -29,8 +29,6 @@ public func prepareAssociatedTypePage(
 
   var env: [String: Any] = [:]
 
-  env["name"] = decl.identifier.value
-
   env["pageType"] = "Associated Type"
   env["declarationPreview"] = decl.site.text  // todo
 
@@ -68,8 +66,6 @@ public func prepareAssociatedValuePage(
 
   var env: [String: Any] = [:]
 
-  env["name"] = decl.identifier.value
-
   env["pageType"] = "Associated Value"
   env["declarationPreview"] = decl.site.text  // todo
 
@@ -93,7 +89,6 @@ public func prepareAssociatedValuePage(
 public func prepareTypeAliasPage(
   _ context: GenerationContext, of declId: TypeAliasDecl.ID
 ) throws -> StencilContext {
-  let decl: TypeAliasDecl = context.documentation.typedProgram.ast[declId]!
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = context.documentation.typedProgram.nodeToScope[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
@@ -106,7 +101,6 @@ public func prepareTypeAliasPage(
   )
 
   var env: [String: Any] = [:]
-  env["name"] = decl.identifier.value
 
   env["pageType"] = "Type Alias"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderTypeAliasDecl(
@@ -144,8 +138,6 @@ public func prepareBindingPage(
   )
 
   var env: [String: Any] = [:]
-
-  env["name"] = "binding"
 
   env["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderBindingDecl(
@@ -186,8 +178,6 @@ public func prepareOperatorPage(
 
   var env: [String: Any] = [:]
 
-  env["name"] = decl.name.value
-
   env["pageType"] = "Operator Introducer"
   env["declarationPreview"] = decl.site.text  // todo
 
@@ -211,7 +201,6 @@ public func prepareOperatorPage(
 public func prepareFunctionPage(
   _ context: GenerationContext, of declId: FunctionDecl.ID
 ) throws -> StencilContext {
-  let decl: FunctionDecl = context.documentation.typedProgram.ast[declId]!
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
@@ -224,7 +213,6 @@ public func prepareFunctionPage(
   )
 
   var env: [String: Any] = [:]
-  env["name"] = decl.site.text
 
   env["pageType"] = "Function"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(
@@ -278,7 +266,6 @@ public func prepareFunctionPage(
 public func prepareMethodPage(
   _ context: GenerationContext, of declId: MethodDecl.ID
 ) throws -> StencilContext {
-  let decl: MethodDecl = context.documentation.typedProgram.ast[declId]!
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
@@ -291,9 +278,6 @@ public func prepareMethodPage(
   )
 
   var env: [String: Any] = [:]
-
-  // TODO address the case where the function has no name
-  env["name"] = decl.identifier.value
 
   env["pageType"] = "Method"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(
@@ -352,7 +336,6 @@ public func prepareMethodPage(
 public func prepareSubscriptPage(
   _ context: GenerationContext, of declId: SubscriptDecl.ID
 ) throws -> StencilContext {
-  let decl: SubscriptDecl = context.documentation.typedProgram.ast[declId]!
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
@@ -365,8 +348,6 @@ public func prepareSubscriptPage(
   )
 
   var env: [String: Any] = [:]
-
-  env["name"] = decl.site.text
 
   env["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(
@@ -417,7 +398,6 @@ public func prepareSubscriptPage(
 public func prepareInitializerPage(
   _ context: GenerationContext, of declId: InitializerDecl.ID
 ) throws -> StencilContext {
-  let decl: InitializerDecl = context.documentation.typedProgram.ast[declId]!
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
@@ -430,9 +410,6 @@ public func prepareInitializerPage(
   )
 
   var env: [String: Any] = [:]
-
-  // TODO address the case where the function has no name
-  env["name"] = decl.site.text
 
   env["pageType"] = "Initializer"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(
@@ -486,7 +463,6 @@ public func prepareTraitPage(
 )
   throws -> StencilContext
 {
-  let decl: TraitDecl = context.documentation.typedProgram.ast[declId]!
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
@@ -499,8 +475,6 @@ public func prepareTraitPage(
   )
 
   var env: [String: Any] = [:]
-
-  env["name"] = decl.identifier.value
 
   env["pageType"] = "Trait"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(
@@ -539,7 +513,6 @@ public func prepareTraitPage(
 public func prepareProductTypePage(
   _ context: GenerationContext, of declId: ProductTypeDecl.ID
 ) throws -> StencilContext {
-  let decl: ProductTypeDecl = context.documentation.typedProgram.ast[declId]!
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
@@ -553,7 +526,6 @@ public func prepareProductTypePage(
 
   var env: [String: Any] = [:]
 
-  env["name"] = decl.identifier.value
   env["pageType"] = "Product Type"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(
     context.documentation, declId, target)
