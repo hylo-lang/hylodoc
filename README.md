@@ -19,7 +19,11 @@ swift run hdc PATH_TO_MODULE --output OUTPUT_DIRECTORY
 
 # open up the generated website in a web server
 swift run hdc PATH_TO_MODULE && python3 -m http.server 8080 -d dist
+
+# Generate documentation for the standard library
+swift run hdc PATH_TO_STDLIB --documenting-standard-library
 ```
+
 ## Development Environment Setup
 ### Windows
 - Install docker and WSL2

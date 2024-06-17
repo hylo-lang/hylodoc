@@ -1,7 +1,8 @@
 /// A collection of UTF-8 code units.
+/// 
+/// Important: This implementation assumes little-endianness.
 public type UTF8Array: Regular {
 
-  /// Important: This implementation assumes little-endianness.
 
   /// The description of out-of-line payloads in `UTF8Array`s.
   typealias Header = { count: Int, capacity: Int }

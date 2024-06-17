@@ -1,7 +1,7 @@
 import DocumentationDB
+import HyloStandardLibrary
 import MarkdownKit
 import PathWrangler
-import HyloStandardLibrary
 import Stencil
 import TestUtils
 import XCTest
@@ -294,27 +294,29 @@ final class FolderTest: XCTestCase {
 
   func testFolderPageGenerationWithInternalDetailsWithInternalChildren() throws {
 
-    var diagnostics = DiagnosticSet()
-
     /// An instance that includes just the standard library.
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try checkNoDiagnostic { d in try AST.loadStandardLibraryCore(diagnostics: &d) }
 
     // We don't really read anything from here right now, we will the documentation database manually
     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
       .appendingPathComponent("TestHyloModule")
 
     // The module whose Hylo files were given on the command-line
-    let _ = try! ast.makeModule(
-      "TestHyloModule",
-      sourceCode: sourceFiles(in: [libraryPath]),
-      builtinModuleAccess: true,
-      diagnostics: &diagnostics
-    )
+    let _ = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "TestHyloModule",
+        sourceCode: sourceFiles(in: [libraryPath]),
+        builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
-    let typedProgram = try! TypedProgram(
-      annotating: ScopedProgram(ast), inParallel: false,
-      reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _: TypedProgram) in false })
+    let typedProgram = try checkNoDiagnostic { d in
+      try TypedProgram(
+        annotating: ScopedProgram(ast), inParallel: false,
+        reportingDiagnosticsTo: &d,
+        tracingInferenceIf: { (_, _: TypedProgram) in false })
+    }
 
     var db: DocumentationDatabase = .init()
 
