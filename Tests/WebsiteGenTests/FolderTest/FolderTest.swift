@@ -291,4 +291,92 @@ final class FolderTest: XCTestCase {
 
     assertNotContains("Folder1", what: res, file: #file, line: #line)
   }
+
+  func testFolderPageGenerationWithInternalDetailsWithInternalChildren() throws {
+
+    var diagnostics = DiagnosticSet()
+
+    /// An instance that includes just the standard library.
+    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+
+    // We don't really read anything from here right now, we will the documentation database manually
+    let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+      .appendingPathComponent("TestHyloModule")
+
+    // The module whose Hylo files were given on the command-line
+    let _ = try! ast.makeModule(
+      "TestHyloModule",
+      sourceCode: sourceFiles(in: [libraryPath]),
+      builtinModuleAccess: true,
+      diagnostics: &diagnostics
+    )
+
+    let typedProgram = try! TypedProgram(
+      annotating: ScopedProgram(ast), inParallel: false,
+      reportingDiagnosticsTo: &diagnostics,
+      tracingInferenceIf: { (_, _: TypedProgram) in false })
+
+    var db: DocumentationDatabase = .init()
+
+    // Populate the database with some folder information manually:
+    let documentationArticleId = db.assets.articles.insert(
+      .init(
+        location: URL(string: "root/Folder1/index.internal.hylodoc")!,
+        title: "Info Article",
+        content: .document([.paragraph(Text("lorem ipsum"))]),
+        moduleId: ModuleDecl.ID(rawValue: 0)
+      ))
+
+    let child1ArticleId = db.assets.articles.insert(
+      .init(
+        location: URL(string: "root/Folder1/child1.internal.hylodoc")!,
+        title: "First News",
+        content: .document([.paragraph(Text("This is first child"))]),
+        moduleId: ModuleDecl.ID(rawValue: 0)
+      ))
+
+    let folder1Id = db.assets.folders.insert(
+      .init(
+        location: URL(string: "root/Folder1")!,
+        documentation: documentationArticleId,  // <- important connection
+        children: [AnyAssetID.article(child1ArticleId)],
+        moduleId: ModuleDecl.ID(rawValue: 0)
+      ))
+
+    var targetResolver: TargetResolver = .init()
+    let targetId: AnyTargetID = .asset(.folder(folder1Id))
+
+    // folder1Id
+    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    targetResolver.resolve(
+      targetId: targetId,
+      ResolvedTarget(
+        id: targetId,
+        parent: nil,
+        simpleName: partialResolvedParent.simpleName,
+        navigationName: partialResolvedParent.navigationName,
+        children: partialResolvedParent.children,
+        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+      )
+    )
+
+    var context = GenerationContext(
+      documentation: DocumentationContext(
+        documentation: db,
+        typedProgram: typedProgram,
+        targetResolver: targetResolver
+      ),
+      stencilEnvironment: createDefaultStencilEnvironment(),
+      exporter: DefaultExporter(AbsolutePath.current),
+      breadcrumb: [],
+      tree: []
+    )
+
+    let stencilContext = try prepareFolderPage(context, of: folder1Id)
+    let res = try renderPage(&context, stencilContext, of: targetId)
+
+    assertPageTitle("Folder1", in: res, file: #file, line: #line)
+    assertNotContains("content", what: res, file: #file, line: #line)
+    assertNotContains("contents", what: res, file: #file, line: #line)
+  }
 }

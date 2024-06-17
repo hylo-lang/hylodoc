@@ -31,12 +31,13 @@ func partialResolveAsset(
   case .folder(let folderId):
     let folder: FolderAsset = documentationDatabase.assets[folderId]!
 
-    let name =
-      if let articleId = folder.documentation {
-        documentationDatabase.assets[articleId]?.title ?? folder.name
-      } else {
-        folder.name
+    // Display name of the folder
+    var name: String = folder.name
+    if let articleId = folder.documentation {
+      if let article = documentationDatabase.assets[articleId], !article.isInternal {
+        name = article.title ?? folder.name
       }
+    }
 
     return PartialResolvedTarget(
       pathName: folder.name + "/index.html",
@@ -44,6 +45,7 @@ func partialResolveAsset(
       navigationName: name,
       children: folder.children
         .filter { folder.documentation == nil || $0 != .article(folder.documentation!) }
+        .filter { !documentationDatabase.assets[$0]!.isInternal }
         .map { .asset($0) }
     )
   case .sourceFile(let sourceFileId):

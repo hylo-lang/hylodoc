@@ -11,6 +11,8 @@ public protocol Asset: IdentifiedEntity {
   /// Either the file or folder name of the asset.
   var name: String { get }
 
+  var isInternal: Bool { get }
+
   associatedtype EntityStoreT: ReadableEntityStoreProtocol where EntityStoreT.Entity == Self
   static func specificStore(from: AssetStore) -> EntityStoreT
 }
@@ -19,6 +21,11 @@ public protocol Asset: IdentifiedEntity {
 extension Asset {
   public var name: String {
     return location.lastPathComponent
+  }
+
+  /// Check if the asset is internal
+  public var isInternal: Bool {
+    return location.lastPathComponent.contains(".internal.")
   }
 }
 

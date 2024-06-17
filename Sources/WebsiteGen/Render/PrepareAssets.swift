@@ -110,13 +110,9 @@ public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) 
   // check if folder has documentation
   if let detailsId = folder.documentation {
     let detailsArticle = context.documentation.documentation.assets[detailsId]!
-
-    env["articleContent"] = htmlGenerator.generate(document: detailsArticle.content)
-
-    // todo refactor title handling to be at one place
-    //    if let title = detailsArticle.title {
-    //      env["pageTitle"] = title
-    //    }
+    if !detailsArticle.isInternal {
+      env["articleContent"] = htmlGenerator.generate(document: detailsArticle.content)
+    }
   }
 
   // Map children to an array of [(name, relativePath)]
