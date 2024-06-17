@@ -3,7 +3,7 @@ import DocExtractor
 import DocumentationDB
 import Foundation
 import FrontEnd
-import StandardLibraryCore
+import HyloStandardLibrary
 import WebsiteGen
 
 public struct CLI: ParsableCommand {
@@ -32,7 +32,7 @@ public struct CLI: ParsableCommand {
       }
 
       var diagnostics = DiagnosticSet()
-      var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+      var ast = try AST.loadStandardLibraryCore(diagnostics: &diagnostics)
       var modules: [InputModuleInfo] = []
 
       for sourceBundlePath in sourceBundlePaths {

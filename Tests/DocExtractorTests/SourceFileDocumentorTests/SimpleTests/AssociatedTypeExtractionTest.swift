@@ -5,7 +5,7 @@ import TestUtils
 import XCTest
 
 final class AssociatedTypeExtractionTest: XCTestCase {
-  func testAssociatedTypeExtraction() {
+  func testAssociatedTypeExtraction() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -22,19 +22,20 @@ final class AssociatedTypeExtractionTest: XCTestCase {
         }
         """, named: "testFile1.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let _ = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile1.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
+    let _ = checkNoDiagnostic { d in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile1.hylo")!,
+        into: &store,
+        diagnostics: &d
+      )
+    }
 
     let declId = ast.resolveAssociatedType(by: "B")!
     let myTypeDoc = store.associatedTypeDocs[declId]

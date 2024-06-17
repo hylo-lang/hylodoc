@@ -1,10 +1,11 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
+import TestUtils
 import XCTest
 
 final class FrontendUsageTest: XCTestCase {
-  func testASTWalking() {
+  func testASTWalking() throws {
     let libraryPath = URL(fileURLWithPath: #filePath)
       .deletingLastPathComponent()
       .appendingPathComponent("ExampleModule")
@@ -12,15 +13,15 @@ final class FrontendUsageTest: XCTestCase {
     /// An instance that includes just the standard library.
     var ast = AST(ConditionalCompilationFactors())
 
-    var diagnostics = DiagnosticSet()
-
     // The module whose Hylo files were given on the command-line
-    let createdModuleId = try! ast.makeModule(
-      "ExampleModule",
-      sourceCode: sourceFiles(in: [libraryPath]),
-      builtinModuleAccess: true,
-      diagnostics: &diagnostics
-    )
+    let createdModuleId = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "ExampleModule",
+        sourceCode: sourceFiles(in: [libraryPath]),
+        builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
     let _ = createdModuleId
 

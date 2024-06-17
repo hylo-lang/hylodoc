@@ -1,7 +1,7 @@
 import DocumentationDB
 import MarkdownKit
 import PathWrangler
-import StandardLibraryCore
+import HyloStandardLibrary
 import Stencil
 import TestUtils
 import XCTest
@@ -15,7 +15,7 @@ final class FolderTest: XCTestCase {
     var diagnostics = DiagnosticSet()
 
     /// An instance that includes just the standard library.
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try AST.loadStandardLibraryCore(diagnostics: &diagnostics)
 
     // We don't really read anything from here right now, we will the documentation database manually
     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
@@ -87,7 +87,7 @@ final class FolderTest: XCTestCase {
     var diagnostics = DiagnosticSet()
 
     /// An instance that includes just the standard library.
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try AST.loadStandardLibraryCore(diagnostics: &diagnostics)
 
     // We don't really read anything from here right now, we will the documentation database manually
     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
@@ -169,7 +169,7 @@ final class FolderTest: XCTestCase {
     var diagnostics = DiagnosticSet()
 
     /// An instance that includes just the standard library.
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try AST.loadStandardLibraryCore(diagnostics: &diagnostics)
 
     // We don't really read anything from here right now, we will the documentation database manually
     let libraryPath = URL(fileURLWithPath: #filePath).deletingLastPathComponent()

@@ -5,7 +5,7 @@ import TestUtils
 import XCTest
 
 final class FuncExtractionTest: XCTestCase {
-  func testFuncExtractionInlineParams() {
+  func testFuncExtractionInlineParams() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -21,19 +21,20 @@ final class FuncExtractionTest: XCTestCase {
         fun id<T: Movable>(_ x: T) -> T { x }
         """, named: "testFile4.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let _ = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile4.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
+    let _ = checkNoDiagnostic { d in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile4.hylo")!,
+        into: &store,
+        diagnostics: &d
+      )
+    }
 
     let declId = ast.resolveFunc(by: "id")!
     let myTypeDoc = store.functionDocs[declId]
@@ -59,7 +60,7 @@ final class FuncExtractionTest: XCTestCase {
       what: "This is a generic.")
   }
 
-  func testFuncExtractionSectionParams() {
+  func testFuncExtractionSectionParams() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -77,19 +78,20 @@ final class FuncExtractionTest: XCTestCase {
         fun id<T: Movable>(_ x: T) -> T { x }
         """, named: "testFile5.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let _ = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile5.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
+    let _ = checkNoDiagnostic { d in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile5.hylo")!,
+        into: &store,
+        diagnostics: &d
+      )
+    }
 
     let declId = ast.resolveFunc(by: "id")!
     let myTypeDoc = store.functionDocs[declId]
@@ -115,7 +117,7 @@ final class FuncExtractionTest: XCTestCase {
       what: "This is a generic.")
   }
 
-  func testFuncExtractionWrongParams() {
+  func testFuncExtractionWrongParams() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -133,18 +135,22 @@ final class FuncExtractionTest: XCTestCase {
         fun id<T: Movable>(_ x: T) -> T { x }
         """, named: "testFile6.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let _ = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile6.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
+    let _ = checkDiagnosticPresent(
+      f: { d in
+        sourceFileDocumentor.document(
+          ast: ast,
+          translationUnitId: ast.resolveTranslationUnit(by: "testFile6.hylo")!,
+          into: &store,
+          diagnostics: &d
+        )
+      },
+      expectedMessages: ["warning"]
     )
-
-    assertContains(diagnostics.description, what: "warning")
   }
 }

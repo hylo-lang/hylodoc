@@ -11,62 +11,44 @@ final class CommentExtractorTest: XCTestCase {
   func expectSuccess(
     code: String,
     file: StaticString = #file, line: UInt = #line  //
-  ) -> (ast: AST, doc: DocumentedFile)? {
-    var diagnostics = DiagnosticSet()
+  ) throws -> (ast: AST, doc: DocumentedFile)? {
     let sourceFile = SourceFile(stringLiteral: code)
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
-    if !diagnostics.isEmpty {
-      XCTFail(
-        "Errors while frontend parsing: \(diagnostics)",
-        file: file, line: line)
-      return nil
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
     }
 
     let commentExtractor = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
 
-    guard let doc = commentExtractor.parse(sourceFile: sourceFile, diagnostics: &diagnostics)
-    else {
-      XCTFail(
-        "Comment extraction failed with the following diagnostics: \(diagnostics)",
-        file: file, line: line)
-      return nil
+    let doc = checkNoDiagnostic { d in
+      commentExtractor.parse(sourceFile: sourceFile, diagnostics: &d)
     }
 
-    return (ast, doc)
+    return doc.map { _ in (ast, doc!) }
   }
 
   func expectFail(
     code: String,
     message: String,
     file: StaticString = #file, line: UInt = #line  //
-  ) {
-    var diagnostics = DiagnosticSet()
+  ) throws {
     let sourceFile = SourceFile(stringLiteral: code)
-    let _ = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
-    if !diagnostics.isEmpty {
-      XCTFail(
-        "Errors while frontend parsing: \(diagnostics)",
-        file: file, line: line)
-      return
+    let _ = try checkNoDiagnostic { d in try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
     }
 
     let commentExtractor = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
 
-    guard
-      commentExtractor.parse(sourceFile: sourceFile, diagnostics: &diagnostics) == nil
-        && !diagnostics.isEmpty
-    else {
-      XCTFail(message)
-      return
+    let result = checkDiagnosticPresent { d in
+      commentExtractor.parse(sourceFile: sourceFile, diagnostics: &d)
     }
+    XCTAssertNil(result)
   }
-  func testOneLineCommentExtraction() {
+  func testOneLineCommentExtraction() throws {
     let code =
       """
       /// This is a comment.
       public typealias MyType = Int
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     let declId = ast.resolveTypeAlias(by: "MyType")!
@@ -85,14 +67,14 @@ final class CommentExtractorTest: XCTestCase {
 
   // todo write more tests
 
-  func testMultiLineCommentExtraction() {
+  func testMultiLineCommentExtraction() throws {
     let code =
       """
       /// This is a multi-line comment.
       /// It spans multiple lines.
       public typealias MyType = Int
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     let declId = ast.resolveTypeAlias(by: "MyType")!
@@ -109,7 +91,7 @@ final class CommentExtractorTest: XCTestCase {
       symbolComment.value.contentBeforeSections.description, what: "It spans multiple lines.")
   }
 
-  func testMultipleSymbolComments() {
+  func testMultipleSymbolComments() throws {
     let code =
       """
       /// First comment.
@@ -118,7 +100,7 @@ final class CommentExtractorTest: XCTestCase {
       /// Second comment.
       public typealias TypeB = String
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     let declIdA = ast.resolveTypeAlias(by: "TypeA")!
@@ -137,23 +119,23 @@ final class CommentExtractorTest: XCTestCase {
     assertContains(symbolCommentB.value.contentBeforeSections.description, what: "Second comment.")
   }
 
-  func testCommentMissingSymbol() {
+  func testCommentMissingSymbol() throws {
     let code =
       """
       /// Invalid comment without symbol
       """
 
-    expectFail(code: code, message: "Expected to fail due to comment missing symbol")
+    try expectFail(code: code, message: "Expected to fail due to comment missing symbol")
   }
 
-  func testFileLevelCommentExtraction() {
+  func testFileLevelCommentExtraction() throws {
     let code =
       """
       /// # file-level
       /// This is a file-level comment.
       public typealias MyType = Int
       """
-    guard let (_, doc) = expectSuccess(code: code)
+    guard let (_, doc) = try expectSuccess(code: code)
     else { return }
 
     XCTAssertNotNil(doc.fileLevel)
@@ -164,7 +146,7 @@ final class CommentExtractorTest: XCTestCase {
     assertContains(fileLevelSection.blocks.description, what: "This is a file-level comment.")
   }
 
-  func testFileLevelCommentEndOfFile() {
+  func testFileLevelCommentEndOfFile() throws {
     let code =
       """
       public typealias MyType = Int
@@ -172,7 +154,7 @@ final class CommentExtractorTest: XCTestCase {
       /// # file-level
       /// This is a file-level comment.
       """
-    guard let (_, doc) = expectSuccess(code: code)
+    guard let (_, doc) = try expectSuccess(code: code)
     else { return }
 
     XCTAssertNotNil(doc.fileLevel)
@@ -182,7 +164,7 @@ final class CommentExtractorTest: XCTestCase {
     XCTAssertEqual(fileLevelSection.name, "file-level")
     assertContains(fileLevelSection.blocks.description, what: "This is a file-level comment.")
   }
-  func testMultipleFileLevelComments() {
+  func testMultipleFileLevelComments() throws {
     let code =
       """
       /// # file-level
@@ -192,10 +174,10 @@ final class CommentExtractorTest: XCTestCase {
       public typealias TypeB = Int
       """
 
-    expectFail(code: code, message: "Expected to fail due to double file-level comments")
+    try expectFail(code: code, message: "Expected to fail due to double file-level comments")
   }
 
-  func testMixedCommentTypes() {
+  func testMixedCommentTypes() throws {
     let code =
       """
       /// # file-level
@@ -205,7 +187,7 @@ final class CommentExtractorTest: XCTestCase {
       /// This is a symbol comment.
       public typealias TypeB = String
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     XCTAssertNotNil(doc.fileLevel)
@@ -227,27 +209,27 @@ final class CommentExtractorTest: XCTestCase {
       symbolComment.value.contentBeforeSections.description, what: "This is a symbol comment.")
   }
 
-  func testNoDocumentationComment() {
+  func testNoDocumentationComment() throws {
     let code =
       """
       // This is a regular comment.
       public typealias MyType = Int
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     let declId = ast.resolveTypeAlias(by: "MyType")!
     XCTAssertNil(doc.symbolComments[ast[declId].site.startIndex])
   }
 
-  func testCommentStartingOnSameLineAsCode() {
+  func testCommentStartingOnSameLineAsCode() throws {
     let code =
       """
       public typealias TypeA = Int /// This is a comment.
       /// Continuation of the comment.
       public typealias TypeB = String
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     let declIdA = ast.resolveTypeAlias(by: "TypeA")!
@@ -266,14 +248,14 @@ final class CommentExtractorTest: XCTestCase {
       symbolComment.value.contentBeforeSections.description, what: "Continuation of the comment.")
   }
 
-  func testCommentSeparatedByWhitespaceBeforeTarget() {
+  func testCommentSeparatedByWhitespaceBeforeTarget() throws {
     let code =
       """
       /// This is a comment.
 
       public typealias MyType = Int
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     let declId = ast.resolveTypeAlias(by: "MyType")!
@@ -287,7 +269,7 @@ final class CommentExtractorTest: XCTestCase {
       symbolComment.value.contentBeforeSections.description, what: "This is a comment.")
   }
 
-  func testCommentNotAligned() {
+  func testCommentNotAligned() throws {
     let code =
       """
       /// This is a comment
@@ -296,7 +278,7 @@ final class CommentExtractorTest: XCTestCase {
 
       public typealias MyType = Int
       """
-    guard let (ast, doc) = expectSuccess(code: code)
+    guard let (ast, doc) = try expectSuccess(code: code)
     else { return }
 
     let declId = ast.resolveTypeAlias(by: "MyType")!

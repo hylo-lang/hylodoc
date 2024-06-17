@@ -2,7 +2,7 @@ import DocExtractor
 import DocumentationDB
 import Foundation
 import FrontEnd
-import StandardLibraryCore
+import HyloStandardLibrary
 import Stencil
 import TestUtils
 import WebsiteGen
@@ -19,9 +19,8 @@ func runFullPipelineWithoutErrors(at sourceUrl: URL) throws {
     try fileManager.removeItem(at: outputURL)
   }
 
-  var diagnostics = DiagnosticSet()
-  var ast = checkNoDiagnostic { d in
-    loadStandardLibraryCore(diagnostics: &d)
+  var ast = try checkNoDiagnostic { d in
+    try AST.loadStandardLibraryCore(diagnostics: &d)
   }
 
   let rootModuleId = try checkNoDiagnostic { d in
@@ -33,7 +32,8 @@ func runFullPipelineWithoutErrors(at sourceUrl: URL) throws {
   let typedProgram = try checkNoDiagnostic { d in
     try TypedProgram(
       annotating: ScopedProgram(ast), inParallel: false,
-      reportingDiagnosticsTo: &diagnostics, tracingInferenceIf: { (_, _) in false })
+      reportingDiagnosticsTo: &d, tracingInferenceIf: { (_, _) in false }
+      )
   }
 
   let result = extractDocumentation(

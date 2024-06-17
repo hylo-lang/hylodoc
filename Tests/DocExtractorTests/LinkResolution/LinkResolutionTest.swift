@@ -1,5 +1,5 @@
 import Foundation
-import StandardLibraryCore
+import HyloStandardLibrary
 import TestUtils
 import XCTest
 
@@ -9,7 +9,7 @@ import XCTest
 final class NameResolutionTest: XCTestCase {
   func testNameResolution() throws {
 
-    var ast = checkNoDiagnostic { d in loadStandardLibraryCore(diagnostics: &d) }
+    var ast = try checkNoDiagnostic { d in try AST.loadStandardLibraryCore(diagnostics: &d) }
 
     // The module whose Hylo files were given on the command-line
     let _ = try checkNoDiagnostic { d in
@@ -259,27 +259,29 @@ final class NameResolutionTest: XCTestCase {
     XCTAssertEqual(paramResolved.count, 1)
   }
 
-  func testManualLinkResolutionUsingHyloTypeChecker() {
-    var diagnostics = DiagnosticSet()
-
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+  func testManualLinkResolutionUsingHyloTypeChecker() throws {
+    var ast = try checkNoDiagnostic { d in try AST.loadStandardLibraryCore(diagnostics: &d) }
 
     // The module whose Hylo files were given on the command-line
-    let rootModuleId = try! ast.makeModule(
-      "RootModule",
-      sourceCode: sourceFiles(in: [
-        URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
-          "RootModule")
-      ]),
-      builtinModuleAccess: true,
-      diagnostics: &diagnostics
-    )
+    let rootModuleId = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "RootModule",
+        sourceCode: sourceFiles(in: [
+          URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
+            "RootModule")
+        ]),
+        builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
-    let typedProgram = try! TypedProgram(
-      annotating: ScopedProgram(ast), inParallel: false,
-      reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _) in return false })
-
+    let typedProgram = try checkNoDiagnostic { d in
+      try TypedProgram(
+        annotating: ScopedProgram(ast), inParallel: false,
+        reportingDiagnosticsTo: &d,
+        tracingInferenceIf: { (_, _) in false }
+      )
+    }
     var typeChecker = TypeChecker.init(asContextFor: typedProgram)
 
     let rootModuleScope = AnyScopeID(rootModuleId)

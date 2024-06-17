@@ -43,7 +43,6 @@ final class DocumentationDBWorks: XCTestCase {
       db.assets[childFolderDocId]?.location,
       URL(fileURLWithPath: "file://C:/parent/child", isDirectory: true)
     )
-
     XCTAssertEqual(db.assets[childFolderDocId]!.moduleId, ModuleDecl.ID(rawValue: 1))
   }
 }

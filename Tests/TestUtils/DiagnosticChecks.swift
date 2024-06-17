@@ -22,6 +22,30 @@ public func checkNoDiagnostic<R>(
   }
 }
 
+/// Assert that there are some diagnostics present after running `f` and that the diagnostics are consistent with the thrown diagnostics.
+public func checkDiagnosticPresent<R>(
+  f: (inout DiagnosticSet) throws -> R, testFile: StaticString = #filePath, line: UInt = #line,
+  expectedMessages: [String] = []
+) rethrows -> R {
+  var d = DiagnosticSet()
+  do {
+    let r = try f(&d)
+    XCTAssertFalse(
+      d.elements.isEmpty, "Expected diagnostics, but none were emitted", file: testFile, line: line)
+    return r
+  } catch let d1 as DiagnosticSet {
+    XCTAssertEqual(
+      d1, d, "thrown diagnostics don't match mutated diagnostics",
+      file: testFile, line: line)
+    XCTAssertFalse(
+      d.elements.isEmpty, "Expected diagnostics, but none were emitted", file: testFile, line: line)
+    for message in expectedMessages {
+      assertContains(d.description, what: message, file: testFile, line: line)
+    }
+    throw d
+  }
+}
+
 /// Reports any diagnostics in `s` as XCTest issues.
 public func checkEmpty(_ s: DiagnosticSet) {
   if !s.elements.isEmpty {

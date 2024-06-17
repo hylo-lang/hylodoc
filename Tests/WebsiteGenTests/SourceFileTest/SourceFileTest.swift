@@ -2,7 +2,7 @@ import DocExtractor
 import DocumentationDB
 import MarkdownKit
 import PathWrangler
-import StandardLibraryCore
+import HyloStandardLibrary
 import Stencil
 import TestUtils
 import XCTest
@@ -21,7 +21,7 @@ final class SourceFileTest: XCTestCase {
 
     var diagnostics = DiagnosticSet()
 
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try AST.loadStandardLibraryCore(diagnostics: &diagnostics)
     let myModuleId = try! ast.makeModule(
       "MyModule",
       sourceCode: [

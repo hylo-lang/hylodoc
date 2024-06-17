@@ -1,7 +1,7 @@
 import DocumentationDB
+import HyloStandardLibrary
 import MarkdownKit
 import PathWrangler
-import StandardLibraryCore
 import Stencil
 import TestUtils
 import XCTest
@@ -11,9 +11,7 @@ import XCTest
 
 final class ArticleTest: XCTestCase {
   func testArticlePageGenerationWithTitle() throws {
-    var diagnostics = DiagnosticSet()
-
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try checkNoDiagnostic { d in try AST.loadStandardLibraryCore(diagnostics: &d) }
 
     // We don't really read anything from here right now, we will the documentation database manually
     let libraryPath = URL(fileURLWithPath: #filePath)
@@ -21,18 +19,22 @@ final class ArticleTest: XCTestCase {
       .appendingPathComponent("TestHyloModule")
 
     // The module whose Hylo files were given on the command-line
-    let _ = try! ast.makeModule(
-      "TestHyloModule",
-      sourceCode: sourceFiles(in: [libraryPath]),
-      builtinModuleAccess: true,
-      diagnostics: &diagnostics
-    )
+    let _ = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "TestHyloModule",
+        sourceCode: sourceFiles(in: [libraryPath]),
+        builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
-    let typedProgram = try! TypedProgram(
-      annotating: ScopedProgram(ast), inParallel: false,
-      reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _) in false }
-    )
+    let typedProgram = try checkNoDiagnostic { d in
+      try TypedProgram(
+        annotating: ScopedProgram(ast), inParallel: false,
+        reportingDiagnosticsTo: &d,
+        tracingInferenceIf: { (_, _) in false }
+      )
+    }
 
     var db: DocumentationDatabase = .init()
 
@@ -89,9 +91,9 @@ final class ArticleTest: XCTestCase {
 
   func testArticlePageGenerationNoTitle() throws {
 
-    var diagnostics = DiagnosticSet()
-
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try checkNoDiagnostic { d in
+      try AST.loadStandardLibraryCore(diagnostics: &d)
+    }
 
     // We don't really read anything from here right now, we will the documentation database manually
     let libraryPath = URL(fileURLWithPath: #filePath)
@@ -99,17 +101,22 @@ final class ArticleTest: XCTestCase {
       .appendingPathComponent("TestHyloModule")
 
     // The module whose Hylo files were given on the command-line
-    let _ = try! ast.makeModule(
-      "TestHyloModule",
-      sourceCode: sourceFiles(in: [libraryPath]),
-      builtinModuleAccess: true,
-      diagnostics: &diagnostics
-    )
+    let _ = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "TestHyloModule",
+        sourceCode: sourceFiles(in: [libraryPath]),
+        builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
-    let typedProgram = try! TypedProgram(
-      annotating: ScopedProgram(ast), inParallel: false,
-      reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _) in false })
+    let typedProgram = try checkNoDiagnostic { d in
+      try TypedProgram(
+        annotating: ScopedProgram(ast), inParallel: false,
+        reportingDiagnosticsTo: &d,
+        tracingInferenceIf: { (_, _) in false }
+      )
+    }
 
     var db: DocumentationDatabase = .init()
 

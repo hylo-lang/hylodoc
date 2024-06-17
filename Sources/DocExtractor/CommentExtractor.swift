@@ -23,6 +23,7 @@ public struct RealCommentParser<LLCommentParser: LowLevelCommentParser>: Comment
     self.lowLevelCommentParser = lowLevelCommentParser
   }
 
+  // todo refactor this to use exceptions
   public func parse(sourceFile: SourceFile, diagnostics: inout DiagnosticSet) -> DocumentedFile? {
     let builder = DocumentedFileBuilder(sourceFile, lowLevelCommentParser)
     diagnostics.formUnion(builder.diagnostics)

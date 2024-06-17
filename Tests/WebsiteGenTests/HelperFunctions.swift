@@ -1,7 +1,7 @@
 import DocumentationDB
 import MarkdownKit
 import PathWrangler
-import StandardLibraryCore
+import HyloStandardLibrary
 import Stencil
 import XCTest
 import WebsiteGen

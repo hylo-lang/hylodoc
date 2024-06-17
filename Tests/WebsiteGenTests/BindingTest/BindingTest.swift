@@ -4,7 +4,7 @@ import Foundation
 import FrontEnd
 import MarkdownKit
 import PathWrangler
-import StandardLibraryCore
+import HyloStandardLibrary
 import Stencil
 import TestUtils
 import XCTest
@@ -16,7 +16,7 @@ final class BindingTest: XCTestCase {
   func test() throws {
     var diagnostics = DiagnosticSet()
 
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try AST.loadStandardLibraryCore(diagnostics: &diagnostics)
 
     // We don't really read anything from here right now, we will the documentation database manually
     let libraryPath = URL(fileURLWithPath: #filePath)

@@ -5,7 +5,7 @@ import TestUtils
 import XCTest
 
 final class BindingExtractionTest: XCTestCase {
-  func testBindingExtraction() {
+  func testBindingExtraction() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -31,7 +31,9 @@ final class BindingExtractionTest: XCTestCase {
         """, named: "testFile3.hylo")
 
     var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 

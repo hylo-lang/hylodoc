@@ -2,7 +2,7 @@ import DocExtractor
 import DocumentationDB
 import Foundation
 import FrontEnd
-import StandardLibraryCore
+import HyloStandardLibrary
 import Stencil
 import WebsiteGen
 import XCTest

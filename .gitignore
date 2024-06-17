@@ -2,7 +2,6 @@
 /.*-build
 /Packages
 /swift-format
-/test-output
 
 **.lcov
 **.profdata
@@ -15,7 +14,9 @@ Package.resolved
 **.7z
 llvm.pc
 
-dist/
+# test output
+dist
+test-output
 
 # IDEs
 /.vscode

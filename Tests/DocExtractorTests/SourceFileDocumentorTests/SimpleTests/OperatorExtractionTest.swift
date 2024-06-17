@@ -5,7 +5,7 @@ import TestUtils
 import XCTest
 
 final class OperatorExtractionTest: XCTestCase {
-  func testOperatorExtraction() {
+  func testOperatorExtraction() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -19,19 +19,20 @@ final class OperatorExtractionTest: XCTestCase {
         operator infix+ : addition
         """, named: "testFile9.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let _ = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile9.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
+    let _ = checkNoDiagnostic { d in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile9.hylo")!,
+        into: &store,
+        diagnostics: &d
+      )
+    }
 
     let declId = ast.resolveOperator()!.first!
     let myTypeDoc = store.operatorDocs[declId]

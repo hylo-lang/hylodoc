@@ -5,7 +5,7 @@ import TestUtils
 import XCTest
 
 final class SubscriptExtractionTest: XCTestCase {
-  func testSubscriptDeclExtraction() {
+  func testSubscriptDeclExtraction() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -38,20 +38,20 @@ final class SubscriptExtractionTest: XCTestCase {
         }
         """, named: "testFile11.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let fileLevel = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile11.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
-
+    let fileLevel = checkNoDiagnostic { d in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile11.hylo")!,
+        into: &store,
+        diagnostics: &d
+      )
+    }
     assertContains(fileLevel.summary?.debugDescription, what: "This is the summary of the file.")
     assertContains(fileLevel.description?.debugDescription, what: "Hello")
     assertContains(fileLevel.description?.debugDescription, what: "world")

@@ -1,33 +1,28 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import StandardLibraryCore
+import HyloStandardLibrary
+import TestUtils
 import XCTest
 
 final class ASTPlayground: XCTestCase {
-  func testASTWalking() {
+  func testASTWalking() throws {
 
-    var diagnostics = DiagnosticSet()
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try checkNoDiagnostic { d in try AST.loadStandardLibraryCore(diagnostics: &d) }
 
-    guard
-      let _ = try? ast.addModule(
-        fromSingleSourceFile: .init(
-          synthesizedText: """
-              type Vector: Deinitializable {
-                var x: Int
-                fun myMethod(m: Int) {
-                  inout {
-                    &x += m
-                  }
-                }
-              }
-
-            """, named: "hello.hylo"), diagnostics: &diagnostics, moduleName: "hello")
-    else {
-      XCTFail("Failed to add module")
-      print(diagnostics)
-      return
+    let source: SourceFile =
+      """
+        type Vector: Deinitializable {
+          var x: Int
+          fun myMethod(m: Int) {
+            inout {
+              &x += m
+            }
+          }
+        }
+      """
+    let _ = try checkNoDiagnostic { d in
+      try ast.addModule(fromSingleSourceFile: source, diagnostics: &d, moduleName: "hello")
     }
 
     struct ASTWalker: ASTWalkObserver {
@@ -49,17 +44,14 @@ final class ASTPlayground: XCTestCase {
       ast.walk(m, notifying: &walker)
     }
 
-    guard
-      let a = try? TypedProgram(
-        annotating: ScopedProgram(ast), inParallel: false, reportingDiagnosticsTo: &diagnostics,
+    let typedProgram = try checkNoDiagnostic { d in
+      try TypedProgram(
+        annotating: ScopedProgram(ast),
+        inParallel: false,
+        reportingDiagnosticsTo: &d,
         tracingInferenceIf: { a, b in false })
-    else {
-      XCTFail("Failed to type check")
-      print(diagnostics)
-      return
     }
-
-    let _ = a
+    let _ = typedProgram
   }
 
 }

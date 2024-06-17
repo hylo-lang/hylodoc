@@ -5,7 +5,7 @@ import TestUtils
 import XCTest
 
 final class ProductTypeExtractionTest: XCTestCase {
-  func testProductTypeExtractionInlineSingleInvariant() {
+  func testProductTypeExtractionInlineSingleInvariant() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -23,19 +23,20 @@ final class ProductTypeExtractionTest: XCTestCase {
         }
         """, named: "testFile.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let _ = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
+    let _ = checkNoDiagnostic { d in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
+        into: &store,
+        diagnostics: &d
+      )
+    }
 
     let declId = ast.resolveProductType(by: "A")!
     let myTypeDoc = store.productTypeDocs[declId]
@@ -55,7 +56,7 @@ final class ProductTypeExtractionTest: XCTestCase {
       what: "x and y must always be positive.")
   }
 
-  func testProductTypeExtractionListInvariant() {
+  func testProductTypeExtractionListInvariant() throws {
     let commentParser = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
@@ -74,19 +75,20 @@ final class ProductTypeExtractionTest: XCTestCase {
         }
         """, named: "testFile10.hylo")
 
-    var diagnostics = DiagnosticSet()
-    let ast = AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
+    let ast = try checkNoDiagnostic { d in
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+    }
 
     var store = SymbolDocStore()
 
-    let _ = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile10.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
+    let _ = checkNoDiagnostic { d in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile10.hylo")!,
+        into: &store,
+        diagnostics: &d
+      )
+    }
 
     let declId = ast.resolveProductType(by: "A")!
     let myTypeDoc = store.productTypeDocs[declId]

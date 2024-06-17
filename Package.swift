@@ -52,7 +52,7 @@ let package = Package(
       dependencies: [
         "DocExtractor",
         "WebsiteGen",
-        "StandardLibraryCore",
+        "HyloStandardLibrary",
         .product(name: "FrontEnd", package: "hylo"),
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
       ],
@@ -91,12 +91,21 @@ let package = Package(
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "WebsiteGenTests",
-      dependencies: ["WebsiteGen", "StandardLibraryCore", "TestUtils", "Kanna"],
+      dependencies: [
+        "WebsiteGen",
+        "HyloStandardLibrary",
+        "TestUtils", 
+        "Kanna"
+      ],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "DocExtractorTests",
-      dependencies: ["DocExtractor", "StandardLibraryCore", "TestUtils"],
+      dependencies: [
+        "DocExtractor",
+        "HyloStandardLibrary",
+        "TestUtils"
+      ],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
@@ -118,9 +127,10 @@ let package = Package(
       exclude: [],
       swiftSettings: allTargetsSwiftSettings),
     .target(
-      name: "StandardLibraryCore",
+      name: "HyloStandardLibrary",
       dependencies: [.product(name: "FrontEnd", package: "hylo")],
-      resources: [.copy("StandardLibraryCoreResource")],
+      path: "Sources/StandardLibrary",
+      resources: [.copy("Sources")],
       swiftSettings: allTargetsSwiftSettings
     ),
   ]

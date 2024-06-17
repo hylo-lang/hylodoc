@@ -1,41 +1,45 @@
 import DocExtractor
 import DocumentationDB
 import FrontEnd
-import StandardLibraryCore
+import HyloStandardLibrary
 import XCTest
+import TestUtils
 
 func assetNameIs(_ name: String, _ assets: AssetStore) -> ((AnyAssetID) -> Bool) {
   { assets[$0]?.location.lastPathComponent == name }
 }
 
 final class ScanAssetsTests: XCTestCase {
-  func testAssetCollection() {
+  func testAssetCollection() throws {
     // GIVEN two loaded modules, ModuleA and ModuleB
 
-    var diagnostics = DiagnosticSet()
-
-    var ast = loadStandardLibraryCore(diagnostics: &diagnostics)
+    var ast = try checkNoDiagnostic { d in try AST.loadStandardLibraryCore(diagnostics: &d) }
 
     let baseUrl = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
     let moduleAPath = baseUrl.appendingPathComponent("ModuleA")
     let moduleBPath = baseUrl.appendingPathComponent("ModuleB")
 
-    let moduleAId = try! ast.makeModule(
-      "ModuleA", sourceCode: sourceFiles(in: [moduleAPath]), builtinModuleAccess: true,
-      diagnostics: &diagnostics)
+    let moduleAId = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "ModuleA", sourceCode: sourceFiles(in: [moduleAPath]), builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
-    let moduleBId = try! ast.makeModule(
-      "ModuleB", sourceCode: sourceFiles(in: [moduleBPath]), builtinModuleAccess: true,
-      diagnostics: &diagnostics)
+    let moduleBId = try checkNoDiagnostic { d in
+      try ast.makeModule(
+        "ModuleB", sourceCode: sourceFiles(in: [moduleBPath]), builtinModuleAccess: true,
+        diagnostics: &d
+      )
+    }
 
-    XCTAssert(diagnostics.isEmpty, diagnostics.description)
-
-    let typedProgram = try! TypedProgram(
-      annotating: ScopedProgram(ast), inParallel: false,
-      reportingDiagnosticsTo: &diagnostics,
-      tracingInferenceIf: { (_, _) in false })
-
-    XCTAssert(diagnostics.isEmpty, diagnostics.description)
+    let typedProgram = try checkNoDiagnostic { d in
+      try TypedProgram(
+        annotating: ScopedProgram(ast), inParallel: false,
+        reportingDiagnosticsTo: &d,
+        tracingInferenceIf: { (_, _) in false }
+      )
+    }
 
     // WHEN trying to extract documentation
 
