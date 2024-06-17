@@ -100,7 +100,7 @@ func partialResolveDecl(
     let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderAssociatedTypeDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: name,  //NavigationSymbolDecRenderer.renderAssociatedTypeDecl(typedProgram, id),
       children: []
@@ -110,7 +110,7 @@ func partialResolveDecl(
     let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderAssociatedValueDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: name,  //NavigationSymbolDecRenderer.renderAssociatedValueDecl(typedProgram, id),
       children: []
@@ -120,7 +120,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderTypeAliasDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderTypeAliasDecl(typedProgram, id),
       children: []
@@ -130,7 +130,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderBindingDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderBindingDecl(typedProgram, id),
       children: []
@@ -140,7 +140,7 @@ func partialResolveDecl(
     let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderOperatorDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: name,  //NavigationSymbolDecRenderer.renderOperatorDecl(typedProgram, id),
       children: []
@@ -150,7 +150,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderFunctionDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderFunctionDecl(typedProgram, id),
       children: []
@@ -160,7 +160,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderMethodDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderMethodDecl(typedProgram, id),
       children: []
@@ -170,7 +170,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderSubscriptDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderSubscriptDecl(typedProgram, id),
       children: []
@@ -180,7 +180,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderInitializerDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderInitializerDecl(typedProgram, id),
       children: []
@@ -191,7 +191,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderTraitDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderTraitDecl(typedProgram, id),
       children: decl.members.filter(isSupportedDecl).map { .decl($0) }
@@ -202,7 +202,7 @@ func partialResolveDecl(
     let name = SimpleSymbolDeclRenderer.renderProductTypeDecl(typedProgram, id)
 
     return PartialResolvedTarget(
-      pathName: name + "/index.html",
+      pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderProductTypeDecl(typedProgram, id),
       children: decl.members.filter(isSupportedDecl).map { .decl($0) }
