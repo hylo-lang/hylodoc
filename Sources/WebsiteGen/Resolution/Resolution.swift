@@ -81,9 +81,12 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
 func urlRelativeToParent(
   _ targetResolver: TargetResolver, of parentId: AnyTargetID?, with pathComponent: String
 ) -> URL {
+  // Reason for transforming colon: https://stackoverflow.com/a/25477235/15495831
+  let transformedName = pathComponent.replacingOccurrences(of: ":", with: "\u{A789}")
+
   if let url = targetResolver[parentId]?.url {
-    return url.deletingLastPathComponent().appendingPathComponent(pathComponent)
+    return url.deletingLastPathComponent().appendingPathComponent(transformedName)
   }
 
-  return URL(fileURLWithPath: "/" + pathComponent)
+  return URL(fileURLWithPath: "/" + transformedName)
 }
