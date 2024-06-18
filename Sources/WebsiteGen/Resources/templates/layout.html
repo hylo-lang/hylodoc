@@ -37,9 +37,7 @@
           <!-- Navigation -->
           <div id="navigation-tree-container">
             <ul>
-              {% for item in treeRoot %}
-              {% include "page_components/tree_item.html" %}
-              {% endfor %}
+              {{ tree }}
             </ul>
           </div>
         </aside>

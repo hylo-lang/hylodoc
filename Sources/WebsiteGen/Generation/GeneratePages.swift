@@ -13,20 +13,19 @@ public struct GenerationContext {
   let exporter: Exporter
 
   var breadcrumb: [BreadcrumbItem]
-  let tree: [NavigationItem]
+  let tree: String
 }
 
 public func generateIndexAndTargetPages(
   documentation: DocumentationContext, exporter: Exporter
 ) throws {
+  var stencil = createDefaultStencilEnvironment()
   var context = GenerationContext(
     documentation: documentation,
-    stencilEnvironment: createDefaultStencilEnvironment(),
+    stencilEnvironment: stencil,
     exporter: exporter,
     breadcrumb: [],
-    tree: documentation.targetResolver.rootTargets.map {
-      documentation.targetResolver.navigationItemFromTarget(targetId: $0)
-    }.filter { $0 != nil }.map { $0! }
+    tree: try generateTree(&stencil, documentation)
   )
 
   // Add name of the root to the breadcrumb stack
@@ -162,4 +161,17 @@ public func generateModuleIndex(_ context: inout GenerationContext) throws {
     of: .empty
   )
   try context.exporter.exportHtml(content, at: RelativePath(pathString: "index.html"))
+}
+
+public func generateTree(_ stencil: inout Environment, _ documentation: DocumentationContext) throws
+  -> String
+{
+  return try documentation.targetResolver.rootTargets.map {
+    documentation.targetResolver.navigationItemFromTarget(targetId: $0)
+  }
+  .filter { $0 != nil }
+  .map {
+    try stencil.renderTemplate(name: "page_components/tree_item.html", context: ["item": $0 as Any])
+  }
+  .joined(separator: "\n")
 }

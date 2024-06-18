@@ -58,7 +58,7 @@ public func renderPage(
   completeContext["breadcrumbs"] = context.breadcrumb
   completeContext["toc"] = tableOfContents(stencilContext: stencil.context)
   completeContext["pathToRoot"] = target?.relativePath.pathToRoot ?? RelativePath.current
-  completeContext["treeRoot"] = context.tree
+  completeContext["tree"] = context.tree
 
   return try context.stencilEnvironment.renderTemplate(
     name: stencil.templateName,
