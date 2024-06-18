@@ -34,19 +34,19 @@ public struct InlineSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   public static func renderTraitDecl(
     _ ctx: DocumentationContext, _ n: TraitDecl.ID
   ) -> String {
-    return renderDetailedTrait(ctx, n, true)
+    return renderDetailedTrait(ctx, n, true).toHTML()
   }
 
   public static func renderTypeAliasDecl(
     _ ctx: DocumentationContext, _ n: TypeAliasDecl.ID
   ) -> String {
-    return renderDetailedTypeAlias(ctx, n, true)
+    return renderDetailedTypeAlias(ctx, n, true).toHTML()
   }
 
   public static func renderProductTypeDecl(
     _ ctx: DocumentationContext, _ n: FrontEnd.ProductTypeDecl.ID
   ) -> String {
-    return renderDetailedProductType(ctx, n, true)
+    return renderDetailedProductType(ctx, n, true).toHTML()
   }
 
   public static func renderBindingDecl(
@@ -54,13 +54,13 @@ public struct InlineSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   )
     -> String
   {
-    return renderDetailedBinding(ctx, n, true)
+    return renderDetailedBinding(ctx, n, true).toHTML()
   }
 
   public static func renderInitializerDecl(
     _ ctx: DocumentationContext, _ n: FrontEnd.InitializerDecl.ID
   ) -> String {
-    return renderDetailedInitializer(ctx, n, true)
+    return renderDetailedInitializer(ctx, n, true).toHTML()
   }
 
   public static func renderFunctionDecl(
@@ -68,7 +68,7 @@ public struct InlineSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   )
     -> String
   {
-    return renderDetailedFunction(ctx, n, true)
+    return renderDetailedFunction(ctx, n, true).toHTML()
   }
 
   public static func renderMethodDecl(
@@ -76,7 +76,7 @@ public struct InlineSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   )
     -> String
   {
-    return renderDetailedMethod(ctx, n, true)
+    return renderDetailedMethod(ctx, n, true).toHTML()
   }
 
   public static func renderSubscriptDecl(
@@ -84,7 +84,7 @@ public struct InlineSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   )
     -> String
   {
-    return renderDetailedSubscript(ctx, n, true)
+    return renderDetailedSubscript(ctx, n, true).toHTML()
   }
 }
 
@@ -93,25 +93,25 @@ public struct BlockSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   public static func renderTraitDecl(
     _ ctx: DocumentationContext, _ n: TraitDecl.ID
   ) -> String {
-    return renderDetailedTrait(ctx, n, false)
+    return renderDetailedTrait(ctx, n, false).toHTML()
   }
 
   public static func renderTypeAliasDecl(
     _ ctx: DocumentationContext, _ n: TypeAliasDecl.ID
   ) -> String {
-    return renderDetailedTypeAlias(ctx, n, false)
+    return renderDetailedTypeAlias(ctx, n, false).toHTML()
   }
 
   public static func renderProductTypeDecl(
     _ ctx: DocumentationContext, _ n: ProductTypeDecl.ID
   ) -> String {
-    return renderDetailedProductType(ctx, n, false)
+    return renderDetailedProductType(ctx, n, false).toHTML()
   }
 
   public static func renderBindingDecl(
     _ ctx: DocumentationContext, _ n: BindingDecl.ID
   ) -> String {
-    return renderDetailedBinding(ctx, n, false)
+    return renderDetailedBinding(ctx, n, false).toHTML()
   }
 
   public static func renderInitializerDecl(
@@ -119,13 +119,13 @@ public struct BlockSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   )
     -> String
   {
-    return renderDetailedInitializer(ctx, n, false)
+    return renderDetailedInitializer(ctx, n, false).toHTML()
   }
 
   public static func renderFunctionDecl(
     _ ctx: DocumentationContext, _ n: FunctionDecl.ID
   ) -> String {
-    return renderDetailedFunction(ctx, n, false)
+    return renderDetailedFunction(ctx, n, false).toHTML()
   }
 
   public static func renderMethodDecl(
@@ -133,7 +133,7 @@ public struct BlockSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   )
     -> String
   {
-    return renderDetailedMethod(ctx, n, false)
+    return renderDetailedMethod(ctx, n, false).toHTML()
   }
 
   public static func renderSubscriptDecl(
@@ -141,6 +141,6 @@ public struct BlockSymbolDeclRenderer: DynamicSymbolDeclRenderer {
   )
     -> String
   {
-    return renderDetailedSubscript(ctx, n, false)
+    return renderDetailedSubscript(ctx, n, false).toHTML()
   }
 }
