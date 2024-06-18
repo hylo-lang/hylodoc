@@ -21,7 +21,7 @@ public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAs
     context: .init(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -53,12 +53,11 @@ public func prepareArticlePage(_ context: GenerationContext, of: ArticleAsset.ID
 {
   let article = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(article.moduleId)
-  let target = AnyTargetID.asset(AnyAssetID(of))
   let htmlGenerator = SimpleHTMLGenerator(
     context: .init(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -94,12 +93,11 @@ public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) 
 {
   let folder = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(folder.moduleId)
-  let target = AnyTargetID.asset(.folder(of))
   let htmlGenerator = SimpleHTMLGenerator(
     context: .init(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -115,10 +113,10 @@ public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) 
     }
   }
 
-  // Map children to an array of [(name, relativePath)]
+  // Map children to an array of [(name, url)]
   env["contents"] = context.documentation.targetResolver[.asset(.folder(of))]!.children
     .map { context.documentation.targetResolver[$0]! }
-    .map { ($0.simpleName, $0.relativePath) }
+    .map { ($0.simpleName, $0.url) }
 
   return StencilContext(templateName: "folder_layout.html", context: env)
 }

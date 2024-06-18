@@ -2,7 +2,6 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 import MarkdownKit
-import PathWrangler
 import HyloStandardLibrary
 import Stencil
 import TestUtils
@@ -79,7 +78,7 @@ final class InitializerTest: XCTestCase {
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
         children: partialResolved.children,
-        relativePath: RelativePath.current
+        url: URL(fileURLWithPath: "/")
       )
     )
 
@@ -90,9 +89,9 @@ final class InitializerTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareInitializerPage(context, of: initializerId)

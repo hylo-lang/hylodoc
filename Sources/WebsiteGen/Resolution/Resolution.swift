@@ -1,7 +1,7 @@
 import DequeModule
 import DocumentationDB
+import Foundation
 import FrontEnd
-import PathWrangler
 
 typealias TargetItem = (parentId: AnyTargetID?, targetId: AnyTargetID)
 
@@ -42,7 +42,7 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
     )
 
     // Get relative path to the target
-    let relativePath = relativePathToParent(
+    let url = urlRelativeToParent(
       targetResolver,
       of: targetItem.parentId,
       with: partialResolved.pathName
@@ -62,7 +62,7 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
         children: partialResolved.children.filter { !isDirectlyCopiedAssetTarget($0) },  // other files should not show up anywhere
-        relativePath: relativePath
+        url: url
       )
     )
 
@@ -78,14 +78,12 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
 }
 
 /// Get relative path to the target
-func relativePathToParent(
-  _ targetResolver: TargetResolver, of parentId: AnyTargetID?, with pathName: String
-) -> RelativePath {
-  if let parentPath = targetResolver[parentId]?.relativePath {
-    var relativePath = parentPath / ".." / pathName
-    relativePath.resolve()
-    return relativePath
+func urlRelativeToParent(
+  _ targetResolver: TargetResolver, of parentId: AnyTargetID?, with pathComponent: String
+) -> URL {
+  if let url = targetResolver[parentId]?.url {
+    return url.deletingLastPathComponent().appendingPathComponent(pathComponent)
   }
 
-  return RelativePath(pathString: pathName)
+  return URL(fileURLWithPath: "/" + pathComponent)
 }

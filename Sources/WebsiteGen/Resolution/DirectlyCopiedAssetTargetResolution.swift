@@ -25,7 +25,7 @@ func resolveDirectlyCopiedAssetTarget(
   }
 
   let otherFile = documentationDatabase.assets[otherFileId]!
-  let relativePath = relativePathToParent(
+  let url = urlRelativeToParent(
     targetResolver,
     of: parentId,
     with: otherFile.name
@@ -33,6 +33,6 @@ func resolveDirectlyCopiedAssetTarget(
 
   return ResolvedDirectlyCopiedAssetTarget(
     sourceUrl: otherFile.location,
-    relativePath: relativePath
+    url: url
   )
 }

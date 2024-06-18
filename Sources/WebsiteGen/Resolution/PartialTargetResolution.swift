@@ -61,7 +61,8 @@ func partialResolveAsset(
     let sourceFile: SourceFileAsset = documentationDatabase.assets[sourceFileId]!
 
     return PartialResolvedTarget(
-      pathName: String(sourceFile.name.lazy.split(separator: ".")[0]) + "/index.html",
+      pathName: String(sourceFile.name.components(separatedBy: ".").first ?? sourceFile.name)
+        + "/index.html",
       simpleName: sourceFile.name,
       navigationName: sourceFile.name,
       children: typedProgram.ast[sourceFile.translationUnit]!.decls

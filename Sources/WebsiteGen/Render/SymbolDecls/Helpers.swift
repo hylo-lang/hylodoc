@@ -59,11 +59,11 @@ func wrapIdentifier(_ inner: String) -> String {
   return wrap("span", inner, className: "identifier")
 }
 
-func wrapType(_ inner: String, href: String? = nil) -> String {
+func wrapType(_ inner: String, href: URL? = nil) -> String {
   return wrap(href != nil ? "a" : "span", inner, className: "type", href: href)
 }
 
-func wrapLink(_ inner: String, href: String? = nil) -> String {
+func wrapLink(_ inner: String, href: URL? = nil) -> String {
   if href == nil {
     return inner
   }
@@ -75,10 +75,10 @@ func wrapName(_ inner: String) -> String {
   return wrap("span", inner, className: "name")
 }
 
-func wrap(_ element: String, _ inner: String, className: String? = nil, href: String? = nil)
+func wrap(_ element: String, _ inner: String, className: String? = nil, href: URL? = nil)
   -> String
 {
-  let link = href != nil ? " href=\"\(href!)\"" : ""
+  let link = href != nil ? " href=\"\(urlToEncodedPath(href!))\"" : ""
   let classes = className != nil ? " class=\"\(className!)\"" : ""
   return "<\(element)\(classes)\(link)>\(inner)</\(element)>"
 }

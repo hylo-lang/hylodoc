@@ -77,13 +77,13 @@ func getMemberNameAndSummary(
   case TypeAliasDecl.self:
     let docID = TypeAliasDecl.ID(of)!
     scope = AnyScopeID(docID)
-    name = InlineSymbolDeclRenderer.renderTypeAliasDecl(context.documentation, docID, referringFrom)
+    name = InlineSymbolDeclRenderer.renderTypeAliasDecl(context.documentation, docID)
     summary = context.documentation.documentation.symbols.typeAliasDocs[docID]?.common.summary
     key = "Type Aliases"
   case BindingDecl.self:
     let docID = BindingDecl.ID(of)!
     scope = AnyScopeID(docID)
-    name = InlineSymbolDeclRenderer.renderBindingDecl(context.documentation, docID, referringFrom)
+    name = InlineSymbolDeclRenderer.renderBindingDecl(context.documentation, docID)
     summary = context.documentation.documentation.symbols.bindingDocs[docID]?.common.summary
     key = "Bindings"
   // TODO Mark needs to implement this
@@ -95,7 +95,7 @@ func getMemberNameAndSummary(
   case FunctionDecl.self:
     let docID = FunctionDecl.ID(of)!
     scope = AnyScopeID(docID)
-    name = InlineSymbolDeclRenderer.renderFunctionDecl(context.documentation, docID, referringFrom)
+    name = InlineSymbolDeclRenderer.renderFunctionDecl(context.documentation, docID)
     summary =
       context.documentation.documentation.symbols.functionDocs[docID]?.documentation.common.common
       .summary
@@ -103,7 +103,7 @@ func getMemberNameAndSummary(
   case MethodDecl.self:
     let docID = MethodDecl.ID(of)!
     scope = AnyScopeID(docID)
-    name = InlineSymbolDeclRenderer.renderMethodDecl(context.documentation, docID, referringFrom)
+    name = InlineSymbolDeclRenderer.renderMethodDecl(context.documentation, docID)
     summary =
       context.documentation.documentation.symbols.methodDeclDocs[docID]?.documentation.common.common
       .summary
@@ -115,7 +115,7 @@ func getMemberNameAndSummary(
   case SubscriptDecl.self:
     let docID = SubscriptDecl.ID(of)!
     scope = AnyScopeID(docID)
-    name = InlineSymbolDeclRenderer.renderSubscriptDecl(context.documentation, docID, referringFrom)
+    name = InlineSymbolDeclRenderer.renderSubscriptDecl(context.documentation, docID)
     summary =
       context.documentation.documentation.symbols.subscriptDeclDocs[docID]?.documentation.common
       .common
@@ -129,7 +129,7 @@ func getMemberNameAndSummary(
     let docID = InitializerDecl.ID(of)!
     scope = AnyScopeID(docID)
     name = InlineSymbolDeclRenderer.renderInitializerDecl(
-      context.documentation, docID, referringFrom)
+      context.documentation, docID)
     summary =
       context.documentation.documentation.symbols.initializerDocs[docID]?.documentation.common
       .common
@@ -138,14 +138,13 @@ func getMemberNameAndSummary(
   case TraitDecl.self:
     let docID = TraitDecl.ID(of)!
     scope = AnyScopeID(docID)
-    name = InlineSymbolDeclRenderer.renderTraitDecl(context.documentation, docID, referringFrom)
+    name = InlineSymbolDeclRenderer.renderTraitDecl(context.documentation, docID)
     summary = context.documentation.documentation.symbols.traitDocs[docID]?.common.summary
     key = "Traits"
   case ProductTypeDecl.self:
     let docID = ProductTypeDecl.ID(of)!
     scope = AnyScopeID(docID)
-    name = InlineSymbolDeclRenderer.renderProductTypeDecl(
-      context.documentation, docID, referringFrom)
+    name = InlineSymbolDeclRenderer.renderProductTypeDecl(context.documentation, docID)
     summary = context.documentation.documentation.symbols.productTypeDocs[docID]?.common.summary
     key = "Product Types"
   default:
@@ -160,10 +159,7 @@ func getMemberNameAndSummary(
         context: ReferenceRenderingContext(
           typedProgram: context.documentation.typedProgram,
           scopeId: scope,
-          resolveUrls: referWithSource(
-            context.documentation.targetResolver,
-            from: .decl(of)
-          )
+          resolveUrls: targetToUrl(context.documentation.targetResolver)
         )
       ),
       key

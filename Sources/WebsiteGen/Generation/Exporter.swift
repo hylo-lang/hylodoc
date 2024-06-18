@@ -1,36 +1,36 @@
 import Foundation
-import PathWrangler
 
 /// Protocol responsible for how to store assets and other pages
 public protocol Exporter {
-  func copyFromFile(from: URL, to: RelativePath) throws
-  func exportHtml(_ content: String, at: RelativePath) throws
-  func createDirectory(at: RelativePath) throws
+  func copyFromFile(from: URL, to: URL) throws
+  func exportHtml(_ content: String, at: URL) throws
+  func createDirectory(at: URL) throws
 }
 
+/// Default exporter where all target URL's see the export directory as root
 public struct DefaultExporter: Exporter {
-  let absolute: AbsolutePath
+  let baseUrl: URL
 
-  public init(_ absolute: AbsolutePath) {
-    self.absolute = absolute
+  public init(_ baseUrl: URL) {
+    self.baseUrl = baseUrl
   }
 
-  public func relativeToUrl(_ path: RelativePath) -> URL {
-    return URL(path: path.absolute(in: absolute).resolved())
+  public func relativeToUrl(_ url: URL) -> URL {
+    return baseUrl.appendingPathComponent(url.path)
   }
 
-  public func copyFromFile(from: URL, to: RelativePath) throws {
+  public func copyFromFile(from: URL, to: URL) throws {
     // Create parent directories
-    try createDirectory(at: to / "..")
+    try createDirectory(at: to.deletingLastPathComponent())
 
     // Copy file
     let url = relativeToUrl(to)
     try FileManager.default.copyItem(at: from, to: url)
   }
 
-  public func exportHtml(_ content: String, at: RelativePath) throws {
+  public func exportHtml(_ content: String, at: URL) throws {
     // Create parent directories
-    try createDirectory(at: at / "..")
+    try createDirectory(at: at.deletingLastPathComponent())
 
     // Write to file
     let url = relativeToUrl(at)
@@ -38,7 +38,7 @@ public struct DefaultExporter: Exporter {
   }
 
   /// Create directory and its parents
-  public func createDirectory(at: RelativePath) throws {
+  public func createDirectory(at: URL) throws {
     let url = relativeToUrl(at)
     try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
   }

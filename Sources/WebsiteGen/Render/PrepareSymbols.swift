@@ -21,8 +21,7 @@ public func prepareAssociatedTypePage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(
-        context.documentation.targetResolver, from: .decl(AnyDeclID(declId)))
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -58,8 +57,7 @@ public func prepareAssociatedValuePage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(
-        context.documentation.targetResolver, from: .decl(AnyDeclID(declId)))
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -89,13 +87,12 @@ public func prepareAssociatedValuePage(
 public func prepareTypeAliasPage(
   _ context: GenerationContext, of declId: TypeAliasDecl.ID
 ) throws -> StencilContext {
-  let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = context.documentation.typedProgram.nodeToScope[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -104,7 +101,7 @@ public func prepareTypeAliasPage(
 
   env["pageType"] = "Type Alias"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderTypeAliasDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.typeAliasDocs[declId] {
     env["summary"] = doc.common.summary.map(htmlGenerator.generate(document:))
@@ -126,13 +123,12 @@ public func prepareBindingPage(
   _ context: GenerationContext, of declId: BindingDecl.ID
 ) throws -> StencilContext {
   let decl: BindingDecl = context.documentation.typedProgram.ast[declId]!
-  let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = context.documentation.typedProgram.nodeToScope[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -141,7 +137,7 @@ public func prepareBindingPage(
 
   env["pageType"] = decl.isStatic ? "Static Binding" : "Binding"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderBindingDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.bindingDocs[declId] {
     env["summary"] = doc.common.summary.map(htmlGenerator.generate(document:))
@@ -165,13 +161,12 @@ public func prepareOperatorPage(
   _ context: GenerationContext, of declId: OperatorDecl.ID
 ) throws -> StencilContext {
   let decl: OperatorDecl = context.documentation.typedProgram.ast[declId]!
-  let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = context.documentation.typedProgram.nodeToScope[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -201,13 +196,12 @@ public func prepareOperatorPage(
 public func prepareFunctionPage(
   _ context: GenerationContext, of declId: FunctionDecl.ID
 ) throws -> StencilContext {
-  let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -216,7 +210,7 @@ public func prepareFunctionPage(
 
   env["pageType"] = "Function"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderFunctionDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.functionDocs[declId] {
     env["summary"] = doc.documentation.common.common.summary.map(htmlGenerator.generate(document:))
@@ -272,7 +266,7 @@ public func prepareMethodPage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -281,7 +275,7 @@ public func prepareMethodPage(
 
   env["pageType"] = "Method"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderMethodDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.methodDeclDocs[declId] {
     env["summary"] = doc.documentation.common.common.summary.map(htmlGenerator.generate(document:))
@@ -342,7 +336,7 @@ public func prepareSubscriptPage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -351,7 +345,7 @@ public func prepareSubscriptPage(
 
   env["pageType"] = "Subscript"  // todo determine whether it's a subscript or property declaration, if it's the latter, we should display "Property"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderSubscriptDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.subscriptDeclDocs[declId] {
     env["summary"] = doc.documentation.common.common.summary.map(htmlGenerator.generate(document:))
@@ -398,13 +392,12 @@ public func prepareSubscriptPage(
 public func prepareInitializerPage(
   _ context: GenerationContext, of declId: InitializerDecl.ID
 ) throws -> StencilContext {
-  let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -413,7 +406,7 @@ public func prepareInitializerPage(
 
   env["pageType"] = "Initializer"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderInitializerDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.initializerDocs[declId] {
     env["summary"] = doc.documentation.common.common.summary.map(htmlGenerator.generate(document:))
@@ -469,7 +462,7 @@ public func prepareTraitPage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -478,7 +471,7 @@ public func prepareTraitPage(
 
   env["pageType"] = "Trait"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderTraitDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.traitDocs[declId] {
     env["summary"] = doc.common.summary.map(htmlGenerator.generate(document:))
@@ -519,7 +512,7 @@ public func prepareProductTypePage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: referWithSource(context.documentation.targetResolver, from: target)
+      resolveUrls: targetToUrl(context.documentation.targetResolver)
     ),
     generator: context.htmlGenerator
   )
@@ -528,7 +521,7 @@ public func prepareProductTypePage(
 
   env["pageType"] = "Product Type"
   env["declarationPreview"] = BlockSymbolDeclRenderer.renderProductTypeDecl(
-    context.documentation, declId, target)
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.productTypeDocs[declId] {
     env["summary"] = doc.common.summary.map(htmlGenerator.generate(document:))

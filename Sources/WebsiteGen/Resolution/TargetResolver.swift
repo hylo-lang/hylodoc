@@ -1,7 +1,6 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import PathWrangler
 
 public enum AnyTargetID: Equatable, Hashable {
   case asset(AnyAssetID)
@@ -15,28 +14,28 @@ public struct ResolvedTarget {
   let simpleName: String  // name as seen in the breadcrumb and page title, without additional styling/tags
   let navigationName: String  // name as seen in the tree navigation, which has highlighting of some sort
   let children: [AnyTargetID]
-  let relativePath: RelativePath
+  let url: URL
 
   public init(
     id: AnyTargetID, parent: AnyTargetID?, simpleName: String, navigationName: String,
-    children: [AnyTargetID], relativePath: RelativePath
+    children: [AnyTargetID], url: URL
   ) {
     self.id = id
     self.parent = parent
     self.simpleName = simpleName
     self.navigationName = navigationName
     self.children = children
-    self.relativePath = relativePath
+    self.url = url
   }
 }
 
 public struct ResolvedDirectlyCopiedAssetTarget {
   let sourceUrl: URL
-  let relativePath: RelativePath
+  let url: URL
 
-  public init(sourceUrl: URL, relativePath: RelativePath) {
+  public init(sourceUrl: URL, url: URL) {
     self.sourceUrl = sourceUrl
-    self.relativePath = relativePath
+    self.url = url
   }
 }
 
@@ -79,38 +78,13 @@ public struct TargetResolver {
   }
 
   /// Get a url referencing from one target to another
-  public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath? {
+  public func url(to: AnyTargetID) -> URL? {
     // Resolve back reference
     if let referBack = backReferences[to] {
-      return refer(from: from, to: referBack)
+      return url(to: referBack)
     }
 
-    // same target
-    if from == to {
-      return nil
-    }
-
-    // what is being referred to
-    guard let relativePathTo = targets[to]?.relativePath else {
-      return nil
-    }
-
-    // where are we referring from
-    guard let relativePathFrom = targets[from]?.relativePath else {
-      // refer from root if we got nothing to refer from
-      return relativePathTo
-    }
-
-    return relativePathFrom.refer(to: relativePathTo)
-  }
-
-  /// Get the absolute file path of a target in an absolute path
-  public func pathToFile(from: AnyTargetID, in absolutePath: AbsolutePath) -> AbsolutePath? {
-    guard let relativePath = targets[from]?.relativePath else {
-      return nil
-    }
-
-    return relativePath.absolute(in: absolutePath)
+    return targets[to]?.url
   }
 
   public func navigationItemFromTarget(targetId: AnyTargetID) -> NavigationItem? {
@@ -121,7 +95,7 @@ public struct TargetResolver {
     return NavigationItem(
       id: targetId,
       name: resolved.navigationName,
-      relativePath: resolved.relativePath,
+      url: resolved.url,
       cssClassOfTarget: getCssClassOfTarget(targetId),
       children: resolved.children.map { navigationItemFromTarget(targetId: $0) }.filter {
         $0 != nil

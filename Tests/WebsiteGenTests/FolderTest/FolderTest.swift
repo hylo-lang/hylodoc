@@ -1,7 +1,6 @@
 import DocumentationDB
 import HyloStandardLibrary
 import MarkdownKit
-import PathWrangler
 import Stencil
 import TestUtils
 import XCTest
@@ -57,7 +56,7 @@ final class FolderTest: XCTestCase {
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
         children: partialResolvedParent.children,
-        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html")
       )
     )
 
@@ -68,9 +67,9 @@ final class FolderTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
@@ -138,7 +137,7 @@ final class FolderTest: XCTestCase {
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
         children: partialResolvedParent.children,
-        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html")
       )
     )
 
@@ -149,9 +148,9 @@ final class FolderTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
@@ -237,7 +236,7 @@ final class FolderTest: XCTestCase {
         simpleName: partialResolvedChild1.simpleName,
         navigationName: partialResolvedChild1.navigationName,
         children: partialResolvedChild1.children,
-        relativePath: RelativePath(pathString: "root/Folder1/child1.hylodoc")
+        url: URL(fileURLWithPath: "root/Folder1/child1.hylodoc")
       )
     )
 
@@ -252,7 +251,7 @@ final class FolderTest: XCTestCase {
         simpleName: partialResolvedChild2.simpleName,
         navigationName: partialResolvedChild2.navigationName,
         children: partialResolvedChild2.children,
-        relativePath: RelativePath(pathString: "root/Folder1/Folder2/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/Folder2/index.html")
       )
     )
 
@@ -266,7 +265,7 @@ final class FolderTest: XCTestCase {
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
         children: partialResolvedParent.children,
-        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html")
       )
     )
 
@@ -277,9 +276,9 @@ final class FolderTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareFolderPage(context, of: folder1Id)
@@ -358,7 +357,7 @@ final class FolderTest: XCTestCase {
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
         children: partialResolvedParent.children,
-        relativePath: RelativePath(pathString: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html")
       )
     )
 
@@ -369,9 +368,9 @@ final class FolderTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareFolderPage(context, of: folder1Id)

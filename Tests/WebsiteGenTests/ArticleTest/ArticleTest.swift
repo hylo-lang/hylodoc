@@ -1,7 +1,6 @@
 import DocumentationDB
 import HyloStandardLibrary
 import MarkdownKit
-import PathWrangler
 import Stencil
 import TestUtils
 import XCTest
@@ -62,7 +61,7 @@ final class ArticleTest: XCTestCase {
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
         children: partialResolved.children,
-        relativePath: RelativePath.current
+        url: URL(fileURLWithPath: "/")
       )
     )
 
@@ -73,9 +72,9 @@ final class ArticleTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareArticlePage(context, of: articleId)
@@ -145,7 +144,7 @@ final class ArticleTest: XCTestCase {
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
         children: partialResolved.children,
-        relativePath: RelativePath.current
+        url: URL(fileURLWithPath: "/")
       )
     )
 
@@ -156,9 +155,9 @@ final class ArticleTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareArticlePage(context, of: article1Id)

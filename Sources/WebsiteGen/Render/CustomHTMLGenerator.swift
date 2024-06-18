@@ -1,12 +1,12 @@
 import DocExtractor
+import Foundation
 import FrontEnd
 import MarkdownKit
-import PathWrangler
 
 public struct ReferenceRenderingContext {
   let typedProgram: TypedProgram
   let scopeId: AnyScopeID
-  let resolveUrls: (AnyTargetID) -> RelativePath?
+  let resolveUrls: (AnyTargetID) -> URL?
 }
 
 public protocol HyloReferenceResolvingGenerator {
@@ -85,7 +85,7 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
       fatalError("[ERROR] Reference \(reference.text) resolved to multiple targets: \n\(resolved)")
     }
 
-    if let link = referenceContext!.resolveUrls(.decl(resolved.first!))?.description {
+    if let link = referenceContext!.resolveUrls(.decl(resolved.first!))?.path {
       return "<code class=\"hylo-reference\"><a href=\"\(link)\">\(reference.text)</a></code>"
     }
     return "<code class=\"hylo-reference\">\(reference.text)</code>"
@@ -111,13 +111,8 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
 
 /// Returns a facade closure that is able to resolve urls to arbitrary
 /// targets from the given source in `from`
-func referWithSource(
-  _ targetResolver: TargetResolver,
-  from: AnyTargetID
-) -> (AnyTargetID) -> RelativePath? {
-  return { to in
-    targetResolver.refer(from: from, to: to)
-  }
+func targetToUrl(_ targetResolver: TargetResolver) -> (AnyTargetID) -> URL? {
+  return { targetResolver.url(to: $0) }
 }
 
 /// A facade struct that wraps the necessary context and the generator to ease

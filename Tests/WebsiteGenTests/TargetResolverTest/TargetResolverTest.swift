@@ -1,6 +1,5 @@
 import Foundation
 import FrontEnd
-import PathWrangler
 import HyloStandardLibrary
 import TestUtils
 import XCTest
@@ -132,7 +131,7 @@ final class TargetResolverTest: XCTestCase {
         simpleName: "placeholder",
         navigationName: "placeholder",
         children: [],
-        relativePath: RelativePath(pathString: "index.html")
+        url: URL(fileURLWithPath: "/index.html")
       )
     )
 
@@ -142,8 +141,7 @@ final class TargetResolverTest: XCTestCase {
         backTo: .decl(AnyDeclID(bindingId))
       )
 
-      XCTAssertEqual(
-        targetResolver.refer(from: .empty, to: $0), RelativePath(pathString: "index.html"))
+      XCTAssertEqual(targetResolver.url(to: $0)?.path, "/index.html")
     }
   }
 }

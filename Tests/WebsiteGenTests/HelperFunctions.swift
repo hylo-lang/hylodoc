@@ -1,12 +1,11 @@
 import DocumentationDB
+import Kanna
 import MarkdownKit
-import PathWrangler
 import HyloStandardLibrary
 import Stencil
-import XCTest
-import WebsiteGen
 import TestUtils
-import Kanna
+import WebsiteGen
+import XCTest
 
 /// Check if string contains array of sub-strings only separated by whitespaces
 /// - Parameters:
@@ -66,19 +65,29 @@ public func findByClass(_ className: String, in html: String) -> [String] {
   return doc.css(".\(className)").map { $0.toHTML! }
 }
 
-public func assertPageTitle(_ pageTitle: String, in html: String, file: StaticString = #file, line: UInt = #line) {
-  assertContains(findByTag("h1", in: findByID("summary", in: html)).first, what: pageTitle, file: file, line: line)
+public func assertPageTitle(
+  _ pageTitle: String, in html: String, file: StaticString = #file, line: UInt = #line
+) {
+  assertContains(
+    findByTag("h1", in: findByID("summary", in: html)).first, what: pageTitle, file: file,
+    line: line)
 }
 
-public func assertSummary(_ summary: String, in html: String, file: StaticString = #file, line: UInt = #line) {
+public func assertSummary(
+  _ summary: String, in html: String, file: StaticString = #file, line: UInt = #line
+) {
   assertContains(findByID("summary", in: html), what: summary, file: file, line: line)
 }
 
-public func assertDetails(_ details: String, in html: String, file: StaticString = #file, line: UInt = #line) {
+public func assertDetails(
+  _ details: String, in html: String, file: StaticString = #file, line: UInt = #line
+) {
   assertContains(findByID("details", in: html), what: details, file: file, line: line)
 }
 
-public func assertContent(_ content: String, in html: String, file: StaticString = #file, line: UInt = #line) {
+public func assertContent(
+  _ content: String, in html: String, file: StaticString = #file, line: UInt = #line
+) {
   // assertContains(findByID("content", in: html), what: content, file: file, line: line)
   assertContains(html, what: content, file: file, line: line)
 }
@@ -88,7 +97,9 @@ public func assertContent(_ content: String, in html: String, file: StaticString
 ///   - id: css id of the element to be found
 ///   - count: number of children elements (list items) expected to be found
 ///   - html: string in which to search for the element
-public func assertListExistAndCount(id: String, count: Int, in html: String, file: StaticString = #file, line: UInt = #line) {
+public func assertListExistAndCount(
+  id: String, count: Int, in html: String, file: StaticString = #file, line: UInt = #line
+) {
   let doc = findByID(id, in: html)
   if doc.isEmpty {
     XCTFail(
@@ -112,7 +123,9 @@ public func assertListExistAndCount(id: String, count: Int, in html: String, fil
 /// - Parameters:
 ///   - dict: dictionary with section titles as keys and number of declarations as values
 ///   - members: html string in which to search for the sections
-public func assertSectionsExsistingAndCount(_ dict: [String: Int], in members: String, file: StaticString = #file, line: UInt = #line) {
+public func assertSectionsExsistingAndCount(
+  _ dict: [String: Int], in members: String, file: StaticString = #file, line: UInt = #line
+) {
   for (title, count) in dict {
     let id = convertToID(title) as! String
     if count > 0 {
@@ -121,14 +134,13 @@ public func assertSectionsExsistingAndCount(_ dict: [String: Int], in members: S
 
       let declarationsCount = findByClass("declaration", in: section).count
       if declarationsCount != count {
-      XCTFail(
-        "\nExpected to find " + ANSIColors.green("\(count) \(id)\n")
-          + "but found " + ANSIColors.red("\(declarationsCount)"),
-        file: file, line: line)
-      return
-    }
-    }
-    else {
+        XCTFail(
+          "\nExpected to find " + ANSIColors.green("\(count) \(id)\n")
+            + "but found " + ANSIColors.red("\(declarationsCount)"),
+          file: file, line: line)
+        return
+      }
+    } else {
       assertNotContains(members, what: id, file: file, line: line)
     }
   }

@@ -1,10 +1,10 @@
-import PathWrangler
+import Foundation
 
 public struct NavigationItem {
   // General Information
   let id: AnyTargetID
   let name: String
-  let relativePath: RelativePath
+  let url: URL
   let cssClassOfTarget: String
 
   // Relations
@@ -13,11 +13,11 @@ public struct NavigationItem {
 
 public struct BreadcrumbItem {
   let name: String
-  let relativePath: RelativePath
+  let url: URL
 
-  public init(name: String, relativePath: RelativePath) {
+  public init(name: String, url: URL) {
     self.name = name
-    self.relativePath = relativePath
+    self.url = url
   }
 }
 

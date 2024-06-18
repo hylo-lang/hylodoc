@@ -1,9 +1,9 @@
-<li {% if item.id|toString == target.id|toString %} class="active"{% endif %}>
+<li>
     {% if item.children %}
     <input type="checkbox" checked>
     {% endif %}
 
-    <a class="nav-entry {{ item.cssClassOfTarget }}" href="/{{ item.relativePath }}">
+    <a class="nav-entry {{ item.cssClassOfTarget }}" href="{% path item.url %}">
         <div class="arrow"></div>
         {% if item.cssClassOfTarget == "symbol" %}
         <code class="inline"><pre>{{ item.name }}</pre></code>

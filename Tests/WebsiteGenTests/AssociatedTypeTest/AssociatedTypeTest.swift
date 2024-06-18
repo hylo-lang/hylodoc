@@ -2,7 +2,6 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 import MarkdownKit
-import PathWrangler
 import HyloStandardLibrary
 import Stencil
 import TestUtils
@@ -71,7 +70,7 @@ final class AssociatedTypeTest: XCTestCase {
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
         children: partialResolved.children,
-        relativePath: RelativePath.current
+        url: URL(fileURLWithPath: "/")
       )
     )
 
@@ -82,9 +81,9 @@ final class AssociatedTypeTest: XCTestCase {
         targetResolver: targetResolver
       ),
       stencilEnvironment: createDefaultStencilEnvironment(),
-      exporter: DefaultExporter(AbsolutePath.current),
+      exporter: DefaultExporter(URL(fileURLWithPath: "/")),
       breadcrumb: [],
-      tree: []
+      tree: ""
     )
 
     let stencilContext = try prepareAssociatedTypePage(context, of: associatedTypeId)

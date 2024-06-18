@@ -2,7 +2,6 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 import MarkdownKit
-import PathWrangler
 import Stencil
 
 /// Context containing all the documentation used in the Website Generation phase
@@ -34,7 +33,7 @@ public func generateDocumentation(
   )
 
   // Initialize exporter
-  let exporter: DefaultExporter = .init(AbsolutePath(url: exportPath)!)
+  let exporter: DefaultExporter = .init(exportPath)
 
   do {
     // Generate content
@@ -47,7 +46,7 @@ public func generateDocumentation(
     try context.targetResolver.otherTargets.forEach {
       try exporter.copyFromFile(
         from: $0.value.sourceUrl,
-        to: $0.value.relativePath
+        to: $0.value.url
       )
     }
   } catch {
@@ -65,7 +64,7 @@ func copyPublicWebsiteAssets(exporter: Exporter) -> Bool {
     .appendingPathComponent("assets")
 
   do {
-    try exporter.copyFromFile(from: assetsSourceLocation, to: RelativePath(pathString: "assets"))
+    try exporter.copyFromFile(from: assetsSourceLocation, to: URL(fileURLWithPath: "/assets"))
   } catch {
     print("Error while copying website assets")
     print("from \"\(assetsSourceLocation)\"")

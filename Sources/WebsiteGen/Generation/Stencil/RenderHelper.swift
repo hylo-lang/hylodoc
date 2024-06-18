@@ -1,7 +1,6 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import PathWrangler
 import Stencil
 
 public typealias StencilContext = (templateName: String, context: [String: Any])
@@ -14,7 +13,7 @@ extension Environment {
     let ext = Extension()
     ext.registerFilter("convertToID") { (value: Any?) in return convertToID(value) }
     ext.registerFilter("toString") { value in String(describing: value) }
-    ext.registerTag("refer", parser: ReferNode.parse)
+    ext.registerTag("path", parser: PathNode.parse)
 
     self.init(
       loader: loader,
@@ -57,7 +56,6 @@ public func renderPage(
   completeContext["target"] = target
   completeContext["breadcrumbs"] = context.breadcrumb
   completeContext["toc"] = tableOfContents(stencilContext: stencil.context)
-  completeContext["pathToRoot"] = target?.relativePath.pathToRoot ?? RelativePath.current
   completeContext["tree"] = context.tree
 
   return try context.stencilEnvironment.renderTemplate(

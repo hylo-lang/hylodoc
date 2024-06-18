@@ -2,7 +2,6 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 import MarkdownKit
-import PathWrangler
 import Stencil
 
 /// Context containing all the information needed to generate all the pages
@@ -32,7 +31,7 @@ public func generateIndexAndTargetPages(
   context.breadcrumb.append(
     BreadcrumbItem(
       name: "Documentation",
-      relativePath: RelativePath.current
+      url: URL(fileURLWithPath: "/")
     ))
 
   // Generate all targets from the found roots
@@ -54,7 +53,7 @@ func generatePageForAnyTarget(_ context: inout GenerationContext, of targetId: A
   context.breadcrumb.append(
     BreadcrumbItem(
       name: resolvedTarget.simpleName,
-      relativePath: resolvedTarget.relativePath
+      url: resolvedTarget.url
     ))
 
   switch targetId {
@@ -96,7 +95,7 @@ func generatePageForAnyAsset(
 
   // Render page and export content
   let content = try renderPage(&context, stencilContext, of: .asset(assetId))
-  try context.exporter.exportHtml(content, at: resolvedTarget.relativePath)
+  try context.exporter.exportHtml(content, at: resolvedTarget.url)
 }
 
 func generatePageForAnyDecl(
@@ -135,7 +134,7 @@ func generatePageForAnyDecl(
 
   // Render page and export content
   let content = try renderPage(&context, stencilContext, of: .decl(declId))
-  try context.exporter.exportHtml(content, at: resolvedTarget.relativePath)
+  try context.exporter.exportHtml(content, at: resolvedTarget.url)
 }
 
 public func generateModuleIndex(_ context: inout GenerationContext) throws {
@@ -150,17 +149,17 @@ public func generateModuleIndex(_ context: inout GenerationContext) throws {
       ]))
   }
 
-  // Map children to an array of [(name, relativePath)]
+  // Map children to an array of [(name, url)]
   env["contents"] = context.documentation.documentation.modules
     .map { context.documentation.targetResolver[.asset(.folder($0.rootFolder))]! }
-    .map { ($0.simpleName, $0.relativePath) }
+    .map { ($0.simpleName, $0.url) }
 
   let content = try renderPage(
     &context,
     StencilContext(templateName: "folder_layout.html", context: env),
     of: .empty
   )
-  try context.exporter.exportHtml(content, at: RelativePath(pathString: "index.html"))
+  try context.exporter.exportHtml(content, at: URL(fileURLWithPath: "/index.html"))
 }
 
 public func generateTree(_ stencil: inout Environment, _ documentation: DocumentationContext) throws
