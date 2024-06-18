@@ -84,6 +84,11 @@ public struct TargetResolver {
       return url(to: referBack)
     }
 
+    // Resolve other targets
+    if let otherTarget = otherTargets[to] {
+      return otherTarget.url
+    }
+
     return targets[to]?.url
   }
 
