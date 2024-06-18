@@ -24,6 +24,8 @@ swift run hdc PATH_TO_MODULE && python3 -m http.server 8080 -d dist
 swift run hdc PATH_TO_STDLIB --documenting-standard-library
 ```
 
+## Documentation Syntax Reference
+You can read our syntax specification in the [Syntax Reference](./SyntaxReference.md)
 ## Development Environment Setup
 ### Windows
 - Install docker and WSL2

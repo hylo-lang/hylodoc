@@ -188,3 +188,34 @@ Markdown articles can be written in `.hylodoc` files.
 A **level 1 heading** may only appear at the beginning of the article, and, if present, is interpreted as the main title of the article, and removed from the content.
 
 **Hylodoc references** are supported in articles, and they are resolved in the scope of the module in which they appear in.
+
+## Reference Syntax
+### URLs
+There are two form of links in the MarkDown syntax:
+- autolinks (`<https://example.com>`)
+- full Markdown links (`[title](url)`) for arbitrary URLs except ones with the `file://` protocol.
+
+Implicit links are not supported.
+
+### Local File References
+> Note: this feature has not been implemented yet. The syntax is also work in progress.
+
+We only support the full link syntax for local file references. The user is required to start the reference with
+either `../`, `./`, or `/`. This is the most unambiguous syntax, and it is also the most common one, supported by all
+editors. The `/` prefix will serve as a pointer to the root of the entire repository which might be different than the
+module that is currently being documented. This is so that absolute links can be resolved properly in a repository by
+GitHub, which takes the root of the repository as the base for resolving absolute links.
+
+### Symbol References
+We can use double backticks for code entity references, just like Swift. You can write any name that can be resolved
+from the scope of the documented entity.
+
+```markdown
+``MyModule.myFunction(x:y:_:)``
+```
+
+If there is no ambiguity, parameter labels can be ignored from function references:
+```markdown
+``MyModule.myFunction``
+```
+> Note: currently, only the latter syntax is implemented
