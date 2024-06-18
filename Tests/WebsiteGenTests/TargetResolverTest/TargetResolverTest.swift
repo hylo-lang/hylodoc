@@ -144,4 +144,19 @@ final class TargetResolverTest: XCTestCase {
       XCTAssertEqual(targetResolver.url(to: $0)?.path, "/index.html")
     }
   }
+
+  func testResolveUrlToOtherTarget() {
+    var targetResolver: TargetResolver = .init()
+    let targetId: AnyTargetID = .empty  // dummy target
+
+    targetResolver.resolveOther(
+      targetId: targetId,
+      ResolvedDirectlyCopiedAssetTarget(
+        sourceUrl: URL(fileURLWithPath: "./some/path/localFile.pdf"),
+        url: URL(fileURLWithPath: "/some/path/localFile.pdf")
+      )
+    )
+
+    XCTAssertEqual(targetResolver.url(to: targetId)?.path, "/some/path/localFile.pdf")
+  }
 }
