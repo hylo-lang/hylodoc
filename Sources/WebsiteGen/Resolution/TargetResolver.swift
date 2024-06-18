@@ -82,7 +82,6 @@ public struct TargetResolver {
   public func refer(from: AnyTargetID, to: AnyTargetID) -> RelativePath? {
     // Resolve back reference
     if let referBack = backReferences[to] {
-      print(referBack)
       return refer(from: from, to: referBack)
     }
 

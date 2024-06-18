@@ -122,33 +122,34 @@ extension AST {
     return walker.result
   }
 
-  public func resolveBinding(by name: String) -> BindingDecl.ID? {
+  /// Resolve binding by index of occurrence in a specific module
+  ///
+  /// - Parameters:
+  ///   - byOccurrenceNumber: zero-indexed occurrence
+  ///   - in: id of moduleDecl to look in
+  public func resolveBinding(byOccurrenceNumber occurrence: Int, in moduleId: ModuleDecl.ID)
+    -> BindingDecl.ID?
+  {
     struct ASTWalker: ASTWalkObserver {
-      var result: BindingDecl.ID?
-      var members: [AnyDeclID] = []
-      let targetName: String
+      var result: BindingDecl.ID? = nil
+      var occurrence: Int
 
       mutating func willEnter(_ id: AnyNodeID, in ast: AST) -> Bool {
         if let e: BindingDecl.ID = BindingDecl.ID(id) {
-          let binding = ast[e]
-          let pattern = ast[binding.pattern]
-          if let subPattern = ast[NamePattern.ID(pattern.subpattern)] {
-            let varDecl = ast[subPattern.decl]
-            if varDecl.identifier.value == targetName {
-              result = e
-              return false
-            }
+          if occurrence == 0 {
+            result = e
+            return false
           }
+
+          occurrence -= 1
         }
 
         return true
       }
     }
 
-    var walker = ASTWalker(result: nil, targetName: name)
-    for m in modules {
-      walk(m, notifying: &walker)
-    }
+    var walker = ASTWalker(occurrence: occurrence)
+    walk(moduleId, notifying: &walker)
     return walker.result
   }
 

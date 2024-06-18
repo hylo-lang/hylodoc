@@ -1,3 +1,5 @@
 trait Shape {
   let x: Int = 5
+
+  let (name, age) = ("Thomas", 21)
 }

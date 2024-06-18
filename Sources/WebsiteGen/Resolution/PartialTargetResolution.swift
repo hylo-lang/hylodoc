@@ -237,12 +237,32 @@ public func backReferencesOfTarget(_ typedProgram: TypedProgram, targetId: AnyTa
 {
   if case .decl(let declId) = targetId, let bindingId = BindingDecl.ID(declId) {
     let binding = typedProgram.ast[bindingId]!
-    let pattern = typedProgram.ast[binding.pattern]
-    if let subPattern = typedProgram.ast[NamePattern.ID(pattern.subpattern)] {
-      let varDecl = subPattern.decl
-      return [.decl(AnyDeclID(varDecl))]
-    }
+    return resolvePatternToTargets(typedProgram, pattern: AnyPatternID(binding.pattern))
   }
 
   return nil
+}
+
+/// Recursively resolve patterns to target ID's
+public func resolvePatternToTargets(_ typedProgram: TypedProgram, pattern: AnyPatternID)
+  -> [AnyTargetID]
+{
+  // Binding pattern
+  if let bindingPattern: BindingPattern = typedProgram.ast[BindingPattern.ID(pattern)] {
+    return resolvePatternToTargets(typedProgram, pattern: bindingPattern.subpattern)
+  }
+
+  // Single variable pattern
+  if let namePattern: NamePattern = typedProgram.ast[NamePattern.ID(pattern)] {
+    return [.decl(AnyDeclID(namePattern.decl))]
+  }
+
+  // Tuple pattern
+  if let tuplePattern: TuplePattern = typedProgram.ast[TuplePattern.ID(pattern)] {
+    return tuplePattern.elements.flatMap {
+      resolvePatternToTargets(typedProgram, pattern: $0.pattern)
+    }
+  }
+
+  return []
 }
