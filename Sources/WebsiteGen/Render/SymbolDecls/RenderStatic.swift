@@ -4,14 +4,13 @@ import FrontEnd
 func renderSimpleTrait(
   _ typedProgram: TypedProgram, _ n: TraitDecl.ID, _ raw: Bool
 )
-  -> String
+  -> RenderString
 {
   let trait = typedProgram.ast[n]
   let identifier = trait.identifier.value
 
-  var result = raw ? "trait" : wrapKeyword("trait")
-  result += " "
-  result += raw ? identifier : wrapName(identifier)
+  var result: RenderString = raw ? .wrap() : .wrap([.keyword("trait"), .text(" ")])
+  result += raw ? .text(identifier) : .name(identifier)
 
   return result
 }
@@ -19,14 +18,13 @@ func renderSimpleTrait(
 func renderSimpleTypeAlias(
   _ typedProgram: TypedProgram, _ n: TypeAliasDecl.ID, _ raw: Bool
 )
-  -> String
+  -> RenderString
 {
   let typeAlias = typedProgram.ast[n]
   let identifier = typeAlias.identifier.value
 
-  var result = raw ? "typealias" : wrapKeyword("typealias")
-  result += " "
-  result += raw ? identifier : wrapName(identifier)
+  var result: RenderString = raw ? .wrap() : .wrap([.keyword("typealias"), .text(" ")])
+  result += raw ? .text(identifier) : .name(identifier)
 
   return result
 }
@@ -34,33 +32,39 @@ func renderSimpleTypeAlias(
 func renderSimpleProductType(
   _ typedProgram: TypedProgram, _ n: ProductTypeDecl.ID, _ raw: Bool
 )
-  -> String
+  -> RenderString
 {
   let productType = typedProgram.ast[n]
-  var result = raw ? "type" : wrapKeyword("type")
-  result += " "
-  result += raw ? productType.baseName : wrapName(productType.baseName)
+  let identifier = productType.baseName
+
+  var result: RenderString = raw ? .wrap() : .wrap([.keyword("type"), .text(" ")])
+  result += raw ? .text(identifier) : .name(identifier)
+
   return result
 }
 
 func renderSimpleBinding(
   _ typedProgram: TypedProgram, _ n: BindingDecl.ID, _ raw: Bool
-) -> String {
+) -> RenderString {
   let binding = typedProgram.ast[n]
   let bindingPattern = typedProgram.ast[binding.pattern]
 
   let subpattern = typedProgram.ast[NamePattern.ID(bindingPattern.subpattern)]!
   let variable = typedProgram.ast[subpattern.decl]
   let introducer = String(describing: bindingPattern.introducer.value)
+  let identifier = variable.baseName
 
-  var result = ""
-  if binding.isStatic {
-    result += raw ? "static" : wrapKeyword("static")
-    result += " "
+  var result: RenderString = .wrap()
+
+  if !raw {
+    if binding.isStatic {
+      result += .wrap([.keyword("static"), .text(" ")])
+    }
+
+    result += .wrap([.keyword(introducer), .text(" ")])
   }
-  result += raw ? introducer : wrapKeyword(introducer)
-  result += " "
-  result += raw ? variable.baseName : wrapName(variable.baseName)
+
+  result += raw ? .text(identifier) : .name(identifier)
 
   return result
 }
@@ -68,14 +72,13 @@ func renderSimpleBinding(
 func renderSimpleInitializer(
   _ typedProgram: TypedProgram, _ n: InitializerDecl.ID, _ raw: Bool
 )
-  -> String
+  -> RenderString
 {
   let initializer = typedProgram.ast[n]
   let params = renderSimpleParams(typedProgram, initializer.parameters)
 
-  var result = raw ? "init" : wrapKeyword("init")
-  let tail = "(\(params))"
-  result += raw ? tail : wrapName(tail)
+  var result: RenderString = raw ? .text("init") : .keyword("init")
+  result += raw ? params : .name([params])
 
   return result
 }
@@ -83,22 +86,24 @@ func renderSimpleInitializer(
 func renderSimpleFunction(
   _ typedProgram: TypedProgram, _ n: FunctionDecl.ID, _ raw: Bool
 )
-  -> String
+  -> RenderString
 {
   let function = typedProgram.ast[n]
   let identifier = function.identifier!.value
 
-  var result = ""
+  var result: RenderString = .wrap()
 
-  if function.isStatic {
-    result += raw ? "static" : wrapKeyword("static")
-    result += " "
+  if !raw {
+    if function.isStatic {
+      result += .wrap([.keyword("static"), .text(" ")])
+    }
+
+    result += .wrap([.keyword("fun"), .text(" ")])
   }
 
-  result += raw ? "fun" : wrapKeyword("fun")
-  result += " "
-  let tail = "\(identifier)(\(renderSimpleParams(typedProgram, function.parameters)))"
-  result += raw ? tail : wrapName(tail)
+  let params = renderSimpleParams(typedProgram, function.parameters)
+  let tail: RenderString = .wrap([.text(identifier), params])
+  result += raw ? tail : .name([tail])
 
   return result
 }
@@ -106,45 +111,57 @@ func renderSimpleFunction(
 func renderSimpleMethod(
   _ typedProgram: TypedProgram, _ n: MethodDecl.ID, _ raw: Bool
 )
-  -> String
+  -> RenderString
 {
   let method = typedProgram.ast[n]
   let identifier = method.identifier.value
 
-  var result = ""
+  var result: RenderString = .wrap()
 
-  result += raw ? "fun" : wrapKeyword("fun")
-  result += " "
-  let tail = "\(identifier)(\(renderSimpleParams(typedProgram, method.parameters)))"
-  result += raw ? tail : wrapName(tail)
+  if !raw {
+    result += .wrap([.keyword("fun"), .text(" ")])
+  }
+
+  let params = renderSimpleParams(typedProgram, method.parameters)
+  let tail: RenderString = .wrap([.text(identifier), params])
+  result += raw ? tail : .name([tail])
 
   return result
 }
 
 func renderSimpleSubscript(
   _ typedProgram: TypedProgram, _ n: SubscriptDecl.ID, _ raw: Bool
-) -> String {
+) -> RenderString {
   let sub: SubscriptDecl = typedProgram.ast[n]
-  var result = ""
-
-  if sub.isStatic {
-    result += raw ? "static" : wrapKeyword("static")
-    result += " "
-  }
-
   let introducer = String(describing: sub.introducer.value)
-  result += raw ? introducer : wrapKeyword(introducer)
+  let identifier = sub.identifier?.value
 
-  var tail = ""
-  if let identifier = sub.identifier {
-    tail += " \(identifier.value)"
+  var result: RenderString = .wrap()
+  var tail: RenderString = .wrap()
+
+  if !raw {
+    if sub.isStatic {
+      result += .wrap([.keyword("static"), .text(" ")])
+    }
+
+    result += .keyword(introducer)
+
+    if identifier != nil {
+      tail += .wrap([.text(" "), .name(identifier!)])
+    }
+  } else {
+    if identifier != nil {
+      result += identifier!
+    } else {
+      result += introducer
+    }
   }
 
   if sub.introducer.value == SubscriptDecl.Introducer.subscript {
-    tail += "(\(renderSimpleParams(typedProgram, sub.parameters)))"
+    tail += renderSimpleParams(typedProgram, sub.parameters)
   }
 
-  result += raw ? tail : wrapName(tail)
+  result += raw ? tail : .name([tail])
 
   return result
 }
@@ -152,23 +169,22 @@ func renderSimpleSubscript(
 func renderSimpleParams(
   _ typedProgram: TypedProgram, _ ns: [ParameterDecl.ID]
 )
-  -> String
+  -> RenderString
 {
-  var result = ""
-
-  for p in ns {
-    result += renderSimpleParam(typedProgram, p)
+  let params = ns.map { p in
+    renderSimpleParam(typedProgram, p)
   }
 
-  return result
+  return .wrap([.text("("), .join(params, ""), .text(")")])
 }
 
 func renderSimpleParam(
   _ typedProgram: TypedProgram, _ n: ParameterDecl.ID
 )
-  -> String
+  -> RenderString
 {
   let parameter: ParameterDecl = typedProgram.ast[n]
   let label = getParamLabel(parameter)
-  return "\(label):"
+
+  return .wrap([.text(label), .text(":")])
 }

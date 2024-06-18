@@ -82,3 +82,28 @@ func wrap(_ element: String, _ inner: String, className: String? = nil, href: UR
   let classes = className != nil ? " class=\"\(className!)\"" : ""
   return "<\(element)\(classes)\(link)>\(inner)</\(element)>"
 }
+
+func getDeclUrl(_ ctx: DocumentationContext, _ to: AnyDeclID?)
+  -> String?
+{
+  if to == nil {
+    return nil
+  }
+
+  return ctx.targetResolver.url(to: .decl(to!))?.description
+}
+
+func isSelfParam(_ program: TypedProgram, _ parameter: ParameterDecl) -> Bool {
+  if let annotation = program.ast[parameter.annotation] {
+    if let nameID = NameExpr.ID(annotation.bareType) {
+      let nameExpr = program.ast[nameID]
+      return nameExpr.name.value.stem == "Self"
+    }
+  }
+
+  return false
+}
+
+func getNameExprDecl(_ program: TypedProgram, _ expr: NameExpr.ID) -> AnyDeclID? {
+  return program.referredDecl[expr]?.decl
+}

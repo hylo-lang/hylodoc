@@ -34,49 +34,49 @@ public struct SimpleSymbolDeclRenderer: StaticSymbolDeclRenderer {
   public static func renderTraitDecl(
     _ typedProgram: TypedProgram, _ n: TraitDecl.ID
   ) -> String {
-    return renderSimpleTrait(typedProgram, n, true)
+    return renderSimpleTrait(typedProgram, n, true).toHTML()
   }
 
   public static func renderTypeAliasDecl(
     _ typedProgram: TypedProgram, _ n: TypeAliasDecl.ID
   ) -> String {
-    return renderSimpleTypeAlias(typedProgram, n, true)
+    return renderSimpleTypeAlias(typedProgram, n, true).toHTML()
   }
 
   public static func renderProductTypeDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.ProductTypeDecl.ID
   ) -> String {
-    return renderSimpleProductType(typedProgram, n, true)
+    return renderSimpleProductType(typedProgram, n, true).toHTML()
   }
 
   public static func renderBindingDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.BindingDecl.ID
   ) -> String {
-    return renderSimpleBinding(typedProgram, n, true)
+    return renderSimpleBinding(typedProgram, n, true).toHTML()
   }
 
   public static func renderInitializerDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.InitializerDecl.ID
   ) -> String {
-    return renderSimpleInitializer(typedProgram, n, true)
+    return renderSimpleInitializer(typedProgram, n, true).toHTML()
   }
 
   public static func renderFunctionDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.FunctionDecl.ID
   ) -> String {
-    return renderSimpleFunction(typedProgram, n, true)
+    return renderSimpleFunction(typedProgram, n, true).toHTML()
   }
 
   public static func renderMethodDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.MethodDecl.ID
   ) -> String {
-    return renderSimpleMethod(typedProgram, n, true)
+    return renderSimpleMethod(typedProgram, n, true).toHTML()
   }
 
   public static func renderSubscriptDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.SubscriptDecl.ID
   ) -> String {
-    return renderSimpleSubscript(typedProgram, n, true)
+    return renderSimpleSubscript(typedProgram, n, true).toHTML()
   }
 }
 
@@ -85,48 +85,48 @@ public struct NavigationSymbolDecRenderer: StaticSymbolDeclRenderer {
   public static func renderTraitDecl(
     _ typedProgram: TypedProgram, _ n: TraitDecl.ID
   ) -> String {
-    return renderSimpleTrait(typedProgram, n, false)
+    return renderSimpleTrait(typedProgram, n, false).toHTML()
   }
 
   public static func renderTypeAliasDecl(
     _ typedProgram: TypedProgram, _ n: TypeAliasDecl.ID
   ) -> String {
-    return renderSimpleTypeAlias(typedProgram, n, false)
+    return renderSimpleTypeAlias(typedProgram, n, false).toHTML()
   }
 
   public static func renderProductTypeDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.ProductTypeDecl.ID
   ) -> String {
-    return renderSimpleProductType(typedProgram, n, false)
+    return renderSimpleProductType(typedProgram, n, false).toHTML()
   }
 
   public static func renderBindingDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.BindingDecl.ID
   ) -> String {
-    return renderSimpleBinding(typedProgram, n, false)
+    return renderSimpleBinding(typedProgram, n, false).toHTML()
   }
 
   public static func renderInitializerDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.InitializerDecl.ID
   ) -> String {
-    return renderSimpleInitializer(typedProgram, n, false)
+    return renderSimpleInitializer(typedProgram, n, false).toHTML()
   }
 
   public static func renderFunctionDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.FunctionDecl.ID
   ) -> String {
-    return renderSimpleFunction(typedProgram, n, false)
+    return renderSimpleFunction(typedProgram, n, false).toHTML()
   }
 
   public static func renderMethodDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.MethodDecl.ID
   ) -> String {
-    return renderSimpleMethod(typedProgram, n, false)
+    return renderSimpleMethod(typedProgram, n, false).toHTML()
   }
 
   public static func renderSubscriptDecl(
     _ typedProgram: TypedProgram, _ n: FrontEnd.SubscriptDecl.ID
   ) -> String {
-    return renderSimpleSubscript(typedProgram, n, false)
+    return renderSimpleSubscript(typedProgram, n, false).toHTML()
   }
 }
