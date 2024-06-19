@@ -243,6 +243,13 @@ public func prepareFunctionPage(
       )
     }
 
+    env["preconditions"] = doc.documentation.common.preconditions.map {
+      htmlGenerator.generate(document: $0.description)
+    }
+    env["postconditions"] = doc.documentation.common.postconditions.map {
+      htmlGenerator.generate(document: $0.description)
+    }
+
     env["seeAlso"] = doc.documentation.common.common.seeAlso.map(htmlGenerator.generate(document:))
   }
 
@@ -370,6 +377,14 @@ public func prepareSubscriptPage(
         htmlGenerator.generate(document: value.description)
       )
     }
+
+    env["preconditions"] = doc.documentation.common.preconditions.map {
+      htmlGenerator.generate(document: $0.description)
+    }
+    env["postconditions"] = doc.documentation.common.postconditions.map {
+      htmlGenerator.generate(document: $0.description)
+    }
+
     env["seeAlso"] = doc.documentation.common.common.seeAlso.map(htmlGenerator.generate(document:))
   }
   env["members"] = prepareMembersData(
