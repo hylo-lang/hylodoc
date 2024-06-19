@@ -233,15 +233,21 @@ public func isSupportedDecl(declId: AnyDeclID) -> Bool {
 }
 
 /// Get all the targets that should refer back to the provided target
-public func backReferencesOfTarget(_ typedProgram: TypedProgram, targetId: AnyTargetID)
-  -> [AnyTargetID]?
+public func backReferencesOfTarget(targetId: AnyTargetID, typedProgram: TypedProgram, documentationDatabase: DocumentationDatabase)
+  -> [AnyTargetID]
 {
   if case .decl(let declId) = targetId, let bindingId = BindingDecl.ID(declId) {
     let binding = typedProgram.ast[bindingId]!
     return resolvePatternToTargets(typedProgram, pattern: AnyPatternID(binding.pattern))
   }
+  if case .asset(let assetId) = targetId, case .folder(let folderAssetId) = assetId {
+    let associatedArticle = documentationDatabase.assets[folderAssetId]?.documentation
+    if let articleId = associatedArticle {
+      return [.asset(.article(articleId))]
+    }
+  }
 
-  return nil
+  return []
 }
 
 /// Recursively resolve patterns to target ID's

@@ -30,6 +30,9 @@ public protocol ReadableEntityStoreProtocol: Sequence {
   associatedtype Entity: IdentifiedEntity
   subscript(_ id: DocumentationID<Entity>) -> Entity? { get }
   var count: Int { get }
+
+  /// Returns the index of the first matching entity satisfying the given predicate
+  func firstIndex(where predicate: (Entity) throws -> Bool) rethrows -> Entity.ID?
 }
 
 /// A store of entities that supports insertion and lookup by ID, both in O(1) time.
@@ -66,6 +69,10 @@ public struct EntityStore<T: IdentifiedEntity>: ReadableEntityStoreProtocol {
   /// conformance to Sequence protocol
   public func makeIterator() -> some IteratorProtocol<T> {
     return entities.makeIterator()
+  }
+
+  public func firstIndex(where predicate: (T) throws -> Bool) rethrows -> T.ID? {
+    return try entities.firstIndex(where: predicate).map { T.ID(UInt32($0)) }
   }
 }
 
@@ -120,5 +127,10 @@ public struct AdaptedEntityStore<ASTNodeType: Node, StoredDataT: IdentifiedEntit
   /// conformance to Sequence protocol
   public func makeIterator() -> some IteratorProtocol<StoredDataT> {
     return entityStore.makeIterator()
+  }
+
+  public func firstIndex(where predicate: (StoredDataT) throws -> Bool) rethrows -> StoredDataT.ID?
+  {
+    return try entityStore.firstIndex(where: predicate)
   }
 }

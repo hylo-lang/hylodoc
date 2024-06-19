@@ -58,9 +58,6 @@ struct RuntimeError: LocalizedError {
 }
 
 public func urlToEncodedPath(_ url: URL) -> String {
-  // The colon is not an allowed url character on Windows
-  var reducedSet = CharacterSet.urlPathAllowed
-  reducedSet.remove(charactersIn: ":")
-
-  return url.path.addingPercentEncoding(withAllowedCharacters: reducedSet) ?? "."
+  precondition(!url.path.contains(":"), "we should not generate URLs containing the colon character")
+  return url.path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "."
 }

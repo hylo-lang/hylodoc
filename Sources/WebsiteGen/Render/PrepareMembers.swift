@@ -150,6 +150,7 @@ func getMemberNameAndSummary(
   default:
     return nil
   }
+  
 
   if let summary = summary, let scope = scope {
     return (
@@ -159,7 +160,9 @@ func getMemberNameAndSummary(
         context: ReferenceRenderingContext(
           typedProgram: context.documentation.typedProgram,
           scopeId: scope,
-          resolveUrls: targetToUrl(context.documentation.targetResolver)
+          resolveUrls: targetToUrl(context.documentation.targetResolver),
+          sourceUrl: sourceUrlOf(context.documentation.typedProgram.ast[of]),
+          assetStore:  context.documentation.documentation.assets
         )
       ),
       key

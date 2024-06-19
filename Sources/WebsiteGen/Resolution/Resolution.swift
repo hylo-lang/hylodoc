@@ -67,11 +67,14 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
     )
 
     // Resolve any references back to this target that are not supposed to have their own page
-    if let backReferences = backReferencesOfTarget(typedProgram, targetId: targetItem.targetId) {
-      backReferences.forEach {
-        targetResolver.resolveBackReference(from: $0, backTo: targetItem.targetId)
-      }
+    let backReferences = backReferencesOfTarget(
+      targetId: targetItem.targetId, typedProgram: typedProgram,
+      documentationDatabase: documentationDatabase)
+
+    backReferences.forEach {
+      targetResolver.resolveBackReference(from: $0, backTo: targetItem.targetId)
     }
+
   }
 
   return targetResolver
@@ -81,7 +84,8 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
 func urlRelativeToParent(
   _ targetResolver: TargetResolver, of parentId: AnyTargetID?, with pathComponent: String
 ) -> URL {
-  // Reason for transforming colon: https://stackoverflow.com/a/25477235/15495831
+  // Colons are not supported in Windows path names, so we transform them to U+A789 (꞉) which looks the same
+  // See: https://stackoverflow.com/a/25477235/15495831
   let transformedName = pathComponent.replacingOccurrences(of: ":", with: "\u{A789}")
 
   if let url = targetResolver[parentId]?.url {

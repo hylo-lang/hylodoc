@@ -188,3 +188,26 @@ public struct AssetStore {
 
   public init() {}
 }
+
+extension AssetStore {
+  // Finds an asset by its URL.
+  // 
+  // Complexity: O(n) where n is the number of assets in the store.
+  public func find(url: URL) -> AnyAssetID? {
+    let url = url.standardized
+
+    if let matchingArticleId = articles.firstIndex(where: { $0.location.standardized == url }) {
+      return .article(matchingArticleId)
+    }
+    if let matchingSourceFileId = sourceFiles.firstIndex(where: { $0.location.standardized == url }) {
+      return .sourceFile(matchingSourceFileId)
+    }
+    if let matchingFolderId = folders.firstIndex(where: { $0.location.standardized == url }) {
+      return .folder(matchingFolderId)
+    }
+    if let matchingOtherFileId = otherFiles.firstIndex(where: { $0.location.standardized == url }) {
+      return .otherFile(matchingOtherFileId)
+    }
+    return nil
+  }
+}

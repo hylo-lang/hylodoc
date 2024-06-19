@@ -1,0 +1,13 @@
+# Subfolder title
+<div id="sub-index-hylodoc-content">
+
+- link to parent: [ref: ../](../)
+- link to myself: [ref: index.hylodoc](index.hylodoc)
+- link to asset: [ref: asd.txt](asd.txt)
+
+These are the best animals that you can get:
+![Ducks 1](ducks.jpg)
+![Ducks 2](./ducks.jpg)
+![Ducks 3](../subfolder/ducks.jpg)
+
+</div>

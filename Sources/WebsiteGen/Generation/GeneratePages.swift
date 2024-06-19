@@ -139,15 +139,10 @@ func generatePageForAnyDecl(
 
 public func generateModuleIndex(_ context: inout GenerationContext) throws {
   var env: [String: Any] = [:]
-  env["pageType"] = "Folder"
+  env["pageType"] = "Home"
 
   // Article Content
-  if let htmlGenerator = context.htmlGenerator as? HtmlGenerator {
-    env["articleContent"] = htmlGenerator.generate(
-      doc: .document([
-        Block.paragraph(Text("Bellow you can find a list of the modules that have been documented"))
-      ]))
-  }
+  env["articleContent"] = "<p>Here is the list of documented modules:</p>"
 
   // Map children to an array of [(name, url)]
   env["contents"] = context.documentation.documentation.modules

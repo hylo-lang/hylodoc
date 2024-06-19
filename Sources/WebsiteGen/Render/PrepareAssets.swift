@@ -21,7 +21,9 @@ public func prepareSourceFilePage(_ context: GenerationContext, of: SourceFileAs
     context: .init(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceFile.location,
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -57,7 +59,9 @@ public func prepareArticlePage(_ context: GenerationContext, of: ArticleAsset.ID
     context: .init(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: article.location,
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -93,14 +97,6 @@ public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) 
 {
   let folder = context.documentation.documentation.assets[of]!
   let scope = AnyScopeID(folder.moduleId)
-  let htmlGenerator = SimpleHTMLGenerator(
-    context: .init(
-      typedProgram: context.documentation.typedProgram,
-      scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
-    ),
-    generator: context.htmlGenerator
-  )
 
   var env: [String: Any] = [:]
   env["pageType"] = "Folder"
@@ -109,7 +105,16 @@ public func prepareFolderPage(_ context: GenerationContext, of: FolderAsset.ID) 
   if let detailsId = folder.documentation {
     let detailsArticle = context.documentation.documentation.assets[detailsId]!
     if !detailsArticle.isInternal {
-      env["articleContent"] = htmlGenerator.generate(document: detailsArticle.content)
+      env["articleContent"] = context.htmlGenerator.generateResolvingHyloReferences(
+        document: detailsArticle.content,
+        context: .init(
+          typedProgram: context.documentation.typedProgram,
+          scopeId: scope,
+          resolveUrls: targetToUrl(context.documentation.targetResolver),
+          sourceUrl: detailsArticle.location,
+          assetStore: context.documentation.documentation.assets
+        )
+      )
     }
   }
 

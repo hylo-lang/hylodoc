@@ -178,7 +178,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
     modules
       .map { module in
         recursivelyVisitFolder(
-          folderPath: module.rootFolderPath,
+          folderPath: module.rootFolderPath.absoluteURL,
           visitor: &self,
           fileManager: fileManager
         )

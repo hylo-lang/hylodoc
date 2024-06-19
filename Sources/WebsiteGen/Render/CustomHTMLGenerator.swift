@@ -1,12 +1,26 @@
 import DocExtractor
+import DocumentationDB
 import Foundation
 import FrontEnd
 import MarkdownKit
 
 public struct ReferenceRenderingContext {
   let typedProgram: TypedProgram
+
+  /// The scope id of the current scope in which references should be resolved
   let scopeId: AnyScopeID
+
+  /// A closure that turns a target id into a URL that can be used to link to it
   let resolveUrls: (AnyTargetID) -> URL?
+
+  // these are for resolving local file references:
+
+  /// The absolute URL of the source file or hylodoc file that we
+  /// should resolve local file references relative to
+  let sourceUrl: URL
+
+  /// We need this for looking up assets by url
+  let assetStore: AssetStore
 }
 
 public protocol HyloReferenceResolvingGenerator {
@@ -56,9 +70,46 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
   }
 
   override open func generate(textFragment fragment: TextFragment) -> String {
+    precondition(referenceContext != nil)
+
     // Override how to generate code tags
     if case .code(let str) = fragment {
       return "<code class=\"tag\">\(String(str).encodingPredefinedXmlEntities())</code>"
+    }
+
+    // Override the generation of links to allow for local file references
+    if case .link(let text, let url, let title) = fragment {
+      let titleAttr = title == nil ? "" : " title=\"\(title!)\""
+
+      guard let reference = url, !reference.isEmpty else {
+        return self.generate(text: text)
+      }
+
+      guard
+        let urlString = resolveLinkReference(
+          reference: reference, referenceContext: referenceContext!), !urlString.isEmpty
+      else {
+        return self.generate(text: text)
+      }
+
+      return "<a href=\"\(urlString)\"\(titleAttr)>" + self.generate(text: text) + "</a>"
+    }
+    // Override the generation of images to resolve local file references
+    if case .image(let alt, let url, let title) = fragment {
+      let titleAttr = title == nil ? "" : " title=\"\(title!)\""
+
+      guard let reference = url, !reference.isEmpty else {
+        return self.generate(text: alt)
+      }
+
+      guard
+        let urlString = resolveLinkReference(
+          reference: reference, referenceContext: referenceContext!), !urlString.isEmpty
+      else {
+        fatalError("Couldn't resolve image reference \(reference) from source url \(referenceContext!.sourceUrl)")
+      }
+
+      return "<img src=\"\(urlString)\" alt=\"\(alt)\"\(titleAttr) />"
     }
 
     return super.generate(textFragment: fragment)
@@ -135,5 +186,42 @@ struct SimpleHTMLGenerator<T: HyloReferenceResolvingGenerator> {
   }
   func generate(document: Block) -> String {
     generator.generateResolvingHyloReferences(document: document, context: context)
+  }
+}
+
+/// Resolves a local file reference to an asset id, relative to the provided source file url.
+func resolveLocalFileReference(_ reference: String, from sourceUrl: URL, in assetStore: AssetStore)
+  -> AnyTargetID
+{
+  // todo refactor into a throwing function
+  let referencedLocalFileUrl = URL.init(
+    fileURLWithPath: reference,
+    relativeTo: sourceUrl.deletingLastPathComponent()
+  ).absoluteURL
+
+  guard let assetId: AnyAssetID = assetStore.find(url: referencedLocalFileUrl.standardized) else {
+    var message =
+      "[Error]: didn't find asset for referenced asset \"\(referencedLocalFileUrl.standardized)\" \n\t"
+      + "while resolving reference \(reference) in \(sourceUrl)\n Possible paths are:\n"
+    for a in assetStore.folders {
+      message += "- " + a.location.description + "\n"
+    }
+    fatalError(message)
+  }
+  return .asset(assetId)
+}
+
+/// Resolves a local file reference or any web url to a correct string
+/// representation of a link that can be embedded in the website
+func resolveLinkReference(reference: String, referenceContext: ReferenceRenderingContext) -> String?
+{
+  if reference.hasPrefix(".") || !reference.contains(":") {
+    referenceContext.resolveUrls(
+      resolveLocalFileReference(
+        reference, from: referenceContext.sourceUrl, in: referenceContext.assetStore
+      )
+    ).map { urlToEncodedPath($0) }
+  } else {
+    reference
   }
 }

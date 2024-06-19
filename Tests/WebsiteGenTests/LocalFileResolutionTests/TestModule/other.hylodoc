@@ -1,0 +1,20 @@
+# Other
+
+These are the best animals that you can get:
+![Ducks 1](subfolder/ducks.jpg)
+![Ducks 2](./subfolder/ducks.jpg)
+
+<div id="other-hylodoc-content">
+ - Link to folder: [folder](./)
+ - Link to index.hylodoc: [index](./index.hylodoc)
+ - Link to other.hylodoc: [index](./other.hylodoc)
+ - Link to subfolder: [subfolder](./subfolder)
+ - Link to index in subfolder: [index in subfolder](./subfolder/index.hylodoc)
+
+ - Link to folder: [folder](.)
+ - Link to index.hylodoc: [index](index.hylodoc)
+ - Link to other.hylodoc: [index](other.hylodoc)
+ - Link to subfolder: [subfolder](subfolder)
+ - Link to index in subfolder: [index in subfolder](subfolder/index.hylodoc)
+
+</div>

@@ -1,0 +1,16 @@
+# TestModule root
+<div id="index-hylodoc-content">
+
+ - Link to folder: [folder](./)
+ - Link to index.hylodoc: [index](./index.hylodoc)
+ - Link to other.hylodoc: [index](./other.hylodoc)
+ - Link to subfolder: [subfolder](./subfolder)
+ - Link to index in subfolder: [index in subfolder](./subfolder/index.hylodoc)
+
+without `./`:
+ - Link to folder: [folder](.)
+ - Link to index.hylodoc: [index](index.hylodoc)
+ - Link to other.hylodoc: [index](other.hylodoc)
+ - Link to subfolder: [subfolder](subfolder)
+ - Link to index in subfolder: [index in subfolder](subfolder/index.hylodoc)
+</div>

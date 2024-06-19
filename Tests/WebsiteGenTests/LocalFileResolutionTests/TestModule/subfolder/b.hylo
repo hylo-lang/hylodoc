@@ -1,0 +1,15 @@
+/// # File-Level:
+/// This is the summary.
+///
+/// - Link to folder: [folder](./)
+/// - Link to index.hylodoc: [index](./index.hylodoc)
+/// - Link to parent: [TestModule](../)
+/// - Link to index in parent: [TestModule article](../index.hylodoc)
+
+/// This is the summary.
+///
+/// - Link to folder: [folder](./)
+/// - Link to index.hylodoc: [index](./index.hylodoc)
+/// - Link to parent: [TestModule](../)
+/// - Link to index in parent: [TestModule article](../index.hylodoc)
+type B{}

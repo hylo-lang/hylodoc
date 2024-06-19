@@ -4,6 +4,13 @@ import FrontEnd
 import MarkdownKit
 import OrderedCollections
 
+func sourceUrlOf(_ decl: any Node) -> URL {
+  decl.site.file.url
+}
+func sourceUrlOf(_ decl: some Node) -> URL {
+  decl.site.file.url
+}
+
 /// Render the associated-type page
 ///
 /// - Parameters:
@@ -21,7 +28,9 @@ public func prepareAssociatedTypePage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -57,7 +66,9 @@ public func prepareAssociatedValuePage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -92,7 +103,9 @@ public func prepareTypeAliasPage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(context.documentation.typedProgram.ast[declId]),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -128,7 +141,9 @@ public func prepareBindingPage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -166,7 +181,9 @@ public func prepareOperatorPage(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -197,11 +214,14 @@ public func prepareFunctionPage(
   _ context: GenerationContext, of declId: FunctionDecl.ID
 ) throws -> StencilContext {
   let scope = AnyScopeID(declId)
+  let decl = context.documentation.typedProgram.ast[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -230,6 +250,7 @@ public func prepareFunctionPage(
       htmlGenerator.generate(document: $0.description)
     }
 
+    // TODO: https://gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-e/04d/automated-documentation-generation-tool/-/issues/147
     env["parameters"] = doc.documentation.parameters.map { key, value in
       (
         context.documentation.typedProgram.ast[key].baseName,
@@ -269,11 +290,14 @@ public func prepareMethodPage(
 ) throws -> StencilContext {
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
+  let decl = context.documentation.typedProgram.ast[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -339,11 +363,14 @@ public func prepareSubscriptPage(
 ) throws -> StencilContext {
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
+  let decl = context.documentation.typedProgram.ast[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -408,11 +435,14 @@ public func prepareInitializerPage(
   _ context: GenerationContext, of declId: InitializerDecl.ID
 ) throws -> StencilContext {
   let scope = AnyScopeID(declId)
+  let decl = context.documentation.typedProgram.ast[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -473,11 +503,14 @@ public func prepareTraitPage(
 {
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
+  let decl = context.documentation.typedProgram.ast[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )
@@ -523,11 +556,14 @@ public func prepareProductTypePage(
 ) throws -> StencilContext {
   let target = AnyTargetID.decl(AnyDeclID(declId))
   let scope = AnyScopeID(declId)
+  let decl = context.documentation.typedProgram.ast[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
       typedProgram: context.documentation.typedProgram,
       scopeId: scope,
-      resolveUrls: targetToUrl(context.documentation.targetResolver)
+      resolveUrls: targetToUrl(context.documentation.targetResolver),
+      sourceUrl: sourceUrlOf(decl),
+      assetStore: context.documentation.documentation.assets
     ),
     generator: context.htmlGenerator
   )

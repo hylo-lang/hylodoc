@@ -70,7 +70,15 @@ private func parseFileLevelDocumentation(
 
   let (summary, description) = parseSummaryAndDescription(
     blocks: fileLevelComment.value.specialSections.first {
-      $0.name.lowercased() == SpecialSectionType.fileLevel.headingName
+      if $0.name.lowercased() == SpecialSectionType.fileLevel.headingName { return true }
+      if $0.name.lowercased() == "file-level" {
+        diagnostics.insert(
+          .error(
+            "File-level section should be named 'File-level:' (with a colon).",
+            at: fileLevelComment.site))
+        return true
+      }
+      return false
     }!.blocks,
     diagnostics: &diagnostics
   )
