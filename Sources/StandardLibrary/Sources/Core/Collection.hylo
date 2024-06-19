@@ -16,12 +16,12 @@ public trait Collection {
 
   /// Returns the position immediately after `i`.
   ///
-  /// - Requires: `i != end_position()`.
+  /// # Precondition: `i != end_position()`.
   fun position(after i: Position) -> Position
 
   /// Accesses the element at position `i`.
   ///
-  /// - Requires: `i` is a valid position in `self` different from `end_position()`.
+  /// # Precondition: `i` is a valid position in `self` different from `end_position()`.
   subscript(_ i: Position): Element { let }
 
 }
@@ -31,7 +31,7 @@ public extension Collection {
   /// Returns the result of applying `combine` on an accumulator, initialized with `initial_value`,
   /// and each element of `self`, in order.
   ///
-  /// - Complexity: O(n), where n is the number of elements in `self`.
+  /// # Complexity: O(n), where n is the number of elements in `self`.
   public fun reduce<E, T: Movable>(
     _ accumulator: sink T,
     _ combine: [E](sink T, Element) -> T
@@ -44,7 +44,7 @@ public extension Collection {
 
   /// Returns `true` iff `self` contains an element satisfying `predicate`.
   ///
-  /// - Complexity: O(n), where n is the number of elements in `self`.
+  /// # Complexity: O(n), where n is the number of elements in `self`.
   public fun contains<E>(where predicate: [E](Element) -> Bool) -> Bool {
     for let e in self {
       if predicate(e) { return true }
@@ -54,7 +54,7 @@ public extension Collection {
 
   /// Returns `true` iff all elements in `self` satisfy `predicate`.
   ///
-  /// - Complexity: O(n), where n is the number of elements in `self`.
+  /// # Complexity: O(n), where n is the number of elements in `self`.
   public fun all_satisfy<E>(_ predicate: [E](Element) -> Bool) -> Bool {
     for let e in self {
       if !predicate(e) { return false }

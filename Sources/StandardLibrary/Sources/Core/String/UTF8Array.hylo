@@ -69,12 +69,12 @@ public type UTF8Array: Regular {
     // TODO: uncomment when #1046 is implemented
     // precondition(source.count >= 0)
 
-    // Source is empty and requested capacity fits in inline storage.
+    /// Source is empty and requested capacity fits in inline storage.
     if (source.count == 0) && (minimum_capacity < 7) {
       &self.units = 0
     }
 
-    // Source buffer and requested capacity fit in inline storage.
+    /// Source buffer and requested capacity fit in inline storage.
     else if (source.count < 8) && (minimum_capacity < 7) {
       &self.units = UInt64(truncating_or_extending: source.count) << 2
       PointerToMutable<Int8>(type_punning: mutable_pointer[to: &units])
@@ -82,7 +82,7 @@ public type UTF8Array: Regular {
         .unsafe_initialize(copying_bytes_from: source.start, count: source.count)
     }
 
-    // Source buffer requires out-of-line storage.
+    /// Source buffer requires out-of-line storage.
     else {
       #if feature(freestanding)
         fatal_error("cannot allocate heap storage in free-standing environment")
@@ -117,7 +117,7 @@ public type UTF8Array: Regular {
       let payload = PointerToMutable<Int8>(type_punning: header.advance(by: 1))
       payload.unsafe_initialize(copying_bytes_from: source.start, count: source.count)
 
-      // Zero-initialize the remainder of the buffer to guarantee that it is null-terminated.
+      /// Zero-initialize the remainder of the buffer to guarantee that it is null-terminated.
       payload.advance(by: source.count)
         .unsafe_initialize(repeating: 0, count: capacity - source.count + 1)
 
@@ -175,7 +175,7 @@ public type UTF8Array: Regular {
 
   /// Returns `true` if the payload of `self` is stored inline.
   fun is_inline() -> Bool {
-    // Note: the flag is stored inversed so that `0` is an empty string.
+    /// Note: the flag is stored inversed so that `0` is an empty string.
     (units & 0b10) == 0
   }
 
@@ -212,7 +212,7 @@ public conformance UTF8Array: Copyable {
 
   public fun copy() -> Self {
     if is_inline() || is_unowned() {
-      // Note: copying unowned instances doesn't allocate new storage.
+      /// Note: copying unowned instances doesn't allocate new storage.
       return .new(units: units.copy())
     } else {
       let header = unsafe_heap_header()
@@ -227,17 +227,17 @@ public conformance UTF8Array: Copyable {
 public conformance UTF8Array: Equatable {
 
   public fun infix== (_ other: Self) -> Bool {
-    // If both LHS and RHS are stored inline, their representation are bitwise equal.
+    /// If both LHS and RHS are stored inline, their representation are bitwise equal.
     if self.is_inline() && other.is_inline() {
       return self.units == other.units
     }
 
-    // LHS and RHS are equal if they point to the same buffer.
+    /// LHS and RHS are equal if they point to the same buffer.
     if !self.is_inline() && !other.is_inline() {
       if self.unsafe_heap_header() == other.unsafe_heap_header() { return true }
     }
 
-    // LHS and RHS are equal if they contain the same elements in the same order.
+    /// LHS and RHS are equal if they contain the same elements in the same order.
     // TODO: Rewrite as `self.elements_equal(other)`.
     if self.count() != other.count() { return false }
     var i = 0

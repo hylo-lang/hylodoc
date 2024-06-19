@@ -1,6 +1,6 @@
 /// A contiguous, one-dimensional space whose values can be offset and measured.
 ///
-/// - Important: Default implementations of `infix==` and `infix<` are available if `Stride`
+/// Important: Default implementations of `infix==` and `infix<` are available if `Stride`
 ///   conforms to `Deinitializable`. These implementations depend on `Stride`'s implementation,
 ///   meaning that if a type conforming to `Strideable` is its own `Stride` type, it must also
 ///   provide its own implementations of `infix==` and `infix<` to avoid infinite recursion.
@@ -11,7 +11,7 @@ public trait Strideable: Comparable {
 
   /// Returns the offset to be added to `self` to get `other`.
   ///
-  /// - Complexity: O(1).
+  /// # Complexity: O(1).
   fun offset(to other: Self) -> Stride
 
   /// Returns `self` offset by the given amount.
@@ -20,7 +20,7 @@ public trait Strideable: Comparable {
   /// `offset` is positive or negative, the returned value is greater or lesser then `self`,
   /// respectively. Otherwise, the returned value is equal to `self`.
   ///
-  /// - Complexity: O(1).
+  /// # Complexity: O(1).
   fun advance(by offset: Stride) -> Self
 
 }

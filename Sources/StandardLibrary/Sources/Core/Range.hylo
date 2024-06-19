@@ -14,7 +14,7 @@ public type Range<Bound: SemiRegular & Comparable> {
 
   /// Creates a half-open interval [`lower_bound`, `upper_bound`).
   ///
-  /// - Requires: `lower_bound <= upper_bound`.
+  /// # Precondition: `lower_bound <= upper_bound`.
   public init(from lower_bound: sink Bound, up_to upper_bound: sink Bound) {
     // precondition(lower_bound <= upper_bound)
     &self.lower_bound = lower_bound

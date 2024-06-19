@@ -8,7 +8,7 @@ public type Pointer<Pointee>: Regular {
 
   /// The value at the given address.
   ///
-  /// - Requires: `self` is the address of an object of type `Pointee` and its storage
+  /// # Preconditions: `self` is the address of an object of type `Pointee` and its storage
   ///   is accessed only through this projection during the projection's lifetime.
   public subscript unsafe(): Pointee {
     yield base as* (remote let Pointee)

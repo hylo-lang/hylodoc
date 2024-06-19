@@ -12,7 +12,7 @@ public type Int32: Regular {
 
   /// Creates a copy of `other`.
   ///
-  /// - Requires: The value of `other` must be representable in this type.
+  /// # Precondition: The value of `other` must be representable in this type.
   public init(_ other: Int) {
     &self.value = Builtin.trunc_word_i32(other.value)
   }

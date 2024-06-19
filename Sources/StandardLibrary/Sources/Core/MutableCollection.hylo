@@ -3,12 +3,12 @@ trait MutableCollection: Collection {
 
   /// Accesses the element at position `i`.
   ///
-  /// - Requires: `i` is a valid position in `self` different from `end_position()`.
+  /// # Preconditions: `i` is a valid position in `self` different from `end_position()`.
   subscript(_ i: Position): Element { inout }
 
   /// Exchanges the values at the given positions in `self`.
   ///
-  /// - Requires: `i` and `j` are valid positions in `self` different from `end_position()`.
+  /// # Preconditions: `i` and `j` are valid positions in `self` different from `end_position()`.
   fun swap_at(_ i: Position, _ j: Position) inout
 
 }
@@ -19,7 +19,7 @@ public extension MutableCollection {
   /// the latter sequence of element values is the start of the former sequence, and returns that
   /// position.
   ///
-  /// - Complexity: O(n), where n is the number of elements in `self`.
+  /// # Complexity: O(n), where n is the number of elements in `self`.
   public fun rotate(regions_separated_by p: Position) inout -> Position {
     var m = p.copy()
     var s = start_position()

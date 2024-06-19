@@ -1,6 +1,6 @@
 /// Allocates `size` bytes of uninitialized storage whose alignment is specified by `alignment`.
 ///
-/// - Parameters:
+/// # Parameters:
 ///   - alignment: The alignment of the allocated memory. Must be a valid alignment supported by
 ///     the implementation.
 ///   - size: The number of bytes to allocate. Must be an integral multiple of `alignment`.

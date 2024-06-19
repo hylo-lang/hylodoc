@@ -50,7 +50,7 @@ public type BitArray {
 
   /// Sets the value `b` for the bit at position `p`.
   ///
-  /// - Requires: `p` is a valid position in `self`.
+  /// # Precondition: `p` is a valid position in `self`.
   fun set_value(_ b: Bool, for p: Position) inout {
     let m = 1 << p.offset
     if b {

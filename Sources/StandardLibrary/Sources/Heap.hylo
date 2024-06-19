@@ -6,10 +6,10 @@
 ///
 /// Memory allocated with `hylo_aligned_alloc` must be deallocated with `hylo_aligned_free`.
 ///
-/// - Parameters:
+/// # Parameters:
 ///   - alignment: The alignment of the allocated memory. Must be a power of 2.
 ///   - size: The number of bytes to allocate. Must be greater than 0.
-/// - Returns: a pointer to newly allocated memory.
+/// # Returns: a pointer to newly allocated memory.
 public fun hylo_aligned_alloc(_ alignment: Int, _ size: Int) -> MemoryAddress {
 
   // We allocate `size` plus the storage for a pointer and some padding to satisfy the alignment

@@ -42,28 +42,28 @@ public type Float64 {
 
   /// Returns the quotient of dividing `self` by `other`
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   public fun infix/ (_ other: Self) -> Self {
     Float64(value: Builtin.fdiv_float64(value, other.value))
   }
 
   /// Writes the quotient of dividing `self` by `other` to `self`.
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   public fun infix/= (_ other: Self) inout {
     &self.value = Builtin.fdiv_float64(value, other.value)
   }
 
   /// Returns the remainder of dividing `self` by `other`
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   public fun infix% (_ other: Self) -> Self {
     Float64(value: Builtin.frem_float64(value, other.value))
   }
 
   /// Writes the remainder of dividing `self` by `other` to `self`.
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   public fun infix%= (_ other: Self) inout {
     &self.value = Builtin.frem_float64(value, other.value)
   }

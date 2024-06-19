@@ -8,19 +8,19 @@ public type PointerToMutable<Pointee>: Regular {
 
   /// The value at the address represented by `self`.
   ///
-  /// - Requires: the address stores an object of type Pointee.
+  /// # Preconditions: the address stores an object of type Pointee.
   public subscript unsafe(): Pointee {
-    /// - Requires: nothing mutates the value's storage during this projection's lifetime.
+    /// # Preconditions: nothing mutates the value's storage during this projection's lifetime.
     let { yield base as* (remote let Pointee) }
 
-    /// - Requires: the value is mutable, and nothing accesses its
+    /// # Preconditions: the value is mutable, and nothing accesses its
     ///   storage except through this projection during its lifetime.
     inout { yield &(base as* (remote let Pointee)) }
   }
 
   /// Creates an instance with mutable access to the memory pointed to by `p`.
   ///
-  /// - Warning: while this initializer is not in itself unsafe, it should be used with caution.
+  /// Warning: while this initializer is not in itself unsafe, it should be used with caution.
   public init(adding_mutation_to p: Pointer<Pointee>) {
     &base = p.base
   }
@@ -52,7 +52,7 @@ public type PointerToMutable<Pointee>: Regular {
 
   /// Returns the result of applying `initialize` to the uninitialized `Pointee` storage.
   ///
-  /// - Requires: the `MemoryLayout<Pointee>.size()` bytes starting at the address are uninitialized
+  /// # Preconditions: the `MemoryLayout<Pointee>.size()` bytes starting at the address are uninitialized
   ///   and suitably aligned for `Pointee`.
   public fun unsafe_initialize_pointee<E, R>(_ initialize: inout [E](set Pointee) -> R) -> R {
     initialize(&(base as* (remote set Pointee)))
@@ -127,7 +127,7 @@ public extension PointerToMutable where Pointee: Movable {
 
   /// Initializes the value at the address represented by `self` to `value`.
   ///
-  /// - Requires: the `MemoryLayout<Pointee>.size()` bytes starting at the address are uninitialized
+  /// # Preconditions: the `MemoryLayout<Pointee>.size()` bytes starting at the address are uninitialized
   ///   and suitably aligned for `Pointee`.
   public fun unsafe_initialize_pointee(_ value: sink Pointee) {
     initialize<Pointee>(&(base as* (remote set Pointee)), to: value)
@@ -156,7 +156,7 @@ public subscript mutable_pointer<T>(to x: inout T): PointerToMutable<T> {
 
 /// Initializes `x` to `y`.
 ///
-/// - Note: This function is a workaround for the lack of `set` bindings (see #925).
+/// Note: This function is a workaround for the lack of `set` bindings (see #925).
 fun initialize<T: Movable>(_ x: set T, to y: sink T) {
   &x = y
 }

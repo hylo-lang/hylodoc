@@ -16,7 +16,7 @@ public type Array<Element: SemiRegular>: SemiRegular {
   ///
   /// `initialize` accepts an index and returns the element that should be inserted at that index.
   ///
-  /// - Requires: `count >= 0`.
+  /// # Precondition: `count >= 0`.
   public init<E>(count: Int, initialized_with initialize: inout [E](Int) inout -> Element) {
     precondition(count >= 0, "negative array count")
 
@@ -111,8 +111,8 @@ public type Array<Element: SemiRegular>: SemiRegular {
   /// The new element is inserted before the element currently at `index`. If `index` is equal to
   /// `count()`, the new element is added at the end of the array.
   ///
-  /// - Requires: `index` is in the range `0 ..< count()`.
-  /// - Complexity: O(n), where n is the number of elements in `self`.
+  /// # Precondition: `index` is in the range `0 ..< count()`.
+  /// # Complexity: O(n), where n is the number of elements in `self`.
   public fun insert(_ source: sink Element, at index: Int) inout {
     var c = count()
     &reserve_capacity(c + 1)
@@ -127,8 +127,8 @@ public type Array<Element: SemiRegular>: SemiRegular {
 
   /// Removes and returns the element at `index`.
   ///
-  /// - Requires: `index` is in the range `0 ..< count()`.
-  /// - Complexity: O(n), where n is the number of elements in `self`.
+  /// # Precondition: `index` is in the range `0 ..< count()`.
+  /// # Complexity: O(n), where n is the number of elements in `self`.
   public fun remove(at index: Int) inout -> Element {
     let result = pointer_to_element[at: index].unsafe_pointee()
     var i = index + 1
@@ -171,7 +171,7 @@ public type Array<Element: SemiRegular>: SemiRegular {
 
   /// Reverses the elements of `self` in place.
   ///
-  /// - Complexity: O(n), where n is the number of elements in `self`.
+  /// # Complexity: O(n), where n is the number of elements in `self`.
   public fun reverse() inout {
     var i = count() - 1
     var j = 0
@@ -184,7 +184,7 @@ public type Array<Element: SemiRegular>: SemiRegular {
 
   /// Projects the address of the element at `position`.
   ///
-  /// - Requires: `position` is in the range `0 ..< capacity()`.
+  /// # Precondition: `position` is in the range `0 ..< capacity()`.
   subscript pointer_to_element(at position: Int): PointerToMutable<Element> {
     storage.first_element_address().advance(by: position)
   }
@@ -235,13 +235,13 @@ public conformance Array: Collection {
 
   /// Returns the position immediately after `i`.
   ///
-  /// - Requires: `i != end_position()`.
-  /// - Complexity: O(1).
+  /// # Precondition: `i != end_position()`.
+  /// # Complexity: O(1).
   public fun position(after i: Int) -> Int { i + 1 }
 
   /// Accesses the element at `position`.
   ///
-  /// - Requires: `position` is in the range `0 ..< count()`.
+  /// # Precondition: `position` is in the range `0 ..< count()`.
   public subscript(_ position: Int): Element {
     let {
       precondition((position >= 0) && (position < count()), "position is out of bounds")

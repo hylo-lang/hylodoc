@@ -1,6 +1,6 @@
 /// Unconditionally stops execution.
 ///
-/// - Parameters:
+/// # Parameters:
 ///   - message: A description of the error to write to the standard error of a hosted environment
 ///     before terminating the program. The default is an empty string.
 ///   - file: The file name to print with `message`. The default is the file where this function
@@ -16,7 +16,7 @@ public fun fatal_error(
 
 /// Checks a necessary condition for making forward progress.
 ///
-/// - Parameters:
+/// # Parameters:
 ///   - condition: The condition to test.
 ///   - message: A description of the error to write to the standard error of a hosted environment
 ///     before terminating the program if the precondition fails. The default is an empty string.

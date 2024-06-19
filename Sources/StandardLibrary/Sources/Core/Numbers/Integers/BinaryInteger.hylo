@@ -21,7 +21,7 @@ public trait BinaryInteger: Comparable, Numeric {
 
   /// Returns the quotient and remainder of dividing `self` by `other`.
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   fun quotient_and_remainder(dividing_by other: Self) -> {quotient: Self, remainder: Self}
 
   // TODO: Define an associated type when #1042 is fixed.
@@ -33,22 +33,22 @@ public trait BinaryInteger: Comparable, Numeric {
 
   /// Returns the quotient of dividing `self` by `other`.
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   fun infix/ (_ other: Self) -> Self
 
   /// Writes the quotient of dividing `self` by `other` to `self`.
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   fun infix/= (_ other: Self) inout
 
   /// Returns the remainder of dividing `self` by `other`.
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   fun infix% (_ other: Self) -> Self
 
   /// Writes the remainder of dividing `self` by `other` to `self`.
   ///
-  /// - Requires: `other` is different from `0`.
+  /// # Precondition: `other` is different from `0`.
   fun infix%= (_ other: Self) inout
 
   /// Returns `true` if `self` is smaller than `other`; returns `false` otherwise.
