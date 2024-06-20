@@ -337,6 +337,9 @@ func renderDetailedWhere(
         return .wrap([.name(identifier), .text(" == "), .type(other, href: typeUrl)])
       }
 
+      print(
+        "Warning: encountered a non NameExpr inside where equality constraint (unsupported rendering)"
+      )
       return nil  // TODO
     case .bound(let l, let r):
       let identifier = ctx.typedProgram.ast[l].name.value.stem
@@ -350,10 +353,15 @@ func renderDetailedWhere(
           return .type(name.name.value.stem, href: typeUrl)
         }
 
+        print(
+          "Warning: encountered a non NameExpr inside where bound constraint (unsupported rendering)"
+        )
         return nil  // TODO
       }
       return .wrap([.name(identifier), .text(": "), .join(conformances, " & ")])
     case .value(_):
+      print(
+        "Warning: encountered a where value constraint (unsupported rendering)")
       return nil  // TODO
     }
   }
@@ -403,6 +411,7 @@ func renderDetailedGenericClause(
     return result
   }
 
+  print("Warning: encountered generic clause with no parameters (unsupported rendering)")
   return nil
 }
 
@@ -537,5 +546,6 @@ func renderDetailedType(_ ctx: DocumentationContext, _ type: AnyType)
   //   return .text("WITNESS")
   // }
 
+  print("Warning: encountered an AnyType for which rendering is not yet implemented")
   return .error
 }
