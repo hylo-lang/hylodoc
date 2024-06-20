@@ -209,6 +209,7 @@ public enum SpecialSectionPreset {
   case `subscript`
   case `initializer`
   case `withInvariants`
+  case `withInvariantsAndGenerics`
 
   public var allowedSections: Set<SpecialSectionType> {
     switch self {
@@ -221,6 +222,8 @@ public enum SpecialSectionPreset {
       ]
     case .withInvariants:
       return [.seeAlso, .invariant]
+    case .withInvariantsAndGenerics:
+      return [.seeAlso, .invariant, .generic]
     case .subscript:
       return [
         .seeAlso, .parameter, .throws, .precondition, .postcondition, .complexity, .generic,
@@ -408,7 +411,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
       if let symbolComment = documentedFile.symbolComments[ast[d].site.startIndex] {
 
         validateAllowedSpecialSections(
-          preset: .withInvariants,
+          preset: .withInvariantsAndGenerics,
           comment: symbolComment,
           diagnostics: &diagnostics
         )
@@ -419,7 +422,9 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
               comment: symbolComment, diagnostics: &diagnostics),
             invariants: parseSpecialSection(
               type: .invariant, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Invariant.init(description:), markdownParser: markdownParser)
+              constructor: Invariant.init(description:), markdownParser: markdownParser),
+            genericParameters: makeJustGenericParameters(
+              comment: symbolComment, diagnostics: &diagnostics, astID: AnyDeclID(d), ast: ast)
           ),
           for: d
         )
@@ -751,6 +756,35 @@ private func makeParameters(
   }
 
   return (parameterDocs, genericParameterDocs)
+}
+
+/// Creates generic parameter docs
+private func makeJustGenericParameters(
+  comment: SourceRepresentable<LowLevelCommentInfo>,
+  diagnostics: inout DiagnosticSet,
+  astID: AnyDeclID,
+  ast: AST
+) -> GenericParameterDocumentations {
+  var genericParameterDocs: GenericParameterDocumentations = [:]
+
+  let genericParamDecls = ast.genericParameters(introducedBy: astID)
+
+  let genericParamMap = genericParamDecls.reduce(into: [String: GenericParameterDecl.ID]()) {
+    (dict, paramID) in
+    dict[ast[paramID].identifier.value] = paramID
+  }
+
+  if !genericParamDecls.isEmpty {
+    genericParameterDocs = createParameterDocs(
+      type: .generic,
+      paramMap: genericParamMap,
+      comment: comment,
+      diagnostics: &diagnostics,
+      constructor: GenericParameterDocumentation.init(description:)
+    )
+  }
+
+  return genericParameterDocs
 }
 
 // This method takes the comment and the identified parameters in the AST and validates and creates the docs.

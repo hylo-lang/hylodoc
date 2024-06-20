@@ -581,6 +581,12 @@ public func prepareProductTypePage(
       htmlGenerator.generate(
         document: $0.description)
     }
+    env["genericParameters"] = doc.genericParameters.map { key, value in
+      (
+        context.documentation.typedProgram.ast[key].baseName,
+        htmlGenerator.generate(document: value.description)
+      )
+    }
     env["seeAlso"] = doc.common.seeAlso.map(htmlGenerator.generate(document:))
   }
 

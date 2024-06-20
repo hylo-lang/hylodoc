@@ -56,7 +56,8 @@ final class ProductTypeTest: XCTestCase {
       ),
       invariants: [
         Invariant(description: .document([.paragraph(Text("Invariants are cool"))]))
-      ]
+      ],
+      genericParameters: [:]
     )
 
     var documentation: DocumentationDatabase = .init()

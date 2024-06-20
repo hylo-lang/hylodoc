@@ -42,3 +42,17 @@ type MyType : TraitA, TraitB {
     inout { }
   }
 }
+
+trait D {}
+        
+/// Summary of the product type.
+///
+/// This is the description of the product type.
+/// # Invariant: x and y must always be positive.
+/// # Generic T: This is a generic.
+type A<T: D>{
+  var x: Int
+  var y: Int
+  let t: T
+  fun foo() -> Int { x.copy() }
+}

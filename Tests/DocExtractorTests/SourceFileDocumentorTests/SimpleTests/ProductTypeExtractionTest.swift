@@ -12,13 +12,17 @@ final class ProductTypeExtractionTest: XCTestCase {
 
     let sourceFile = SourceFile(
       synthesizedText: """
+        trait D {}
+        
         /// Summary of the product type.
         ///
         /// This is the description of the product type.
         /// # Invariant: x and y must always be positive.
-        type A {
+        /// # Generic T: This is a generic.
+        type A<T: D>{
           var x: Int
           var y: Int
+          let t: T
           fun foo() -> Int { x.copy() }
         }
         """, named: "testFile.hylo")
@@ -54,6 +58,10 @@ final class ProductTypeExtractionTest: XCTestCase {
     assertContains(
       myTypeDoc.invariants.map { $0.description.debugDescription }.joined(),
       what: "x and y must always be positive.")
+
+      assertContains(
+      myTypeDoc.genericParameters.first?.value.description.description,
+      what: "This is a generic.")
   }
 
   func testProductTypeExtractionListInvariant() throws {
