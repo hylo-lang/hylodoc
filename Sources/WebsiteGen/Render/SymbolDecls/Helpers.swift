@@ -86,11 +86,13 @@ func wrap(_ element: String, _ inner: String, className: String? = nil, href: UR
 func getDeclUrl(_ ctx: DocumentationContext, _ to: AnyDeclID?)
   -> String?
 {
-  if to == nil {
-    return nil
+  if let to = to {
+    if let url = ctx.targetResolver.url(to: .decl(to)) {
+      return urlToEncodedPath(url)
+    }
   }
 
-  return ctx.targetResolver.url(to: .decl(to!))?.description
+  return nil
 }
 
 func isSelfParam(_ program: TypedProgram, _ parameter: ParameterDecl) -> Bool {
