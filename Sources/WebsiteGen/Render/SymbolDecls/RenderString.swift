@@ -24,7 +24,7 @@ enum RenderString: Equatable {
       switch self {
       case .wrap: return nil
       case .keyword: return "keyword"
-      case .name: return "comment"  // FIXME
+      case .name: return "name"
       case .number: return "number-literal"
       case .type: return "type"
       case .link: return nil
@@ -56,6 +56,7 @@ enum RenderString: Equatable {
   case escape(EscapeType)
   case indentation(Int)
   case tag(_ name: RenderTag, _ children: [RenderString] = [])
+  case error
 
   func isEmpty() -> Bool {
     return length() <= 0
@@ -84,6 +85,8 @@ enum RenderString: Equatable {
       }
 
       return inner
+    case .error:
+      return "<span class=\"error\">???</span>"
     }
   }
 
@@ -97,12 +100,14 @@ enum RenderString: Equatable {
       return count
     case .tag(_, let children):
       return children.map { $0.length() }.reduce(0, +)
+    case .error:
+      return 3
     }
   }
 
   func compressed() -> RenderString {
     switch self {
-    case .text, .escape, .indentation:
+    case .text, .escape, .indentation, .error:
       return self
     case .tag(let name, let children):
 

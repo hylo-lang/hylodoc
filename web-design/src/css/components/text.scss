@@ -2,6 +2,7 @@
 $text-primary: #e8e8e8;
 $text-secondary: #A6A6A6;
 $text-secondary-accent: #21E5E5;
+$text-error: #ff3c3c;
 
 // Style
 $h1-size: 1.5rem;
@@ -44,7 +45,8 @@ h3 {
   color: $text-primary;
 }
 
-p, a {
+p,
+a {
   @apply font-inter;
   font-size: $p-size;
   font-weight: $p-weight;

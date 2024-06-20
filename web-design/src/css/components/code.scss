@@ -15,7 +15,8 @@ code {
 
 
   // Make sure everything is using the monospace font
-  &, * {
+  &,
+  * {
     @apply font-mono;
     color: $text-primary;
     font-weight: $font-weight;
@@ -58,5 +59,13 @@ code {
 
   .comment {
     color: $text-secondary;
+  }
+
+  .name {
+    color: $text-secondary;
+  }
+
+  .error {
+    color: $text-error;
   }
 }

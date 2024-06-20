@@ -512,29 +512,29 @@ func renderDetailedType(_ ctx: DocumentationContext, _ type: AnyType)
     ])
   }
 
-  if let _ = AssociatedTypeType(type) {
-    return .text("ASSOCIATED TYPE")
-  }
-
-  if let _ = AssociatedValueType(type) {
-    return .text("ASSOCIATED VALUE")
-  }
-
   if let t = ExistentialType(type) {
     return .text(t.description)
   }
 
-  if let _ = NamespaceType(type) {
-    return .text("NAMESPACE")
-  }
+  // if let _ = AssociatedTypeType(type) {
+  //   return .text("ASSOCIATED TYPE")
+  // }
 
-  if let _ = RemoteType(type) {
-    return .text("REMOTE")
-  }
+  // if let _ = AssociatedValueType(type) {
+  //   return .text("ASSOCIATED VALUE")
+  // }
 
-  if let _ = WitnessType(type) {
-    return .text("WITNESS")
-  }
+  // if let _ = NamespaceType(type) {
+  //   return .text("NAMESPACE")
+  // }
 
-  return .text("?")
+  // if let _ = RemoteType(type) {
+  //   return .text("REMOTE")
+  // }
+
+  // if let _ = WitnessType(type) {
+  //   return .text("WITNESS")
+  // }
+
+  return .error
 }
