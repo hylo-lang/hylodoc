@@ -203,8 +203,8 @@ public struct CLICore {
 public struct CLI: ParsableCommand {
   public static let configuration = CommandConfiguration(
     abstract:
-      "A Swift command-line tool to compile documentation from Hylo source files and generate HTML. ",
-    usage: "hdc <source-path> --output <output-path>"
+      "A command-line tool to compile documentation from a Hylo project into a documentation website.",
+    usage: "hdc <source-path> [options]"
   )
 
   @Argument(help: "The paths to the source bundle. ")

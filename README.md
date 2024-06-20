@@ -4,24 +4,33 @@
 To use HyloDoc for generating websites, you can use its command line interface or use it as a library in your project
 to gain more control and customization.
 
-To get started, clone the repository and run the `hdc` target:
+After setting up the development environment, you can run the HyloDoc CLI the following command:
 ```shell
-swift run hdc --help
+swift run -c release hdc
+```
+
+The CLI can extract documentation from one or more folders and generate a website into the output directory, which by default is `./dist`. An http server can be started after generation by the `--preview` flag.
+
+```shell
+hdc --help
 
 # Outputs documentation of one module to ./dist
-swift run hdc PATH_TO_MODULE
+hdc PATH_TO_MODULE
 
 # Process multiple modules
-swift run hdc PATH_TO_MODULE_1 PATH_TO_MODULE_2 ...
+hdc PATH_TO_MODULE_1 PATH_TO_MODULE_2 ...
 
 # Specify output directory
-swift run hdc PATH_TO_MODULE --output OUTPUT_DIRECTORY
+hdc PATH_TO_MODULE --output OUTPUT_DIRECTORY
 
-# open up the generated website in a web server
-swift run hdc PATH_TO_MODULE && python3 -m http.server 8080 -d dist
+# Preview the generated website by starting a web server
+hdc PATH_TO_MODULE && python3 -m http.server 8080 -d dist
 
-# Generate documentation for the standard library
-swift run hdc PATH_TO_STDLIB --documenting-standard-library
+# Generate documentation for the Standard Library
+hdc ./Sources/StandardLibrary/Sources -s
+
+# Preview the website after generating
+hdc ./Sources/StandardLibrary/Sources -s --preview
 ```
 
 ## Documentation Syntax Reference
@@ -38,7 +47,7 @@ You can read our syntax specification in the [Syntax Reference](./SyntaxReferenc
   to them. If you right-click the arrow, you will have the option to debug the particular test.
 
 ### Mac
-- Set up Swift
+- Set up Swift 5.10 and LLVM, according to the [Hylo compiler's repository](https://github.com/hylo-lang/hylo)
 - CLone the repository
 
 ## Running the Tests
@@ -59,29 +68,24 @@ To check if your staged files adhere to this standard you can run the following 
 swift-format lint -r --configuration .swift-format.json -p Sources Tests Package.swift
 ```
 
-If there are any problems, one can run this command to fix *most* errors:
+If there are any problems, you one can run this command to fix *most* errors in all files.
 ```
-swift-format --in-place -r --configuration .swift-format.json -p Sources Tests Package.swift
+./format-all.sh
 ```
+You can alternatively use the VSCode extension `vknabel.vscode-apple-swift-format` and the `Shift + Alt + F` shortcut for formatting the current file. Note that it takes some time until the library initializes itself in a devcontainer.
 
-However, there are some limitations to this command that will still fail the pipeline, which will require manual 
-modifications.
+However, there are some limitations to these formatting tools that will still fail the pipeline, which will require manual modifications.
 
 #### Pre-commit git hook
 
-There's a pre-commit git hook that will run the format command on any staged `.swift` files. It is provided as 
-`pre-commit` in the project root.
+There is a pre-commit git hook that will run the format command on any staged `.swift` files. It is provided as `pre-commit` in the project root.
 
-To use it you have to have Swift 5.9 installed and available in the PATH environment variable. Next, you will have to 
-install the `swift-format` library locally and add it to `$PATH`. Navigate to a suitable location and run the following
-command:
+To use it, you need to have Swift 5.10 installed and available in the PATH environment variable. Next, install the `swift-format` library locally and add it to `$PATH`. Navigate to a suitable location and run the following command:
 
 ```
-git clone -b release/5.9 https://github.com/apple/swift-format.git && cd swift-format && swift build -c release && export PATH="$(pwd)/.build/release:$PATH" && swift-format --version
+git clone -b release/5.10 https://github.com/apple/swift-format.git && cd swift-format && swift build -c release && export PATH="$(pwd)/.build/release:$PATH" && swift-format --version
 ```
 
-This will clone and build the required `swift-format` version and add it to your PATH. If the installation has been 
-successful, the terminal output should read `509.0.0`.
+This will clone and build the required `swift-format` version and add it to your PATH. If the installation has been successful, the terminal output should read `508.0.0`.
 
-Finally, the pre-commit script should be added to your `.git` folder. Copy `pre-commit` from the project root and paste 
-it in `.git/hooks`. 
+Finally, add the pre-commit script to your `.git` folder. Copy `pre-commit` from the project root and paste it in `.git/hooks`. 

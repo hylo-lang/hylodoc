@@ -38,7 +38,7 @@ let package = Package(
     .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "5.2.2"),
 
     // Web server for preview:
-    
+
     // A server-side Swift web framework.
     .package(url: "https://github.com/vapor/vapor.git", from: "4.99.3"),
     // Non-blocking, event-driven networking for Swift. Used for custom executors
@@ -103,8 +103,8 @@ let package = Package(
       dependencies: [
         "WebsiteGen",
         "HyloStandardLibrary",
-        "TestUtils", 
-        "Kanna"
+        "TestUtils",
+        "Kanna",
       ],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
@@ -113,7 +113,7 @@ let package = Package(
       dependencies: [
         "DocExtractor",
         "HyloStandardLibrary",
-        "TestUtils"
+        "TestUtils",
       ],
       exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
