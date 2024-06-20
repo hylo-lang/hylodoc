@@ -793,7 +793,7 @@ private func makeParameters(
 /// Creates generic parameter docs
 private func makeJustGenericParameters(
   comment: SourceRepresentable<LowLevelCommentInfo>,
-  diagnostics: inout DiagnosticSet,
+  diagnostics: inout HDCDiagnosticSet,
   astID: AnyDeclID,
   ast: AST
 ) -> GenericParameterDocumentations {
