@@ -80,8 +80,19 @@ The parameters are validated. A parameter or generic parameter can only be docum
 
 ### Scope of Embedded Documentation
 Documentation comment blocks can have two different scopes:
-- A **symbol-level** documentation comment annotates the symbol declaration it preceeds, and it needs to be placed before a symbol declaration, possibly separated by spaces.
-- A **file-level** documentation comment describes the source file as a whole, and they are identified by starting with a `# File-Level` heading.
+- A **symbol-level** documentation comment annotates the symbol declaration it preceeds, and it needs to be placed before a symbol declaration, possibly separated by spaces.<br>
+  Example:
+  ```swift
+  /// Checks a necessary condition for making forward progress.
+  ///
+  /// # Parameters:
+  ///   - condition: The condition to test.
+  ///   - message: A description of the error
+  public fun precondition(_ condition: Bool, _ message: String) {
+    ...
+  }
+  ```
+- A **file-level** documentation comment describes the source file as a whole, and they are identified by starting with a `# File-Level` heading.<br>
   Example:
   ```
   /// # File-level:
@@ -96,30 +107,134 @@ Documentation comment blocks can have two different scopes:
   ```
 
 ### Symbol Documentation
+A documentation comment block preceding a symbol declaration is a symbol-level documentation, unless marked file-Level by a heading.
 
-A symbol documentation block must precede a symbol in the source file. The first paragraph after the heading is the file's summary and what follows until the first special section or the end of the file is the description. The allowed special sections vary based on the type of the symbol. Here are the types currently supported:
+The first paragraph is the summary, then the rest of the content until the first section is the description. Example:
 
-<!-- 
-TODO: flip the association
-Introduce the different special sections, and list which types of declarations (or the File-level comment block) they can belong to.
--->
-#### Types of symbols supported and their special sections
+```swift
+/// This is the summary
+/// 
+/// This is the description.
+///
+/// This is still the description.
+/// # See Also:
+///  - This is part of the first section.
+trait A { ... }
+```
 
-  1. Product Types
+#### Section Types:
+1. `# See Also:` - inline, list<br>
+   The See Also section is used to provide references to related symbols, articles, or external resources.<br>
+   **Available for:** all declarations. <br>
+   Example:
+   ```markdown
+   /// # See Also:
+   ///   - ``MyModule.relatedFunction(_:)``
+   ///   - [External Resource](https://example.com/related-topic)
+   ```
+2. `# Invariant:` - inline, `# Invariants:` - list<br>
+   The Invariant section is used to document invariants or conditions that must hold true for the associated type or binding.
+   Available for: **Product Types, Traits, Binding**.<br>
+   ```markdown
+   /// # Invariant: `startIndex < endIndex`.
+   /// # Invariant:
+   ///   - The `capacity` must be greater than `count`.
+   ///   - The earth must be kept spinning
+   ```
+
+3. `# Parameter ` - inline, `# Parameters:` - list<br>
+   The Parameter section is used to document the parameters of a function, method, subscript, or initializer.<br>
+   **Available for:** Function, Method declaration, Method Bundle implementation, Subscript declaration.<br>
+   Example:
+   ```markdown
+   /// # Parameter label: A brief description of the `label` parameter.
+   /// # Parameters:
+   ///   - label: A brief description of the `label` parameter.
+   ///   - value: A description of the `value` parameter.
+   ```
+
+4. `# Generic ` - inline, `# Generics:` - list<br>
+   The Generic section is used to document the generic parameters of a function, method, or initializer.<br>
+   **Available for:** function, method declaration, initializer, product type, trait.<br>
+   Example:
+   ```markdown
+   /// # Generic T: The type of elements in the array.
+   /// # Generics:
+   ///   - T: The type of elements in the array.
+   ///   - U: The type of the transform function's argument.
+   ```
+
+5. `# Throws:` - inline, list<br>
+   The Throws section is used to document the errors that a function, method, subscript, or initializer can throw.<br>
+   **Available for:** function, method declaration, method Bundle implementation, subscript declaration, subscript bundle implementation.<br>
+   Example:
+   ```markdown
+   /// # Throws: An `InvalidArgumentError` if the provided argument is invalid.
+   ```
+
+6. `# Precondition:` - inline, `# Preconditions:` - list<br>
+   The Precondition section is used to document the preconditions that must be met before a function, method, subscript, or initializer is called.<br>
+   **Available for:** function, method declaration, method bundle implementation, subscript declaration, subscript bundle implementation, initializer.<br>
+   Example:
+   ```markdown
+   /// # Precondition: The `index` must be within the bounds of the array.
+   /// # Preconditions:
+   ///   - The `start` index must be less than or equal to the `end` index.
+   ///   - The `capacity` must be greater than or equal to the requested `newCapacity`.
+   ```
+
+7. `# Postcondition:` - inline, `# Postconditions:` - list<br>
+   The Postcondition section is used to document the conditions that must hold true after a function, method, subscript, or initializer has executed.<br>
+   **Available for:** Function, Method declaration, Method Bundle implementation, Subscript declaration, Subscript bundle implementation, Initializer.<br>
+   Example:
+   ```markdown
+   /// # Postcondition: `array.count == 0`
+   /// # Postconditions:
+   ///   - The `capacity` is greater than or equal to the `count`.
+   ///   - The `isEmpty` property returns `true` if the `count` is zero.
+   ```
+
+8. `# Returns:` - inline, list<br>
+   The Returns section is used to document the return value of a function or method.<br>
+   **Available for:** Function, Method declaration, Method Bundle implementation.<br>
+   Example:
+   ```markdown
+   /// # Returns: The sum of all elements in the array.
+
+   /// # Returns:
+   ///  - true on success
+   ///  - false on failure
+   ```
+
+9. `# Yields:` - inline, list<br>
+   The Yields section is used to document the values yielded by a subscript or computed property.<br>
+   **Available for:** subscript/property declaration, subscript/property bundle implementation.<br>
+   Example:
+   ```markdown
+   /// # Yields: The element at the specified `index`.
+   ```
+
+
+#### Supported Symbol Types and Their Available Sections
+Different special sections are available for different declaration types.
+
+  1. Product type
       - `# See Also:` (inline, list)
       - `# Invariant:` (inline), `# Invariants:` (list)
+      - `# Generic:` (inline), `# Generics:` (list)
 
-  2. Traits
+  2. Trait
       - `# See Also:` (inline, list)
       - `# Invariant:` (inline), `# Invariants:` (list)
+      - `# Generic:` (inline), `# Generics:` (list)
 
-  3. Type Alias
+  3. Type alias
       - `# See Also:` (inline, list)
 
-  4. Associated Type
+  4. Associated type
       - `# See Also:` (inline, list)
 
-  5. Associated Value
+  5. Associated value
       - `# See Also:` (inline, list)
 
   6. Binding
@@ -147,16 +262,14 @@ Introduce the different special sections, and list which types of declarations (
       - `# Postcondition:` (inline), `# Postconditions:` (list)
       - `# Returns:` (inline, list)
 
-  10. Method Bundle implementation
+  10. Method bundle implementation
       - `# See Also:` (inline, list)
-      - `# Parameter ` (inline), `# Parameters:` (list)
-      - `# Generic ` (inline), `# Generics:` (list)
       - `# Throws:` (inline, list)
       - `# Precondition:` (inline), `# Preconditions:` (list)
       - `# Postcondition:` (inline), `# Postconditions:` (list)
       - `# Returns:` (inline, list)
 
-  11. Subscript declaration
+  11. Subscript/property declaration
       - `# See Also:` (inline, list)
       - `# Parameter ` (inline), `# Parameters:` (list)
       - `# Generic ` (inline), `# Generics:` (list)
@@ -164,7 +277,7 @@ Introduce the different special sections, and list which types of declarations (
       - `# Precondition:` (inline), `# Preconditions:` (list)
       - `# Postcondition:` (inline), `# Postconditions:` (list)
       - `# Yields:` (inline, list)
-  12. Subscript bundle implementation
+  12. Subscript/property bundle implementation
       - `# See Also:` (inline, list)
       - `# Throws:` (inline, list)
       - `# Precondition:` (inline), `# Preconditions:` (list)
@@ -189,33 +302,51 @@ A **level 1 heading** may only appear at the beginning of the article, and, if p
 
 **Hylodoc references** are supported in articles, and they are resolved in the scope of the module in which they appear in.
 
-## Reference Syntax
+Here's the section restructured in a more reference manual style:
+
+## Syntax of Links
+
 ### URLs
-There are two form of links in the MarkDown syntax:
-- autolinks (`<https://example.com>`)
-- full Markdown links (`[title](url)`) for arbitrary URLs except ones with the `file://` protocol.
+
+The following Markdown syntax for URLs is supported:
+
+- Autolinks: `<https://example.com>`
+- Full Markdown links: `[title](url)` 
+- Images: `![title](https://example.com/logo.png)`
 
 Implicit links are not supported.
 
 ### Local File References
-> Note: this feature has not been implemented yet. The syntax is also work in progress.
 
-We only support the full link syntax for local file references. The user is required to start the reference with
-either `../`, `./`, or `/`. This is the most unambiguous syntax, and it is also the most common one, supported by all
-editors. The `/` prefix will serve as a pointer to the root of the entire repository which might be different than the
-module that is currently being documented. This is so that absolute links can be resolved properly in a repository by
-GitHub, which takes the root of the repository as the base for resolving absolute links.
+Usage: 
+- Full Markdown links: `[title](relative/path/to/file.ext)`
+- Images: `![alt text](path/to/image.png "title")`
+
+Only relative paths are supported. These can refer to the following:
+- Articles (`.hylodoc` files)
+- Folders
+- Source code (`.hylo` files)
+- Other assets (PDF, images, etc.)
+
+`.hylodoc` files, folders, and source files are resolved to their corresponding documentation pages. Other assets are copied to the output directory for download, preserving their relative tree structure.
+
+Examples:
+
+```markdown
+[Article](./article.hylodoc)
+[Article](../src/article.hylodoc)
+![Image](../public/logo.png "Logo")
+[Whitepaper](../public/MVS.pdf)
+[Source File](main.hylo)
+[Folder](../)
+[Folder](./)
+```
 
 ### Symbol References
-We can use double backticks for code entity references, just like Swift. You can write any name that can be resolved
-from the scope of the documented entity.
 
-```markdown
-``MyModule.myFunction(x:y:_:)``
-```
+Usage:
+``` ``MyModule.myFunction(x:y:_:)`` ```
 
-If there is no ambiguity, parameter labels can be ignored from function references:
-```markdown
-``MyModule.myFunction``
-```
-> Note: currently, only the latter syntax is implemented
+Parameter labels can be omitted if the reference is unambiguous: ``` ``markdown``MyModule.myFunction`` ```
+
+> Note: Currently, only the latter syntax is implemented, and it is a fatal failure if the overload set contains more than 1 declaration.

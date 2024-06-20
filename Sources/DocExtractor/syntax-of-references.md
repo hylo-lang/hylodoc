@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Documentation in Hylo code, and in .hylodoc files is written in markdown. We allow referring to code entities in the
-markdown comment similar to as if they were in code. This document describes the syntax of different types of
-references.
+Documentation in Hylo code, and in .hylodoc files is written in markdown. We would like to support local file refernces
+and references to code entities in markdown (similar to as if they were in code). This document describes different
+alternatives that were considered when designing the syntax.
 
 [](/README.md)
 [](../../README.md)
@@ -144,14 +144,29 @@ We support autolinks and full Markdown links for arbitrary URLs (except ones wit
 support implicit links, as they are not part of the CommonMark standard.
 
 ## Local File References
-We will only support the full link syntax for local file references. The user is required to start the reference with 
-either `../`, `./`, or `/`. This is the most unambiguous syntax, and it is also the most common one, supported by all
-editors. The `/` prefix will serve as a pointer to the root of the entire project which might be different than the 
-module that is currently being documented. This is so that absolute links can be resolved properly in a repository by
-GitHub, which takes the root of the repository as the base for resolving absolute links.
+We will only support the full link syntax and the image syntax for local file references. Only relative paths are supported,
+since depending on the context, `/` might refer to different places, e.g. root of module, root of repository.
+Furthermore, relative file references work perfectly in the markdown editors of both IntelliJ and VSCode, so
+we don't have to invest in new editor support. 
 
+One can refer to arbitary assets within the documented modules. The assets will be copied to the website's output.
+References to hylodoc files, folders and source files will be resolved to their corresponding pages, while other assets
+are simply downloaded when the user navigates to them. 
+
+Examples:
+```markdown
+[Article](./article.hylodoc)
+[Article](article.hylodoc)
+[Article](../src/article.hylodoc)
+![Image](../public/logo.png "alternative text")
+[Whitepaper](../public/MVS.pdf)
+[source file](main.hylo)
+[folder](../)
+[folder](./)
+[folder](.)
+```
 ## Symbol References
-We will use the double backticks syntax for code entity references, just like Swift. This is a concise syntax, and it is
+We will use the double backticks syntax for code entity references, just like Swift DocC does. This is a concise syntax, and it is
 clear that it is referring to a code entity, without ambiguity with URLs.
 ```markdown
 ``MyModule.myFunction(x:y:_:)``
