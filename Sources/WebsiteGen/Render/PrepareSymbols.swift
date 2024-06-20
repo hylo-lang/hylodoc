@@ -175,6 +175,7 @@ public func prepareBindingPage(
 public func prepareOperatorPage(
   _ context: GenerationContext, of declId: OperatorDecl.ID
 ) throws -> StencilContext {
+  let decl: OperatorDecl = context.documentation.typedProgram.ast[declId]!
   let scope = context.documentation.typedProgram.nodeToScope[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(

@@ -169,6 +169,9 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderOperatorDecl(typedProgram, id),
+      metaDescription: symbols.operatorDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of binding \(name)",
       children: []
     )
   case FunctionDecl.self:
