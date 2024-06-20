@@ -36,7 +36,7 @@ type MyType : TraitA, TraitB {
   ///
   /// # Preconditions:
   /// - Invar *A* or **A**
-  /// - Invar `B` or ~~B~~
+  /// - Invar `B`
   ///
   /// # Returns: some element
   ///

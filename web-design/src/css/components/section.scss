@@ -19,7 +19,7 @@
     @apply mb-2;
   }
 
-  *:not(:last-child) {
+  blockquote, hr, img, ul, ol, .code-snippet, & > p {
     @apply mb-3;
   }
 
@@ -72,7 +72,7 @@
   }
 
   .tag {
-    @apply px-1.5 m-0 rounded-lg font-mono inline-block;
+    @apply px-1.5 m-0 rounded-lg font-mono break-words;
     border: 1px solid $thin-divider;
     background-color: $snippet-background;
   }

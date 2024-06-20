@@ -74,7 +74,7 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
 
     // Override how to generate code tags
     if case .code(let str) = fragment {
-      return "<code class=\"tag\">\(String(str).encodingPredefinedXmlEntities())</code>"
+      return "<span class=\"tag\">\(String(str).encodingPredefinedXmlEntities())</span>"
     }
 
     // Override the generation of links to allow for local file references
@@ -106,7 +106,9 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
         let urlString = resolveLinkReference(
           reference: reference, referenceContext: referenceContext!), !urlString.isEmpty
       else {
-        fatalError("Couldn't resolve image reference \(reference) from source url \(referenceContext!.sourceUrl)")
+        fatalError(
+          "Couldn't resolve image reference \(reference) from source url \(referenceContext!.sourceUrl)"
+        )
       }
 
       return "<img src=\"\(urlString)\" alt=\"\(alt)\"\(titleAttr) />"
