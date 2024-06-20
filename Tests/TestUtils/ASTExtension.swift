@@ -362,7 +362,8 @@ extension AST {
     return walker.result
   }
 
-  public init(fromSingleSourceFile sourceFile: SourceFile, diagnostics: inout DiagnosticSet) throws {
+  public init(fromSingleSourceFile sourceFile: SourceFile, diagnostics: inout DiagnosticSet) throws
+  {
     self.init(ConditionalCompilationFactors())
     let _ = try makeModule(
       "RootModule",

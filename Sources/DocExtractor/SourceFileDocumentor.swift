@@ -1,11 +1,35 @@
 import DocumentationDB
 import FrontEnd
+import HDCUtils
 import MarkdownKit
+
+@Diagnostify
+public struct FileLevelContentBeforeSpecialSectionsWarning {}
+@Diagnostify
+public struct FileLevelWrongNameError {}
+@Diagnostify
+public struct EmptySpecialSectionWarning {}
+@Diagnostify
+public struct SpecialSectionMoreThanOneListWarning {}
+@Diagnostify
+public struct ListSpecialSectionHasNoListError {}
+@Diagnostify
+public struct UnexpectedSpecialSectionTitleError {}
+@Diagnostify
+public struct InlineSpecialSectionTitleRemoveFailureWarning {}
+@Diagnostify
+public struct SpecialSectionListDoesNotHaveListItemChildrenWarning {}
+@Diagnostify
+public struct BothInlineAndListSpecialSectionError {}
+@Diagnostify
+public struct ParameterSectionMissingColonWarning {}
+@Diagnostify
+public struct UnknownParameterInDocumentationWarning {}
 
 public protocol SourceFileDocumentor {
   func document(
     ast: AST, translationUnitId: TranslationUnit.ID, into symbolStore: inout SymbolDocStore,
-    diagnostics: inout DiagnosticSet
+    diagnostics: inout HDCDiagnosticSet
   ) -> GeneralDescriptionFields
 }
 
@@ -21,7 +45,7 @@ public struct RealSourceFileDocumentor: SourceFileDocumentor {
   public func document(
     ast: AST,
     translationUnitId: TranslationUnit.ID, into symbolStore: inout SymbolDocStore,
-    diagnostics: inout DiagnosticSet
+    diagnostics: inout HDCDiagnosticSet
   )
     -> GeneralDescriptionFields
   {
@@ -49,7 +73,7 @@ public struct RealSourceFileDocumentor: SourceFileDocumentor {
 }
 
 private func parseFileLevelDocumentation(
-  documentedFile: DocumentedFile, diagnostics: inout DiagnosticSet
+  documentedFile: DocumentedFile, diagnostics: inout HDCDiagnosticSet
 ) -> GeneralDescriptionFields {
   guard let fileLevelComment = documentedFile.fileLevel else {
     return GeneralDescriptionFields(summary: nil, description: nil, seeAlso: [])
@@ -57,7 +81,7 @@ private func parseFileLevelDocumentation(
 
   if !fileLevelComment.value.contentBeforeSections.isEmpty {
     diagnostics.insert(
-      .warning(
+      FileLevelContentBeforeSpecialSectionsWarning.warning(
         "File-level comments should not contain content before the special sections (#). Any content before # File-level is ignored.",
         at: fileLevelComment.site))
   }
@@ -71,11 +95,12 @@ private func parseFileLevelDocumentation(
   let (summary, description) = parseSummaryAndDescription(
     blocks: fileLevelComment.value.specialSections.first {
       if $0.name.lowercased() == SpecialSectionType.fileLevel.headingName { return true }
-      if $0.name.lowercased() == "file-level" {
+      if $0.name.lowercased() == "file-level" {  //Is this correct?
         diagnostics.insert(
-          .error(
+          FileLevelWrongNameError.error(
             "File-level section should be named 'File-level:' (with a colon).",
-            at: fileLevelComment.site))
+            at: fileLevelComment.site)
+        )
         return true
       }
       return false
@@ -90,7 +115,7 @@ private func parseFileLevelDocumentation(
   )
 }
 
-private func parseSummaryAndDescription(blocks: [Block], diagnostics: inout DiagnosticSet) -> (
+private func parseSummaryAndDescription(blocks: [Block], diagnostics: inout HDCDiagnosticSet) -> (
   Block?, Block?
 ) {
   guard let firstBlock = blocks.first else {
@@ -101,7 +126,7 @@ private func parseSummaryAndDescription(blocks: [Block], diagnostics: inout Diag
 }
 
 private func parseSeeAlsoSection(
-  comment: SourceRepresentable<LowLevelCommentInfo>, diagnostics: inout DiagnosticSet
+  comment: SourceRepresentable<LowLevelCommentInfo>, diagnostics: inout HDCDiagnosticSet
 ) -> [Block] {
   let seeAlsoSection = comment.value.specialSections.first {
     $0.name == SpecialSectionType.seeAlso.headingName
@@ -115,17 +140,20 @@ private func parseSeeAlsoSection(
 private func parseSeeAlsoSection(
   section: LowLevelCommentInfo.SpecialSection,
   site: SourceRange,
-  diagnostics: inout DiagnosticSet
+  diagnostics: inout HDCDiagnosticSet
 ) -> [Block] {
   if section.blocks.isEmpty {
-    diagnostics.insert(.warning("Empty see also section.", at: site))
+    diagnostics.insert(EmptySpecialSectionWarning.warning("Empty see also section.", at: site))
     return []
   }
   if section.blocks.count > 1 {
-    diagnostics.insert(.warning("See also section should contain only one list.", at: site))
+    diagnostics.insert(
+      SpecialSectionMoreThanOneListWarning.warning(
+        "See also section should contain only one list.", at: site))
   }
   guard case .list(_, _, let blocks) = section.blocks.first! else {
-    diagnostics.insert(.error("See also section should contain a list.", at: site))
+    diagnostics.insert(
+      ListSpecialSectionHasNoListError.error("See also section should contain a list.", at: site))
     return []
   }
 
@@ -249,7 +277,7 @@ private func validateAllowedSpecialSections(
   allowedSections: Set<SpecialSectionType>? = nil,
   preset: SpecialSectionPreset? = nil,
   comment: SourceRepresentable<LowLevelCommentInfo>,
-  diagnostics: inout DiagnosticSet
+  diagnostics: inout HDCDiagnosticSet
 ) {
   let allowedSectionTitles: [String]
 
@@ -268,7 +296,7 @@ private func validateAllowedSpecialSections(
   for section in comment.value.specialSections {
     if !allowedSectionTitles.contains(where: { section.name.lowercased().starts(with: $0) }) {
       diagnostics.insert(
-        .error(
+        UnexpectedSpecialSectionTitleError.error(
           "Unexpected special section heading '\(section.name.lowercased())'.\nApplicable section titles are: \(allowedSectionTitles.descriptions())",
           at: comment.site)
       )
@@ -279,7 +307,7 @@ private func validateAllowedSpecialSections(
 public struct DummySourceFileDocumentor: SourceFileDocumentor {
   public func document(
     ast: AST, translationUnitId: TranslationUnit.ID, into symbolStore: inout SymbolDocStore,
-    diagnostics: inout DiagnosticSet
+    diagnostics: inout HDCDiagnosticSet
   ) -> GeneralDescriptionFields {
     return .init(summary: nil, description: nil, seeAlso: [])
   }
@@ -288,7 +316,7 @@ public struct DummySourceFileDocumentor: SourceFileDocumentor {
 private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
   private let documentedFile: DocumentedFile
   public private(set) var symbolStore: SymbolDocStore
-  public private(set) var diagnostics: DiagnosticSet
+  public private(set) var diagnostics: HDCDiagnosticSet
 
   private let markdownParser: MarkdownParser
 
@@ -296,7 +324,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
   {
     self.symbolStore = symbolStore
     self.documentedFile = documentedFile
-    self.diagnostics = DiagnosticSet()
+    self.diagnostics = HDCDiagnosticSet()
     self.markdownParser = markdownParser
   }
 
@@ -573,7 +601,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
   // Creates the general description for documentations
   private func symbolGeneralDescriptionMaker(
     comment: SourceRepresentable<LowLevelCommentInfo>,
-    diagnostics: inout DiagnosticSet
+    diagnostics: inout HDCDiagnosticSet
   ) -> GeneralDescriptionFields {
     let (summary, description) = parseSummaryAndDescription(
       blocks: comment.value.contentBeforeSections,
@@ -590,7 +618,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
   // Creates the general function documentation fields
   private func commonFuncDocMaker(
     comment: SourceRepresentable<LowLevelCommentInfo>,
-    diagnostics: inout DiagnosticSet
+    diagnostics: inout HDCDiagnosticSet
   ) -> CommonFunctionLikeDocumentation {
     return CommonFunctionLikeDocumentation.init(
       common: symbolGeneralDescriptionMaker(comment: comment, diagnostics: &diagnostics),
@@ -609,7 +637,7 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
   // Creates the general function declaration fields
   private func commonFuncDeclDocMaker(
     comment: SourceRepresentable<LowLevelCommentInfo>,
-    diagnostics: inout DiagnosticSet,
+    diagnostics: inout HDCDiagnosticSet,
     astID: AnyDeclID,
     ast: AST
   ) -> CommonFunctionDeclLikeDocumentation {
@@ -632,13 +660,14 @@ private func removeSectionTitleInline(
   title: SpecialSectionType,
   text: String,
   comment: SourceRepresentable<LowLevelCommentInfo>,
-  diagnostics: inout DiagnosticSet
+  diagnostics: inout HDCDiagnosticSet
 ) -> String {
   if text.lowercased().hasPrefix(title.inlineName) {
     return String(text.dropFirst(title.inlineName.count))
   } else {
     diagnostics.insert(
-      .warning("Unable to remove title from inline section with text \(text)", at: comment.site))
+      InlineSpecialSectionTitleRemoveFailureWarning.warning(
+        "Unable to remove title from inline section with text \(text)", at: comment.site))
     return text
   }
 }
@@ -654,7 +683,7 @@ private func removeSectionTitleInline(
 private func parseSpecialSection<T>(
   type: SpecialSectionType,
   comment: SourceRepresentable<LowLevelCommentInfo>,
-  diagnostics: inout DiagnosticSet,
+  diagnostics: inout HDCDiagnosticSet,
   constructor: (Block) -> T,
   markdownParser: MarkdownParser
 ) -> [T] {
@@ -679,10 +708,12 @@ private func parseSpecialSection<T>(
 
     if let block = blockSection {
       if block.blocks.isEmpty {
-        diagnostics.insert(.warning("Empty \(type.headingName)s section.", at: comment.site))
+        diagnostics.insert(
+          EmptySpecialSectionWarning.warning(
+            "Empty \(type.headingName)s section.", at: comment.site))
       } else if block.blocks.count > 1 {
         diagnostics.insert(
-          .warning(
+          SpecialSectionMoreThanOneListWarning.warning(
             "\(type.headingName.capitalized)s section should contain only one list.",
             at: comment.site))
       } else if case .list(_, _, let blocks) = block.blocks.first! {
@@ -691,12 +722,13 @@ private func parseSpecialSection<T>(
             parsedSections.append(constructor(Block.document(itemBlocks)))
           } else {
             diagnostics.insert(
-              .warning("Unexpected block type in \(type.headingName)s list.", at: comment.site))
+              SpecialSectionListDoesNotHaveListItemChildrenWarning.warning(
+                "Unexpected block type in \(type.headingName)s list.", at: comment.site))
           }
         }
       } else {
         diagnostics.insert(
-          .error(
+          ListSpecialSectionHasNoListError.error(
             "\(type.headingName.capitalized)s section should contain a list.", at: comment.site))
       }
     }
@@ -716,7 +748,7 @@ private func parseSpecialSection<T>(
 //  - ([ParameterDecl.ID: ParameterDocumentation], [GenericParameterDecl.ID: GenericParameterDocumentation])
 private func makeParameters(
   comment: SourceRepresentable<LowLevelCommentInfo>,
-  diagnostics: inout DiagnosticSet,
+  diagnostics: inout HDCDiagnosticSet,
   astID: AnyDeclID,
   ast: AST
 ) -> (ParameterDocumentations, GenericParameterDocumentations) {
@@ -794,7 +826,7 @@ private func createParameterDocs<T, U: NodeIDProtocol>(
   type: SpecialSectionType,
   paramMap: [String: U],
   comment: SourceRepresentable<LowLevelCommentInfo>,
-  diagnostics: inout DiagnosticSet,
+  diagnostics: inout HDCDiagnosticSet,
   constructor: (Block) -> T
 ) -> [U: T] {
   var docs: [U: T] = [:]
@@ -809,7 +841,7 @@ private func createParameterDocs<T, U: NodeIDProtocol>(
 
   if !inlineParameters.isEmpty && parametersSection != nil {
     diagnostics.insert(
-      .error(
+      BothInlineAndListSpecialSectionError.error(
         "Both inline \(type.inlineName)s and a \(type.headingName.capitalized) section are present. Use only one.",
         at: comment.site))
     return docs
@@ -833,10 +865,11 @@ private func createParameterDocs<T, U: NodeIDProtocol>(
   if let section = parametersSection {
     if section.blocks.isEmpty {
       diagnostics.insert(
-        .warning("Empty \(type.headingName.capitalized) section.", at: comment.site))
+        EmptySpecialSectionWarning.warning(
+          "Empty \(type.headingName.capitalized) section.", at: comment.site))
     } else if section.blocks.count > 1 {
       diagnostics.insert(
-        .warning(
+        SpecialSectionMoreThanOneListWarning.warning(
           "\(type.headingName.capitalized) section should contain only one list.", at: comment.site)
       )
     } else if case .list(_, _, let blocks) = section.blocks.first! {
@@ -857,7 +890,7 @@ private func createParameterDocs<T, U: NodeIDProtocol>(
           }
         } else {
           diagnostics.insert(
-            .warning(
+            SpecialSectionListDoesNotHaveListItemChildrenWarning.warning(
               "Unexpected block type in \(type.headingName) list. Should be one paragraph",
               at: comment.site))
         }
@@ -873,12 +906,12 @@ private func createParameterDocsHelper<U: NodeIDProtocol, T>(
   type: SpecialSectionType,
   paramMap: [String: U],
   constructor: (Block) -> T,
-  diagnostics: inout DiagnosticSet,
+  diagnostics: inout HDCDiagnosticSet,
   comment: SourceRepresentable<LowLevelCommentInfo>
 ) -> (paramID: U, doc: T)? {
   guard let colonIndex = fullText.firstIndex(of: ":") else {
     diagnostics.insert(
-      .warning(
+      ParameterSectionMissingColonWarning.warning(
         "\(type.inlineName.capitalized) format is incorrect, missing colon.", at: comment.site))
     return nil
   }
@@ -889,7 +922,7 @@ private func createParameterDocsHelper<U: NodeIDProtocol, T>(
 
   guard let paramID = paramMap[paramName] else {
     diagnostics.insert(
-      .warning(
+      UnknownParameterInDocumentationWarning.warning(
         "\(type.inlineName.capitalized) \(paramName) not found in declaration.", at: comment.site))
     return nil
   }

@@ -1,6 +1,7 @@
 import DocExtractor
 import DocumentationDB
 import FrontEnd
+import HDCUtils
 import TestUtils
 import XCTest
 
@@ -27,7 +28,7 @@ final class FuncExtractionTest: XCTestCase {
 
     var store = SymbolDocStore()
 
-    let _ = checkNoDiagnostic { d in
+    let _ = checkNoHDCDiagnostic { d in
       sourceFileDocumentor.document(
         ast: ast,
         translationUnitId: ast.resolveTranslationUnit(by: "testFile4.hylo")!,
@@ -84,7 +85,7 @@ final class FuncExtractionTest: XCTestCase {
 
     var store = SymbolDocStore()
 
-    let _ = checkNoDiagnostic { d in
+    let _ = checkNoHDCDiagnostic { d in
       sourceFileDocumentor.document(
         ast: ast,
         translationUnitId: ast.resolveTranslationUnit(by: "testFile5.hylo")!,
@@ -141,16 +142,17 @@ final class FuncExtractionTest: XCTestCase {
 
     var store = SymbolDocStore()
 
-    let _ = checkDiagnosticPresent(
-      f: { d in
+    let _ = expectHDCDiagnostic(
+      f: { hd in
         sourceFileDocumentor.document(
           ast: ast,
           translationUnitId: ast.resolveTranslationUnit(by: "testFile6.hylo")!,
           into: &store,
-          diagnostics: &d
+          diagnostics: &hd
         )
       },
-      expectedMessages: ["warning"]
+      expectedDiagnostic: UnknownParameterInDocumentationWarning.self
     )
   }
+
 }

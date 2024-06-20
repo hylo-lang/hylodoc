@@ -1,6 +1,7 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
+import HDCUtils
 import TestUtils
 import XCTest
 
@@ -19,17 +20,18 @@ final class CommentExtractorTest: XCTestCase {
 
     let commentExtractor = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
 
-    let doc = checkNoDiagnostic { d in
-      commentExtractor.parse(sourceFile: sourceFile, diagnostics: &d)
+    let doc = checkNoHDCDiagnostic { hd in
+      commentExtractor.parse(sourceFile: sourceFile, diagnostics: &hd)
     }
 
     return doc.map { _ in (ast, doc!) }
   }
 
-  func expectFail(
+  func expectFail<D: HDCDiagnostic>(
     code: String,
     message: String,
-    file: StaticString = #file, line: UInt = #line  //
+    file: StaticString = #file, line: UInt = #line,  //
+    expectedDiagnostic: D.Type
   ) throws {
     let sourceFile = SourceFile(stringLiteral: code)
     let _ = try checkNoDiagnostic { d in try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
@@ -37,9 +39,12 @@ final class CommentExtractorTest: XCTestCase {
 
     let commentExtractor = RealCommentParser(lowLevelCommentParser: RealLowLevelCommentParser())
 
-    let result = checkDiagnosticPresent { d in
-      commentExtractor.parse(sourceFile: sourceFile, diagnostics: &d)
-    }
+    let result = expectHDCDiagnostic(
+      f: { hd in
+        commentExtractor.parse(sourceFile: sourceFile, diagnostics: &hd)
+      },
+      expectedDiagnostic: D.self
+    )
     XCTAssertNil(result)
   }
   func testOneLineCommentExtraction() throws {
@@ -125,7 +130,9 @@ final class CommentExtractorTest: XCTestCase {
       /// Invalid comment without symbol
       """
 
-    try expectFail(code: code, message: "Expected to fail due to comment missing symbol")
+    try expectFail(
+      code: code, message: "Expected to fail due to comment missing symbol",
+      expectedDiagnostic: DocumentationCommentInUnexpectedLocationError.self)
   }
 
   func testFileLevelCommentExtraction() throws {
@@ -174,7 +181,9 @@ final class CommentExtractorTest: XCTestCase {
       public typealias TypeB = Int
       """
 
-    try expectFail(code: code, message: "Expected to fail due to double file-level comments")
+    try expectFail(
+      code: code, message: "Expected to fail due to double file-level comments",
+      expectedDiagnostic: MultipleFileLevelDocumentationsError.self)
   }
 
   func testMixedCommentTypes() throws {

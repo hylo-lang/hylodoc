@@ -38,7 +38,7 @@ final class TraitExtractionTest: XCTestCase {
 
     var store = SymbolDocStore()
 
-    let fileLevel = checkNoDiagnostic { d in
+    let fileLevel = checkNoHDCDiagnostic { d in
       sourceFileDocumentor.document(
         ast: ast,
         translationUnitId: ast.resolveTranslationUnit(by: "testFile12.hylo")!,

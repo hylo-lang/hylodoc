@@ -1,6 +1,14 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
+import HDCUtils
+
+@Diagnostify
+public struct CommentParsingError {}
+@Diagnostify
+public struct MultipleFileLevelDocumentationsError {}
+@Diagnostify
+public struct DocumentationCommentInUnexpectedLocationError {}
 
 public struct DocumentedFile {
   /// The file-level comment if it exists.
@@ -12,7 +20,7 @@ public struct DocumentedFile {
 
 public protocol CommentParser {
   /// Returns the comments extracted from the source file if there are no errors and reports any issues in the diagnostics parameter
-  func parse(sourceFile: SourceFile, diagnostics: inout DiagnosticSet) -> DocumentedFile?
+  func parse(sourceFile: SourceFile, diagnostics: inout HDCDiagnosticSet) -> DocumentedFile?
 }
 
 /// A structure representing a source file with associated comments.
@@ -24,7 +32,8 @@ public struct RealCommentParser<LLCommentParser: LowLevelCommentParser>: Comment
   }
 
   // todo refactor this to use exceptions
-  public func parse(sourceFile: SourceFile, diagnostics: inout DiagnosticSet) -> DocumentedFile? {
+  public func parse(sourceFile: SourceFile, diagnostics: inout HDCDiagnosticSet) -> DocumentedFile?
+  {
     let builder = DocumentedFileBuilder(sourceFile, lowLevelCommentParser)
     diagnostics.formUnion(builder.diagnostics)
 
@@ -47,7 +56,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   public private(set) var symbolComments:
     [SourceFile.Index: SourceRepresentable<LowLevelCommentInfo>] = [:]
   public private(set) var fileComment: SourceRepresentable<LowLevelCommentInfo>?
-  public private(set) var diagnostics: DiagnosticSet = .init()
+  public private(set) var diagnostics: HDCDiagnosticSet = .init()
 
   /// Initializes a `CommentedFile` with a given source file and comment parser.
   ///
@@ -146,7 +155,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
   {
     let result = commentParser.parse(commentLines: lines)
     if case .failure(let error) = result {
-      diagnostics.insert(.error(error.localizedDescription, at: origin))
+      diagnostics.insert(CommentParsingError.error(error.localizedDescription, at: origin))
     }
     let info = try! result.get()
 
@@ -154,7 +163,8 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
     case .fileLevel:
       guard self.fileComment == nil else {
         diagnostics.insert(
-          .error("Only one file-level documentation comment is allowed.", at: origin))
+          MultipleFileLevelDocumentationsError.error(
+            "Only one file-level documentation comment is allowed.", at: origin))
         return
       }
 
@@ -162,7 +172,7 @@ private struct DocumentedFileBuilder<LLCommentParser: LowLevelCommentParser> {
     case .symbol:
       guard target != nil else {
         diagnostics.insert(
-          .error(
+          DocumentationCommentInUnexpectedLocationError.error(
             "Documentation comment is not related to any code"
               + "entity, nor is it a file-level or section comment.",
             at: origin

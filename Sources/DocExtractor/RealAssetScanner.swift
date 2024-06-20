@@ -1,6 +1,7 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
+import HDCUtils
 import MarkdownKit
 
 public struct InputModuleInfo {
@@ -60,7 +61,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
   }
   public enum SourceFileProcessingError: Error, CustomStringConvertible {
     case noTranslationUnitFound(for: URL)
-    case processingIssue(DiagnosticSet)
+    case processingIssue(HDCDiagnosticSet)
 
     public var description: String {
       switch self {
@@ -133,7 +134,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
       return .failure(.noTranslationUnitFound(for: path))
     }
 
-    var diagnostics = DiagnosticSet()
+    var diagnostics = HDCDiagnosticSet()
     let fileLevelGeneralDescription = sourceFileDocumentor.document(
       ast: typedProgram.ast, translationUnitId: tuID, into: &symbolDocs, diagnostics: &diagnostics)
 

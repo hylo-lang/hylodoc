@@ -1,6 +1,7 @@
 import DocExtractor
 import DocumentationDB
 import FrontEnd
+import HDCUtils
 import TestUtils
 import XCTest
 
@@ -32,19 +33,20 @@ final class BindingExtractionTest: XCTestCase {
 
     var diagnostics = DiagnosticSet()
     let ast = try checkNoDiagnostic { d in
-      try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
+      try AST(fromSingleSourceFile: sourceFile, diagnostics: &diagnostics)
     }
 
     var store = SymbolDocStore()
 
-    let fileLevel = sourceFileDocumentor.document(
-      ast: ast,
-      translationUnitId: ast.resolveTranslationUnit(by: "testFile3.hylo")!,
-      into: &store,
-      diagnostics: &diagnostics
-    )
-
-    assertNoDiagnostics(diagnostics)
+    let fileLevel = checkNoHDCDiagnostic {
+      hd in
+      sourceFileDocumentor.document(
+        ast: ast,
+        translationUnitId: ast.resolveTranslationUnit(by: "testFile3.hylo")!,
+        into: &store,
+        diagnostics: &hd
+      )
+    }
 
     assertContains(fileLevel.summary?.debugDescription, what: "This is the summary of the file.")
     assertContains(fileLevel.description?.debugDescription, what: "Hello")

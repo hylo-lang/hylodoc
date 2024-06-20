@@ -28,7 +28,7 @@ final class AssociatedTypeExtractionTest: XCTestCase {
 
     var store = SymbolDocStore()
 
-    let _ = checkNoDiagnostic { d in
+    let _ = checkNoHDCDiagnostic { d in
       sourceFileDocumentor.document(
         ast: ast,
         translationUnitId: ast.resolveTranslationUnit(by: "testFile1.hylo")!,

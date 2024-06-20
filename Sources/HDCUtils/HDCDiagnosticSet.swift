@@ -73,4 +73,10 @@ extension HDCDiagnosticSet: CustomStringConvertible {
 
 }
 
+extension HDCDiagnosticSet {
+  fileprivate var niceErrorMessage: String {
+    return "Diagnostics: \n" + elements.map { " - " + $0.description + "\n" }.joined(by: "")
+  }
+}
+
 extension HDCDiagnosticSet: Equatable {}

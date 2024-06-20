@@ -59,7 +59,7 @@ let package = Package(
     .target(
       name: "HDCUtils",
       dependencies: [
-        "StandardLibraryCore",
+        "HyloStandardLibrary",
         "HDCMacros",
         .product(name: "FrontEnd", package: "hylo"),
       ],
@@ -167,6 +167,7 @@ let package = Package(
       name: "HDCUtilsTests",
       dependencies: [
         "HDCUtils",
+        "TestUtils",
         .product(name: "FrontEnd", package: "hylo"),
       ],
       path: "Tests/HDCUtilsTests",

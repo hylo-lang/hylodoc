@@ -33,7 +33,7 @@ final class ProductTypeExtractionTest: XCTestCase {
 
     var store = SymbolDocStore()
 
-    let _ = checkNoDiagnostic { d in
+    let _ = checkNoHDCDiagnostic { d in
       sourceFileDocumentor.document(
         ast: ast,
         translationUnitId: ast.resolveTranslationUnit(by: "testFile.hylo")!,
@@ -89,7 +89,7 @@ final class ProductTypeExtractionTest: XCTestCase {
 
     var store = SymbolDocStore()
 
-    let _ = checkNoDiagnostic { d in
+    let _ = checkNoHDCDiagnostic { d in
       sourceFileDocumentor.document(
         ast: ast,
         translationUnitId: ast.resolveTranslationUnit(by: "testFile10.hylo")!,
