@@ -14,7 +14,6 @@ func renderSimpleOperator(
   result += raw ? .text(notation) : .keyword(notation)
   result += raw ? .text(name) : .name(name)
 
-  print(name)
   return result
 }
 
