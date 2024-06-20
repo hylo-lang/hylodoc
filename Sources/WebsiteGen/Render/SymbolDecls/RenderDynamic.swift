@@ -1,6 +1,27 @@
 import Foundation
 import FrontEnd
 
+func renderDetailedOperator(
+  _ ctx: DocumentationContext, _ n: OperatorDecl.ID, _ inline: Bool
+)
+  -> RenderString
+{
+  let op: OperatorDecl = ctx.typedProgram.ast[n]
+  let notation = String(describing: op.notation.value)
+  let name = op.name.value
+  let typeUrl = getDeclUrl(ctx, AnyDeclID(n))
+
+  var result: RenderString = .link(
+    [.keyword("operator"), .text(" "), .keyword(notation), .text(name)], href: typeUrl)
+
+  if let precedenceGroup = op.precedenceGroup {
+    let group = String(describing: precedenceGroup.value)
+    result += .wrap([.text(" : "), .keyword(group)])
+  }
+
+  return result
+}
+
 func renderDetailedTrait(
   _ ctx: DocumentationContext, _ n: TraitDecl.ID, _ inline: Bool
 )
@@ -471,6 +492,48 @@ func renderDetailedType(_ ctx: DocumentationContext, _ type: AnyType)
   if let t = TraitType(type) {
     let typeUrl = getDeclUrl(ctx, AnyDeclID(t.decl))
     return .type(t.name.value, href: typeUrl)
+  }
+
+  if let t = ArrowType(type) {
+    let inputs: [RenderString] = t.inputs.map { i in
+      var result: RenderString = i.label != nil ? .wrap([.name(i.label!), .text(" : ")]) : .wrap()
+      result += renderDetailedType(ctx, i.type)
+      return result
+    }
+
+    let receiverEffect = String(describing: t.receiverEffect)
+    let environment = renderDetailedType(ctx, t.environment)
+    let output = renderDetailedType(ctx, t.output)
+
+    return .wrap([
+      .text("["), environment, .text("] "),
+      .text("("), .join(inputs), .text(") "),
+      .keyword(receiverEffect), .text(" -> "), output,
+    ])
+  }
+
+  if let _ = AssociatedTypeType(type) {
+    return .text("ASSOCIATED TYPE")
+  }
+
+  if let _ = AssociatedValueType(type) {
+    return .text("ASSOCIATED VALUE")
+  }
+
+  if let t = ExistentialType(type) {
+    return .text(t.description)
+  }
+
+  if let _ = NamespaceType(type) {
+    return .text("NAMESPACE")
+  }
+
+  if let _ = RemoteType(type) {
+    return .text("REMOTE")
+  }
+
+  if let _ = WitnessType(type) {
+    return .text("WITNESS")
   }
 
   return .text("?")

@@ -15,6 +15,9 @@ public protocol DynamicSymbolDeclRenderer {
   static func renderBindingDecl(
     _ ctx: DocumentationContext, _ n: BindingDecl.ID
   ) -> String
+  static func renderOperatorDecl(
+    _ ctx: DocumentationContext, _ n: OperatorDecl.ID
+  ) -> String
   static func renderInitializerDecl(
     _ ctx: DocumentationContext, _ n: InitializerDecl.ID
   ) -> String
@@ -55,6 +58,14 @@ public struct InlineSymbolDeclRenderer: DynamicSymbolDeclRenderer {
     -> String
   {
     return renderDetailedBinding(ctx, n, true).toHTML()
+  }
+
+  public static func renderOperatorDecl(
+    _ ctx: DocumentationContext, _ n: FrontEnd.OperatorDecl.ID
+  )
+    -> String
+  {
+    return renderDetailedOperator(ctx, n, true).toHTML()
   }
 
   public static func renderInitializerDecl(
@@ -112,6 +123,14 @@ public struct BlockSymbolDeclRenderer: DynamicSymbolDeclRenderer {
     _ ctx: DocumentationContext, _ n: BindingDecl.ID
   ) -> String {
     return renderDetailedBinding(ctx, n, false).toHTML()
+  }
+
+  public static func renderOperatorDecl(
+    _ ctx: DocumentationContext, _ n: FrontEnd.OperatorDecl.ID
+  )
+    -> String
+  {
+    return renderDetailedOperator(ctx, n, false).toHTML()
   }
 
   public static func renderInitializerDecl(

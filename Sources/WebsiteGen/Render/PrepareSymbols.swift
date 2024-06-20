@@ -175,7 +175,6 @@ public func prepareBindingPage(
 public func prepareOperatorPage(
   _ context: GenerationContext, of declId: OperatorDecl.ID
 ) throws -> StencilContext {
-  let decl: OperatorDecl = context.documentation.typedProgram.ast[declId]!
   let scope = context.documentation.typedProgram.nodeToScope[declId]!
   let htmlGenerator = SimpleHTMLGenerator(
     context: ReferenceRenderingContext(
@@ -191,7 +190,8 @@ public func prepareOperatorPage(
   var env: [String: Any] = [:]
 
   env["pageType"] = "Operator Introducer"
-  env["declarationPreview"] = decl.site.text  // todo
+  env["declarationPreview"] = BlockSymbolDeclRenderer.renderOperatorDecl(
+    context.documentation, declId)
 
   if let doc = context.documentation.documentation.symbols.operatorDocs[declId] {
     env["summary"] = doc.common.summary.map(htmlGenerator.generate(document:))
