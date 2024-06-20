@@ -154,8 +154,8 @@ trait A { ... }
    ```
 
 4. `# Generic ` - inline, `# Generics:` - list<br>
-   The Generic section is used to document the generic parameters of a function, method, or initializer.<br>
-   **Available for:** function, method declaration, initializer, product type, trait.<br>
+   The Generic(s) section is used to document the generic parameters of a declaration.<br>
+   **Available for:** function, method declaration, initializer and product type.<br>
    Example:
    ```markdown
    /// # Generic T: The type of elements in the array.
@@ -226,7 +226,6 @@ Different special sections are available for different declaration types.
   2. Trait
       - `# See Also:` (inline, list)
       - `# Invariant:` (inline), `# Invariants:` (list)
-      - `# Generic:` (inline), `# Generics:` (list)
 
   3. Type alias
       - `# See Also:` (inline, list)
