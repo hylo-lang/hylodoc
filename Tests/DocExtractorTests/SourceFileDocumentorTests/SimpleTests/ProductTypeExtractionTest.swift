@@ -13,7 +13,7 @@ final class ProductTypeExtractionTest: XCTestCase {
     let sourceFile = SourceFile(
       synthesizedText: """
         trait D {}
-        
+
         /// Summary of the product type.
         ///
         /// This is the description of the product type.
@@ -59,7 +59,7 @@ final class ProductTypeExtractionTest: XCTestCase {
       myTypeDoc.invariants.map { $0.description.debugDescription }.joined(),
       what: "x and y must always be positive.")
 
-      assertContains(
+    assertContains(
       myTypeDoc.genericParameters.first?.value.description.description,
       what: "This is a generic.")
   }

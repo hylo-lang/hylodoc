@@ -1,8 +1,8 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import MarkdownKit
 import HyloStandardLibrary
+import MarkdownKit
 import Stencil
 import TestUtils
 import XCTest
@@ -94,7 +94,7 @@ final class ProductTypeTest: XCTestCase {
     let stencilContext = try prepareProductTypePage(context, of: productTypeId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("type Vector2", in: res)
+    assertPageTitle("Vector2", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )

@@ -1,7 +1,7 @@
 import DocExtractor
 import DocumentationDB
-import MarkdownKit
 import HyloStandardLibrary
+import MarkdownKit
 import Stencil
 import TestUtils
 import XCTest

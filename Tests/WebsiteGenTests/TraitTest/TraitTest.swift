@@ -1,8 +1,8 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import MarkdownKit
 import HyloStandardLibrary
+import MarkdownKit
 import Stencil
 import TestUtils
 import XCTest
@@ -93,7 +93,7 @@ final class TraitTest: XCTestCase {
     let stencilContext = try prepareTraitPage(context, of: traitId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("trait Shape", in: res)
+    assertPageTitle("Shape", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )

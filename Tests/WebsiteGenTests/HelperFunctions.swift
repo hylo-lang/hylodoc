@@ -1,7 +1,7 @@
 import DocumentationDB
+import HyloStandardLibrary
 import Kanna
 import MarkdownKit
-import HyloStandardLibrary
 import Stencil
 import TestUtils
 import WebsiteGen

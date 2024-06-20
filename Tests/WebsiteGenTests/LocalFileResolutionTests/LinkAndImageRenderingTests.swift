@@ -1,23 +1,25 @@
 import DocExtractor
-@testable import FrontEnd
+import DocumentationDB
 import MarkdownKit
 import TestUtils
 import XCTest
-import DocumentationDB
 
+@testable import FrontEnd
 @testable import WebsiteGen
 
 final class LinkAndImageRenderingTests: XCTestCase {
   func setupDummyContext() throws -> ReferenceRenderingContext {
     .init(
-      typedProgram: try checkNoDiagnostic{ d in try TypedProgram(annotating: ScopedProgram(AST()), reportingDiagnosticsTo: &d) },
+      typedProgram: try checkNoDiagnostic { d in
+        try TypedProgram(annotating: ScopedProgram(AST()), reportingDiagnosticsTo: &d)
+      },
       scopeId: AnyScopeID(ProductTypeDecl.ID(rawValue: 0)),
       resolveUrls: { _ in nil },
       sourceUrl: URL(fileURLWithPath: "/"),
       assetStore: AssetStore()
     )
   }
-  func testUrlLinkRendering() throws{
+  func testUrlLinkRendering() throws {
     let generator = CustomHTMLGenerator()
     generator.referenceContext = try setupDummyContext()
 
@@ -45,7 +47,7 @@ final class LinkAndImageRenderingTests: XCTestCase {
   func testLinkRenderingForEmails() throws {
     let generator = CustomHTMLGenerator()
     generator.referenceContext = try setupDummyContext()
-    
+
     XCTAssertEqual(
       generator.generate(textFragment: .link(Text("text"), "mailto:a@b.com", nil)),
       "<a href=\"mailto:a@b.com\">text</a>"
@@ -205,7 +207,7 @@ final class LinkAndImageRenderingTests: XCTestCase {
   }
 
   func testResolutionOfLocalFiles() throws {
-    // Testing that all local file references are resolved. 
+    // Testing that all local file references are resolved.
     // If something wouldnt resolve, it would cause a fatal error.
     // It's not ideal, but we would need to introduce exceptions all the way to make this work,
     // which would be a bit of refactoring.

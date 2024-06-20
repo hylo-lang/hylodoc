@@ -40,7 +40,7 @@ final class TargetResolverTest: XCTestCase {
       typedProgram: typedProgram,
       documentationDatabase: .init()
     )
-    XCTAssertEqual(references.count, 2) // 2 vardecls
+    XCTAssertEqual(references.count, 2)  // 2 vardecls
 
     if case .decl(let declId) = references[0] {
       XCTAssertEqual(declId.kind, NodeKind(VarDecl.self))
@@ -163,7 +163,8 @@ final class TargetResolverTest: XCTestCase {
     var ast = try checkNoDiagnostic { d in
       try AST.loadStandardLibraryCore(diagnostics: &d)
     }
-    let sourceUrl = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("TestHyloModule")
+    let sourceUrl = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+      .appendingPathComponent("TestHyloModule")
     let rootModuleId = try checkNoDiagnostic { d in
       try ast.makeModule(
         "TestHyloModule", sourceCode: sourceFiles(in: [sourceUrl]),

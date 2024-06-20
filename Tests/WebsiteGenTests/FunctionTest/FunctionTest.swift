@@ -1,8 +1,8 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import MarkdownKit
 import HyloStandardLibrary
+import MarkdownKit
 import Stencil
 import TestUtils
 import XCTest
@@ -113,7 +113,7 @@ final class FunctionTest: XCTestCase {
     let stencilContext = try prepareFunctionPage(context, of: functionId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("fun id(_:)", in: res)
+    assertPageTitle("id(_:)", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )

@@ -2,8 +2,8 @@ import DocExtractor
 import DocumentationDB
 import FrontEnd
 import HyloStandardLibrary
-import XCTest
 import TestUtils
+import XCTest
 
 func assetNameIs(_ name: String, _ assets: AssetStore) -> ((AnyAssetID) -> Bool) {
   { assets[$0]?.location.lastPathComponent == name }

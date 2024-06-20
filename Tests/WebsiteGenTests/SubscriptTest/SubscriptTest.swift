@@ -1,8 +1,8 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import MarkdownKit
 import HyloStandardLibrary
+import MarkdownKit
 import Stencil
 import TestUtils
 import XCTest
@@ -100,7 +100,7 @@ final class SubscriptTest: XCTestCase {
     let stencilContext = try prepareSubscriptPage(context, of: subscriptId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("subscript min(_:_:)", in: res)
+    assertPageTitle("min(_:_:)", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )

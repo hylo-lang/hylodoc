@@ -33,7 +33,7 @@ func runFullPipelineWithoutErrors(at sourceUrl: URL) throws {
     try TypedProgram(
       annotating: ScopedProgram(ast), inParallel: false,
       reportingDiagnosticsTo: &d, tracingInferenceIf: { (_, _) in false }
-      )
+    )
   }
 
   let result = extractDocumentation(

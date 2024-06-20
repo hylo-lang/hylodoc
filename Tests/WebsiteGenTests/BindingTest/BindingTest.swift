@@ -2,8 +2,8 @@ import DocExtractor
 import DocumentationDB
 import Foundation
 import FrontEnd
-import MarkdownKit
 import HyloStandardLibrary
+import MarkdownKit
 import Stencil
 import TestUtils
 import XCTest

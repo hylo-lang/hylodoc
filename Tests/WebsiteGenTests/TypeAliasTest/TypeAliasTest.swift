@@ -1,8 +1,8 @@
 import DocumentationDB
 import Foundation
 import FrontEnd
-import MarkdownKit
 import HyloStandardLibrary
+import MarkdownKit
 import Stencil
 import TestUtils
 import XCTest
@@ -89,7 +89,7 @@ final class TypeAliasTest: XCTestCase {
     let stencilContext = try prepareTypeAliasPage(context, of: typeAliasId)
     let res = try renderPage(&context, stencilContext, of: targetId)
 
-    assertPageTitle("typealias Vector2", in: res)
+    assertPageTitle("Vector2", in: res)
     assertSummary(
       "Carving up a summary for dinner, minding my own business.", in: res, file: #file, line: #line
     )
