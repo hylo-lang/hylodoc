@@ -1,6 +1,10 @@
 type MyType : TraitA, TraitB {
   public typealias Element = Float64
 
+  /// I don't know about degrees
+  ///
+  /// But I do know about ducks
+  /// ![Ducks](https://wallpaperaccess.com/full/2943133.jpg)
   public var radians: Float64
   public let member2 = "What"
   public static let member3: Element

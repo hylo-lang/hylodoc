@@ -54,6 +54,10 @@
     border-color: $text-secondary;
   }
 
+  img {
+    @apply w-full block rounded-md;
+  }
+
   ul {
     @apply list-disc
   }
