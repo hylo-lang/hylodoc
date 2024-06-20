@@ -69,6 +69,7 @@ final class AssociatedValueTest: XCTestCase {
         parent: nil,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
         url: URL(fileURLWithPath: "/")
       )

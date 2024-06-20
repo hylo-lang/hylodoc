@@ -4,10 +4,6 @@ $content-offset: 3rem;
 .page {
   @apply flex flex-col gap-0 w-screen h-screen;
 
-  .page-header {
-    @apply flex-initial h-fit;
-  }
-
   .page-body {
     @apply flex-1;
   }

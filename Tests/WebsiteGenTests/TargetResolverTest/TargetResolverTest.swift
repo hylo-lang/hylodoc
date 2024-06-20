@@ -135,6 +135,7 @@ final class TargetResolverTest: XCTestCase {
         parent: nil,
         simpleName: "placeholder",
         navigationName: "placeholder",
+        metaDescription: "placeholder",
         children: [],
         url: URL(fileURLWithPath: "/index.html")
       )

@@ -3,23 +3,40 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="/assets/logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{{ metaDescription }}">
   <title>{{ target.simpleName }}</title>
-  <link rel="stylesheet" crossorigin href="/assets/app.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <noscript>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+      rel="stylesheet"
+      type="text/css"
+      crossorigin />
+  </noscript>
+  <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+      rel="preload" 
+      type="text/css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      crossorigin />
+  <link rel="stylesheet" href="/assets/app.css">
 </head>
 
 <body class="page">
 
   <div class="page-header">
     <div class="header-title">
-      <img src="{{ pathToRoot }}/assets/logo.svg">
-      <h3>Documentation</h3>
+      <img src="{{ pathToRoot }}/assets/logo.svg" width="44" height="41" alt="Hylo Logo">
+      <h1>Documentation</h1>
     </div>
 
     <div class="header-breadcrumb">
       {% for item in breadcrumbs %}
-        <a href="{% path item.url %}">{{ item.name }}</a>
+      <a href="{% path item.url %}">{{ item.name }}</a>
       {% endfor %}
     </div>
   </div>
@@ -30,7 +47,8 @@
         <aside class="page-tree">
           <div class="sidebar-search-cont">
             <!-- Only show search if JS is enabled -->
-            <input type="text" id="sidebar-search" name="search" placeholder="Press   /   for Search" style="display: none">
+            <input type="text" id="sidebar-search" name="search" placeholder="Press   /   for Search"
+              style="display: none">
             <script>document.getElementById("sidebar-search").style.display = 'block'</script>
           </div>
 

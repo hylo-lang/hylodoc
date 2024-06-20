@@ -1,10 +1,12 @@
 import DocumentationDB
 import FrontEnd
+import MarkdownKit
 
 public struct PartialResolvedTarget {
   let pathName: String
   let simpleName: String
   let navigationName: String
+  let metaDescription: String // not escaped from " and & symbols
   let children: [AnyTargetID]
 }
 
@@ -31,18 +33,24 @@ func partialResolveAsset(
   case .folder(let folderId):
     let folder: FolderAsset = documentationDatabase.assets[folderId]!
 
+    var description = ""
     // Display name of the folder
     var name: String = folder.name
     if let articleId = folder.documentation {
       if let article = documentationDatabase.assets[articleId], !article.isInternal {
         name = article.title ?? folder.name
+        description = metaDescriptionOf(document: article.content)
       }
+    }
+    if description.isEmpty {
+      description = "Documentation of the folder \(folder.name)"
     }
 
     return PartialResolvedTarget(
       pathName: folder.name + "/index.html",
       simpleName: name,
       navigationName: name,
+      metaDescription: description,
       children: folder.children
         .filter { folder.documentation == nil || $0 != .article(folder.documentation!) }
         .filter {
@@ -65,6 +73,8 @@ func partialResolveAsset(
         + "/index.html",
       simpleName: sourceFile.name,
       navigationName: sourceFile.name,
+      metaDescription: sourceFile.generalDescription.summary.map { metaDescriptionOf(document: $0) }
+        ?? "Documentation of source file \(sourceFile.name))",
       children: typedProgram.ast[sourceFile.translationUnit]!.decls
         .filter(isSupportedDecl)
         .map { .decl($0) }
@@ -77,6 +87,7 @@ func partialResolveAsset(
       pathName: (article.name.components(separatedBy: ".").first ?? article.name) + ".article.html",
       simpleName: name,
       navigationName: name,
+      metaDescription: metaDescriptionOf(document: article.content),
       children: []
     )
   case .otherFile(let otherFileId):
@@ -86,6 +97,7 @@ func partialResolveAsset(
       pathName: otherFile.name,
       simpleName: otherFile.name,
       navigationName: otherFile.name,
+      metaDescription: "",
       children: []
     )
   }
@@ -95,25 +107,32 @@ func partialResolveAsset(
 func partialResolveDecl(
   _ documentationDatabase: DocumentationDatabase, _ typedProgram: TypedProgram, declId: AnyDeclID
 ) -> PartialResolvedTarget {
+  let symbols = documentationDatabase.symbols
   switch declId.kind {
   case AssociatedTypeDecl.self:
-    //let id = AssociatedTypeDecl.ID(declId)!
+    let id = AssociatedTypeDecl.ID(declId)!
     let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderAssociatedTypeDecl(typedProgram, id)
 
     return PartialResolvedTarget(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: name,  //NavigationSymbolDecRenderer.renderAssociatedTypeDecl(typedProgram, id),
+      metaDescription: symbols.associatedTypeDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of associated type \(name)",
       children: []
     )
   case AssociatedValueDecl.self:
-    //let id = AssociatedValueDecl.ID(declId)!
+    let id = AssociatedValueDecl.ID(declId)!
     let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderAssociatedValueDecl(typedProgram, id)
 
     return PartialResolvedTarget(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: name,  //NavigationSymbolDecRenderer.renderAssociatedValueDecl(typedProgram, id),
+      metaDescription: symbols.associatedValueDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of associated value \(name)",
       children: []
     )
   case TypeAliasDecl.self:
@@ -124,6 +143,9 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderTypeAliasDecl(typedProgram, id),
+      metaDescription: symbols.typeAliasDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of type alias \(name)",
       children: []
     )
   case BindingDecl.self:
@@ -134,16 +156,22 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderBindingDecl(typedProgram, id),
+      metaDescription: symbols.bindingDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of binding \(name)",
       children: []
     )
   case OperatorDecl.self:
-    //let id = OperatorDecl.ID(declId)!
+    let id = OperatorDecl.ID(declId)!
     let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderOperatorDecl(typedProgram, id)
 
     return PartialResolvedTarget(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: name,  //NavigationSymbolDecRenderer.renderOperatorDecl(typedProgram, id),
+      metaDescription: symbols.operatorDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of operator \(name)",
       children: []
     )
   case FunctionDecl.self:
@@ -154,6 +182,9 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderFunctionDecl(typedProgram, id),
+      metaDescription: symbols.functionDocs[id]?.documentation.common.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of function \(name)",
       children: []
     )
   case MethodDecl.self:
@@ -164,6 +195,9 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderMethodDecl(typedProgram, id),
+      metaDescription: symbols.methodDeclDocs[id]?.documentation.common.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of method \(name)",
       children: []
     )
   case SubscriptDecl.self:
@@ -174,6 +208,9 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderSubscriptDecl(typedProgram, id),
+      metaDescription: symbols.subscriptDeclDocs[id]?.documentation.common.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of subscript \(name)",
       children: []
     )
   case InitializerDecl.self:
@@ -184,6 +221,9 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderInitializerDecl(typedProgram, id),
+      metaDescription: symbols.initializerDocs[id]?.documentation.common.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of initializer \(name)",
       children: []
     )
   case TraitDecl.self:
@@ -195,6 +235,9 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderTraitDecl(typedProgram, id),
+      metaDescription: symbols.traitDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of trait \(name)",
       children: decl.members.filter(isSupportedDecl).map { .decl($0) }
     )
   case ProductTypeDecl.self:
@@ -206,10 +249,13 @@ func partialResolveDecl(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
       navigationName: NavigationSymbolDecRenderer.renderProductTypeDecl(typedProgram, id),
+      metaDescription: symbols.productTypeDocs[id]?.common.summary.map {
+        metaDescriptionOf(document: $0)
+      } ?? "Documentation of product type \(name)",
       children: decl.members.filter(isSupportedDecl).map { .decl($0) }
     )
   default:
-    fatalError("unexpected declaration" + String(describing: declId))
+    fatalError("unexpected declaration: " + declId.description)
   }
 }
 
@@ -233,7 +279,9 @@ public func isSupportedDecl(declId: AnyDeclID) -> Bool {
 }
 
 /// Get all the targets that should refer back to the provided target
-public func backReferencesOfTarget(targetId: AnyTargetID, typedProgram: TypedProgram, documentationDatabase: DocumentationDatabase)
+public func backReferencesOfTarget(
+  targetId: AnyTargetID, typedProgram: TypedProgram, documentationDatabase: DocumentationDatabase
+)
   -> [AnyTargetID]
 {
   if case .decl(let declId) = targetId, let bindingId = BindingDecl.ID(declId) {
@@ -272,4 +320,22 @@ public func resolvePatternToTargets(_ typedProgram: TypedProgram, pattern: AnyPa
   }
 
   return []
+}
+
+func escapeStringForHTMLAttribute(_ input: String) -> String {
+  return input.replacingOccurrences(of: "&", with: "&amp;")
+    .replacingOccurrences(of: "\"", with: "&quot;")
+}
+
+func metaDescriptionOf(document: Block) -> String {
+  guard case .document(let blocks) = document else {
+    preconditionFailure("expected a document block, got \(document)")
+  }
+
+  for block in blocks {
+    if case .paragraph(let content) = block {
+      return content.rawDescription.prefix(155).description
+    }
+  }
+  return ""
 }

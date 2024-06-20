@@ -13,17 +13,19 @@ public struct ResolvedTarget {
   let parent: AnyTargetID?
   let simpleName: String  // name as seen in the breadcrumb and page title, without additional styling/tags
   let navigationName: String  // name as seen in the tree navigation, which has highlighting of some sort
+  let metaDescription: String // a string already escaped from " and & symbols
   let children: [AnyTargetID]
   let url: URL
 
   public init(
     id: AnyTargetID, parent: AnyTargetID?, simpleName: String, navigationName: String,
-    children: [AnyTargetID], url: URL
+    metaDescription: String, children: [AnyTargetID], url: URL
   ) {
     self.id = id
     self.parent = parent
     self.simpleName = simpleName
     self.navigationName = navigationName
+    self.metaDescription = metaDescription
     self.children = children
     self.url = url
   }

@@ -18,6 +18,8 @@ llvm.pc
 dist
 test-output
 
+.firebase
+
 # IDEs
 /.vscode
 /.swiftpm

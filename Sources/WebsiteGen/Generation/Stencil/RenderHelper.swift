@@ -54,6 +54,7 @@ public func renderPage(
   var completeContext: [String: Any] = stencil.context
   let target = context.documentation.targetResolver[targetId]
   completeContext["target"] = target
+  completeContext["metaDescription"] = target?.metaDescription ?? ""
   completeContext["breadcrumbs"] = context.breadcrumb
   completeContext["toc"] = tableOfContents(stencilContext: stencil.context)
   completeContext["tree"] = context.tree

@@ -142,7 +142,9 @@ public func generateModuleIndex(_ context: inout GenerationContext) throws {
   env["pageType"] = "Home"
 
   // Article Content
-  env["articleContent"] = "<p>Here is the list of documented modules:</p>"
+  env["articleContent"] = "<p>The list of documented modules:</p>"
+  env["metaDescription"] = "The list of documented modules"
+  // todo make titles and descriptions configurable properly without targets
 
   // Map children to an array of [(name, url)]
   env["contents"] = context.documentation.documentation.modules

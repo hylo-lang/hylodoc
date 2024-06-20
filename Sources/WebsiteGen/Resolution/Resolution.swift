@@ -61,6 +61,7 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
         parent: targetItem.parentId,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children.filter { !isDirectlyCopiedAssetTarget($0) },  // other files should not show up anywhere
         url: url
       )

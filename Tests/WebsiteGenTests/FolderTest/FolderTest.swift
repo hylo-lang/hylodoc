@@ -55,6 +55,7 @@ final class FolderTest: XCTestCase {
         parent: nil,
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
         url: URL(fileURLWithPath: "root/Folder1/index.html")
       )
@@ -136,6 +137,7 @@ final class FolderTest: XCTestCase {
         parent: nil,
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
         url: URL(fileURLWithPath: "root/Folder1/index.html")
       )
@@ -235,6 +237,7 @@ final class FolderTest: XCTestCase {
         parent: .asset(.folder(folder1Id)),
         simpleName: partialResolvedChild1.simpleName,
         navigationName: partialResolvedChild1.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolvedChild1.metaDescription),
         children: partialResolvedChild1.children,
         url: URL(fileURLWithPath: "root/Folder1/child1.hylodoc")
       )
@@ -250,6 +253,7 @@ final class FolderTest: XCTestCase {
         parent: targetId,
         simpleName: partialResolvedChild2.simpleName,
         navigationName: partialResolvedChild2.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolvedChild2.metaDescription),
         children: partialResolvedChild2.children,
         url: URL(fileURLWithPath: "root/Folder1/Folder2/index.html")
       )
@@ -264,6 +268,7 @@ final class FolderTest: XCTestCase {
         parent: nil,
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
         url: URL(fileURLWithPath: "root/Folder1/index.html")
       )
@@ -356,6 +361,7 @@ final class FolderTest: XCTestCase {
         parent: nil,
         simpleName: partialResolvedParent.simpleName,
         navigationName: partialResolvedParent.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
         url: URL(fileURLWithPath: "root/Folder1/index.html")
       )

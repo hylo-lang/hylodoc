@@ -1,21 +1,26 @@
 .page-header {
   // Colors
   $header-background: #161616;
+  height: 62px;
 
-  @apply flex flex-row;
+  display: flex;
+  flex-direction: row;
+
   background-color: $header-background;
   border-bottom: 1px solid $thin-divider;
 
   .header-title {
-    @apply w-80 flex-none flex flex-row p-3 gap-2;
+    @apply w-80 flex-none flex flex-row gap-2;
     color: $text-primary;
+    align-items: center;
 
     img {
-      @apply h-6 content-center;
+      margin-left: 16px
     }
 
     h1 {
-      @apply content-center ml-1.5 align-middle;
+      font-size: 1em;
+      font-weight: bold;
     }
   }
 
@@ -36,9 +41,11 @@
       }
 
       &:not(:first-child):before {
-        @apply text-sm;
+        // @apply text-sm;
         content: url(icons/arrow.svg);
-        margin-right: 0.5rem;
+        display: inline-block;
+        width: 14px;
+        height: 17px;
       }
 
       &:last-child {

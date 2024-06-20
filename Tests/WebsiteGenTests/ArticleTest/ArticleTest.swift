@@ -60,6 +60,7 @@ final class ArticleTest: XCTestCase {
         parent: nil,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
         url: URL(fileURLWithPath: "/")
       )
@@ -83,8 +84,7 @@ final class ArticleTest: XCTestCase {
     assertPageTitle("I betcha you would have done the same", in: res)
     assertContent(
       "Carving up a chicken for dinner. Minding my own business. In storms my husband Wilbur in a jealous rage. He was crazy!",
-      in: res,
-      file: #file, line: #line
+      in: res
     )
   }
 
@@ -143,6 +143,7 @@ final class ArticleTest: XCTestCase {
         parent: nil,
         simpleName: partialResolved.simpleName,
         navigationName: partialResolved.navigationName,
+        metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
         url: URL(fileURLWithPath: "/")
       )

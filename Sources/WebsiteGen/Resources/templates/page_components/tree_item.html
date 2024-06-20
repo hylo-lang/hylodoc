@@ -1,6 +1,6 @@
 <li>
     {% if item.children %}
-    <input type="checkbox" checked>
+    <input type="checkbox" checked aria-label="Expanded">
     {% endif %}
 
     <a class="nav-entry {{ item.cssClassOfTarget }}" href="{% path item.url %}">
