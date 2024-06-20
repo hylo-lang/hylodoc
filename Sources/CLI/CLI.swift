@@ -6,6 +6,8 @@ import FrontEnd
 import HyloStandardLibrary
 import WebsiteGen
 
+// import Vapor
+
 extension DiagnosticSet {
   fileprivate var niceErrorMessage: String {
     return "Diagnostics: \n" + elements.map { " - " + $0.description + "\n" }.joined(by: "")
@@ -211,8 +213,14 @@ public struct CLI: ParsableCommand {
   @Option(name: .shortAndLong, help: "The output path for the HTML files. ")
   var outputPath: String = "./dist"
 
-  @Flag(name: .shortAndLong, help: "Document the standard library. ")
+  @Flag(name: .customShort("s"), help: "Document the standard library. ")
   var documentingStandardLibrary: Bool = false
+
+  @Flag(help: "Start a web server to preview the generated documentation. ")
+  var preview: Bool = false
+
+  @Option(name: .customShort("p"), help: "The port number for the web server. ")
+  var port: Int = 8080
 
   public init() {}
 
@@ -230,5 +238,9 @@ public struct CLI: ParsableCommand {
     })
 
     print("Documentation successfully generated at \(outputPath) in \(duration).")
+
+    guard preview else { return }
+    print("Starting preview server... 🚀")
+    try startWebserverSync(port: port, publicDirectory: URL(fileURLWithPath: outputPath))
   }
 }
