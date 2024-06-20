@@ -14,6 +14,7 @@ func renderSimpleOperator(
   result += raw ? .text(notation) : .keyword(notation)
   result += raw ? .text(name) : .name(name)
 
+  print(name)
   return result
 }
 
@@ -93,7 +94,7 @@ func renderSimpleInitializer(
   let initializer = typedProgram.ast[n]
   let params = renderSimpleParams(typedProgram, initializer.parameters)
 
-  var result: RenderString = raw ? .text("init") : .keyword("init")
+  var result: RenderString = raw ? .wrap([.text("init")]) : .wrap([.keyword("init")])
   result += raw ? params : .name([params])
 
   return result
