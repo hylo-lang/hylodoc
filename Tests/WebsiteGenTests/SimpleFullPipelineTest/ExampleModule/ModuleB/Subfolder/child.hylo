@@ -15,13 +15,24 @@ type MyType : TraitA, TraitB {
   /// print(example)
   /// ```
   ///
+  /// An enumeration:
+  /// 1. A
+  /// 2. B
+  ///
+  /// An unordered list:
+  /// - A
+  /// - B
+  /// - C
+  /// ---
+  /// > Block _quote_
+  ///
   /// # Parameters:
   /// - hello: hello from the other side
   /// - world: or word, I *wonder*
   ///
   /// # Preconditions:
-  /// - Invar A
-  /// - Invar `B`
+  /// - Invar *A* or **A**
+  /// - Invar `B` or ~~B~~
   ///
   /// # Returns: some element
   ///

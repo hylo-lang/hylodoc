@@ -19,9 +19,11 @@
     @apply mb-2;
   }
 
-  p {
+  *:not(:last-child) {
     @apply mb-3;
+  }
 
+  p {
     a {
       @apply underline;
       color: $text-secondary-accent;
@@ -30,10 +32,38 @@
         @apply cursor-pointer;
       }
     }
+
+    strong {
+      @apply font-bold;
+      color: $text-primary;
+    }
+
+    em {
+      @apply italic underline;
+    }
+  }
+
+  blockquote {
+    @apply pl-2;
+    border-left: 3px solid $text-primary;
+    color: $text-secondary;
+  }
+
+  hr {
+    @apply h-0.5;
+    border-color: $text-secondary;
   }
 
   ul {
-    @apply list-disc ml-7;
+    @apply list-disc
+  }
+
+  ol {
+    @apply list-decimal
+  }
+
+  ul, ol {
+    @apply ml-7;
     color: $text-primary;
   }
 
