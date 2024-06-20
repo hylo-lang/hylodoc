@@ -2,8 +2,6 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 import MarkdownKit
-import PathWrangler
-import StandardLibraryCore
 import Stencil
 import XCTest
 
