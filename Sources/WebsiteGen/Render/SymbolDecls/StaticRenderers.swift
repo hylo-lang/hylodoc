@@ -12,6 +12,9 @@ public protocol StaticSymbolDeclRenderer {
   static func renderProductTypeDecl(
     _ typedProgram: TypedProgram, _ n: ProductTypeDecl.ID
   ) -> String
+  static func renderOperatorDecl(
+    _ typedProgram: TypedProgram, _ n: OperatorDecl.ID
+  ) -> String
   static func renderBindingDecl(
     _ typedProgram: TypedProgram, _ n: BindingDecl.ID
   ) -> String
@@ -47,6 +50,14 @@ public struct SimpleSymbolDeclRenderer: StaticSymbolDeclRenderer {
     _ typedProgram: TypedProgram, _ n: FrontEnd.ProductTypeDecl.ID
   ) -> String {
     return renderSimpleProductType(typedProgram, n, true).toHTML()
+  }
+
+  public static func renderOperatorDecl(
+    _ typedProgram: TypedProgram, _ n: FrontEnd.OperatorDecl.ID
+  )
+    -> String
+  {
+    return renderSimpleOperator(typedProgram, n, true).toHTML()
   }
 
   public static func renderBindingDecl(
@@ -98,6 +109,14 @@ public struct NavigationSymbolDecRenderer: StaticSymbolDeclRenderer {
     _ typedProgram: TypedProgram, _ n: FrontEnd.ProductTypeDecl.ID
   ) -> String {
     return renderSimpleProductType(typedProgram, n, false).toHTML()
+  }
+
+  public static func renderOperatorDecl(
+    _ typedProgram: TypedProgram, _ n: FrontEnd.OperatorDecl.ID
+  )
+    -> String
+  {
+    return renderSimpleOperator(typedProgram, n, false).toHTML()
   }
 
   public static func renderBindingDecl(

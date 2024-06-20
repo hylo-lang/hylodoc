@@ -1,6 +1,22 @@
 import Foundation
 import FrontEnd
 
+func renderSimpleOperator(
+  _ typedProgram: TypedProgram, _ n: OperatorDecl.ID, _ raw: Bool
+)
+  -> RenderString
+{
+  let op: OperatorDecl = typedProgram.ast[n]
+  let notation = String(describing: op.notation.value)
+  let name = op.name.value
+
+  var result: RenderString = raw ? .wrap() : .wrap([.keyword("operator"), .text(" ")])
+  result += raw ? .text(notation) : .keyword(notation)
+  result += raw ? .text(name) : .name(name)
+
+  return result
+}
+
 func renderSimpleTrait(
   _ typedProgram: TypedProgram, _ n: TraitDecl.ID, _ raw: Bool
 )

@@ -87,11 +87,12 @@ func getMemberNameAndSummary(
     summary = context.documentation.documentation.symbols.bindingDocs[docID]?.common.summary
     key = "Bindings"
   // TODO Mark needs to implement this
-  // case OperatorDecl.self:
-  //     name = InlineSymbolDeclRenderer.renderOperatorDecl(OperatorDecl.ID(of)!)
-  //     let docID = OperatorDecl.ID(of)!
-  //     summary = context.documentation.documentation.symbols.operatorDocs[docID]?.documentation.summary
-  //     key = "Operators"
+  case OperatorDecl.self:
+    let docID = OperatorDecl.ID(of)!
+    scope = AnyScopeID(docID)
+    name = InlineSymbolDeclRenderer.renderOperatorDecl(context.documentation, docID)
+    summary = context.documentation.documentation.symbols.operatorDocs[docID]?.common.summary
+    key = "Operators"
   case FunctionDecl.self:
     let docID = FunctionDecl.ID(of)!
     scope = AnyScopeID(docID)

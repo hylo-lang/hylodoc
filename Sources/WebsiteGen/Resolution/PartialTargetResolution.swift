@@ -6,7 +6,7 @@ public struct PartialResolvedTarget {
   let pathName: String
   let simpleName: String
   let navigationName: String
-  let metaDescription: String // not escaped from " and & symbols
+  let metaDescription: String  // not escaped from " and & symbols
   let children: [AnyTargetID]
 }
 
@@ -163,15 +163,12 @@ func partialResolveDecl(
     )
   case OperatorDecl.self:
     let id = OperatorDecl.ID(declId)!
-    let name = String(typedProgram.ast[declId]!.site.text)  //SimpleSymbolDeclRenderer.renderOperatorDecl(typedProgram, id)
+    let name = SimpleSymbolDeclRenderer.renderOperatorDecl(typedProgram, id)
 
     return PartialResolvedTarget(
       pathName: name.components(separatedBy: " ").last! + "/index.html",
       simpleName: name,
-      navigationName: name,  //NavigationSymbolDecRenderer.renderOperatorDecl(typedProgram, id),
-      metaDescription: symbols.operatorDocs[id]?.common.summary.map {
-        metaDescriptionOf(document: $0)
-      } ?? "Documentation of operator \(name)",
+      navigationName: NavigationSymbolDecRenderer.renderOperatorDecl(typedProgram, id),
       children: []
     )
   case FunctionDecl.self:
