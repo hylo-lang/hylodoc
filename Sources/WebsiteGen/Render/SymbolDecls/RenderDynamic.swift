@@ -178,9 +178,10 @@ func renderDetailedFunction(
     result += .wrap([.text(" -> "), output])
   }
 
-  let effect =
-    function.receiverEffect != nil ? String(describing: function.receiverEffect!.value) : "let"
-  result += .wrap([.text(" { "), .keyword(effect), .text(" }")])
+  if let receiverEffect = function.receiverEffect?.value {
+    let effect = String(describing: receiverEffect)
+    result += .wrap([.text(" { "), .keyword(effect), .text(" }")])
+  }
 
   return result
 }
