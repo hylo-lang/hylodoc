@@ -5,8 +5,19 @@ const navTreeContainer = document.getElementById("navigation-tree-container")!;
 
 const listItems = navTreeContainer.querySelectorAll("li");
 searchInput.addEventListener("input", () => {
-  const query = searchInput.value;
+  const query = searchInput.value
+  window.localStorage.setItem('search-query', query)
+  search(query)
+});
 
+// Apply saved query
+let query = window.localStorage.getItem('search-query')
+if(query) {
+  searchInput.value = query
+  search(query)
+}
+
+function search(query: string) {
   // case-insensitive fuzzy search
   const regexp = new RegExp(".*"+query.split("").map(escapeRegExp).join(".*")+".*", "i");
 
@@ -26,7 +37,7 @@ searchInput.addEventListener("input", () => {
       li.style.display = "none";
     }
   });
-});
+}
 
 /// The text is separated by newlines, and there might be a lot of additional spaces and whitespaces around them.
 function descendantEntries(text: string) {
