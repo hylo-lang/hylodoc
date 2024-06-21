@@ -71,7 +71,8 @@ final class FunctionTest: XCTestCase {
           ),
           preconditions: [],
           postconditions: [],
-          throwsInfo: []
+          throwsInfo: [],
+          complexityInfo: []
         ),
         parameters: [:],
         genericParameters: [:]

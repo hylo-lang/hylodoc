@@ -58,12 +58,14 @@ final class SubscriptTest: XCTestCase {
           ),
           preconditions: [],
           postconditions: [],
-          throwsInfo: []
+          throwsInfo: [],
+          complexityInfo: []
         ),
         parameters: [:],
         genericParameters: [:]
       ),
-      yields: []
+      yields: [],
+      projectsInfo: []
     )
 
     var documentation: DocumentationDatabase = .init()

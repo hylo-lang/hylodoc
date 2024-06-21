@@ -250,6 +250,9 @@ public func prepareFunctionPage(
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
       htmlGenerator.generate(document: $0.description)
     }
+    env["complexityInfo"] = doc.documentation.common.complexityInfo.map {
+      htmlGenerator.generate(document: $0.description)
+    }
 
     // TODO: https://gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-e/04d/automated-documentation-generation-tool/-/issues/147
     env["parameters"] = doc.documentation.parameters.map { key, value in
@@ -325,6 +328,9 @@ public func prepareMethodPage(
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
       htmlGenerator.generate(document: $0.description)
     }
+    env["complexityInfo"] = doc.documentation.common.complexityInfo.map {
+      htmlGenerator.generate(document: $0.description)
+    }
 
     env["parameters"] = doc.documentation.parameters.map { key, value in
       (
@@ -389,7 +395,13 @@ public func prepareSubscriptPage(
     env["yields"] = doc.yields.map {
       htmlGenerator.generate(document: $0.description)
     }
+    env["projectsInfo"] = doc.projectsInfo.map {
+      htmlGenerator.generate(document: $0.description)
+    }
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+      htmlGenerator.generate(document: $0.description)
+    }
+    env["complexityInfo"] = doc.documentation.common.complexityInfo.map {
       htmlGenerator.generate(document: $0.description)
     }
 
@@ -480,6 +492,9 @@ public func prepareInitializerPage(
     }
 
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
+      htmlGenerator.generate(document: $0.description)
+    }
+    env["complexityInfo"] = doc.documentation.common.complexityInfo.map {
       htmlGenerator.generate(document: $0.description)
     }
 

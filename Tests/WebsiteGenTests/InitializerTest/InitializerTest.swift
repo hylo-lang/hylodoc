@@ -58,7 +58,8 @@ final class InitializerTest: XCTestCase {
           ),
           preconditions: [],
           postconditions: [],
-          throwsInfo: []
+          throwsInfo: [],
+          complexityInfo: []
         ),
         parameters: [:],
         genericParameters: [:]

@@ -1,0 +1,16 @@
+{% if complexityInfo %}
+    <div class="content-section" id="complexityInfo">
+        <h1>Throws</h1>
+        {% if complexityInfo.count == 1 %}
+            {{ throwsInfo[0] }}
+        {% else %}
+            <ul>
+            {% for el in complexityInfo %}
+                <li>
+                {{ el }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}
