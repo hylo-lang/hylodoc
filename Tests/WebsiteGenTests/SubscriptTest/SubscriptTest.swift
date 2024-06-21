@@ -59,13 +59,28 @@ final class SubscriptTest: XCTestCase {
           preconditions: [],
           postconditions: [],
           throwsInfo: [],
-          complexityInfo: []
+          complexityInfo: [
+            Complexity(description: .document([.htmlBlock([
+              "<p id=\"exampleComplexity\">And he kept on screeming about complexity</p>"
+            ])]))
+          ]
         ),
         parameters: [:],
         genericParameters: [:]
       ),
-      yields: [],
-      projectsInfo: []
+      yields: [
+        Yields(description: .document([
+          .paragraph(Text("If you'd have been there, if you'd have yielded it"))
+        ])),
+        Yields(description: .document([
+          .paragraph(Text("I betcha you would have yield the same!"))
+        ]))
+      ],
+      projectsInfo: [
+        Projects(description: .document([.htmlBlock([
+              "<p id=\"exampleProjects\">And then he ran into my projects. He ran into my projects 10 times...</p>"
+            ])]))
+      ]
     )
 
     var documentation: DocumentationDatabase = .init()
@@ -110,7 +125,11 @@ final class SubscriptTest: XCTestCase {
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
 
-    assertNotContains(res, what: "yields")
+    assertByID("exampleComplexity", contains: "And he kept on screeming about complexity", in: res, file: #file, line: #line)
+    assertByID("exampleProjects", contains: "And then he ran into my projects. He ran into my projects 10 times...", in: res, file: #file, line: #line)
+
+    assertListExistAndCount(id: "yields", count: 2, in: res, file: #file, line: #line)
+
     assertNotContains(res, what: "throwsInfo")
     assertNotContains(res, what: "parameters")
     assertNotContains(res, what: "genericParameters")

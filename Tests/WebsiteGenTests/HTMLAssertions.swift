@@ -7,64 +7,6 @@ import TestUtils
 import WebsiteGen
 import XCTest
 
-/// Check if string contains array of sub-strings only separated by whitespaces
-/// - Parameters:
-///   - pattern: array of strings to be matched inside res
-///   - res: string in which to search for sub-strings in pattern
-/// - Returns: true if res is a valid string for regex, and all sub-strings in pattern are found in res in the same order and separated by whitespaces or newlines, false otherwise
-func matchWithWhitespacesInBetween(pattern: [String], in res: String) -> Bool {
-  do {
-    let pattern = pattern.map { NSRegularExpression.escapedPattern(for: $0) }.joined(
-      separator: "\\s*")
-    let adjustedPattern = "(?s)" + pattern
-    let regex = try NSRegularExpression(pattern: adjustedPattern)
-
-    let range = NSRange(location: 0, length: res.utf16.count)
-    if let _ = regex.firstMatch(in: res, options: [], range: range) {
-      return true
-    } else {
-      XCTFail(
-        "String expected to contain: \n" + ANSIColors.green("```\n\(pattern)\n```\n")
-          + "but it was actually:\n" + ANSIColors.red("```\n\(res)\n```"),
-        file: #file, line: #line)
-      return false
-    }
-  } catch {
-    print("Invalid regular expression: \(error.localizedDescription)")
-    return false
-  }
-}
-
-/// Find html element by id
-/// - Parameters:
-///   - id: css id of the element to be found
-///   - html: string in which to search for the element
-/// - Returns: string representation of the element with the given id
-public func findByID(_ id: String, in html: String) -> String {
-  let doc = try! HTML(html: html, encoding: .utf8)
-  return doc.at_css("#\(id)")?.toHTML ?? ""
-}
-
-/// Find html elements by tag
-/// - Parameters:
-///   - tag: html tag of the elements to be found
-///   - html: string in which to search for the element
-/// - Returns: array of string representations of the elements with the given tag
-public func findByTag(_ tag: String, in html: String) -> [String] {
-  let doc = try! HTML(html: html, encoding: .utf8)
-  return doc.css(tag).map { $0.toHTML! }
-}
-
-/// Find html elements by class
-/// - Parameters:
-///   - className: css class of the elements to be found
-///   - html: string in which to search for the element
-/// - Returns: array of string representations of the elements with the given class
-public func findByClass(_ className: String, in html: String) -> [String] {
-  let doc = try! HTML(html: html, encoding: .utf8)
-  return doc.css(".\(className)").map { $0.toHTML! }
-}
-
 public func assertPageTitle(
   _ pageTitle: String, in html: String, file: StaticString = #file, line: UInt = #line
 ) {
@@ -88,8 +30,13 @@ public func assertDetails(
 public func assertContent(
   _ content: String, in html: String, file: StaticString = #file, line: UInt = #line
 ) {
-  // assertContains(findByID("content", in: html), what: content, file: file, line: line)
-  assertContains(html, what: content, file: file, line: line)
+  assertContains(findByID("content", in: html), what: content, file: file, line: line)
+}
+
+public func assertByID(
+  _ id: String, contains: String, in html: String, file: StaticString = #file, line: UInt = #line
+) {
+  assertContains(findByID(id, in: html), what: contains, file: file, line: line)
 }
 
 /// Assert that html contains an html element with the given id and has the same children (list items) count as the given count
@@ -97,6 +44,9 @@ public func assertContent(
 ///   - id: css id of the element to be found
 ///   - count: number of children elements (list items) expected to be found
 ///   - html: string in which to search for the element
+/// Note: this function relies on the existence of <li> tags, therefore it won't work properly if `count == 1` and `id` is one of the following:
+/// `complexityInfo`, `projectsInfo`, `returns`, `throwsInfo`, `yields`
+/// Instead, use assertByID for these cases
 public func assertListExistAndCount(
   id: String, count: Int, in html: String, file: StaticString = #file, line: UInt = #line
 ) {
@@ -144,4 +94,37 @@ public func assertSectionsExsistingAndCount(
       assertNotContains(members, what: id, file: file, line: line)
     }
   }
+}
+
+
+/// Helper functions for finding html elements
+
+/// Find html element by id
+/// - Parameters:
+///   - id: css id of the element to be found
+///   - html: string in which to search for the element
+/// - Returns: string representation of the element with the given id
+public func findByID(_ id: String, in html: String) -> String {
+  let doc = try! HTML(html: html, encoding: .utf8)
+  return doc.at_css("#\(id)")?.toHTML ?? ""
+}
+
+/// Find html elements by tag
+/// - Parameters:
+///   - tag: html tag of the elements to be found
+///   - html: string in which to search for the element
+/// - Returns: array of string representations of the elements with the given tag
+public func findByTag(_ tag: String, in html: String) -> [String] {
+  let doc = try! HTML(html: html, encoding: .utf8)
+  return doc.css(tag).map { $0.toHTML! }
+}
+
+/// Find html elements by class
+/// - Parameters:
+///   - className: css class of the elements to be found
+///   - html: string in which to search for the element
+/// - Returns: array of string representations of the elements with the given class
+public func findByClass(_ className: String, in html: String) -> [String] {
+  let doc = try! HTML(html: html, encoding: .utf8)
+  return doc.css(".\(className)").map { $0.toHTML! }
 }

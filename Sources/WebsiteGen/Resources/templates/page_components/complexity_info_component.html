@@ -1,8 +1,8 @@
 {% if complexityInfo %}
     <div class="content-section" id="complexityInfo">
-        <h1>Throws</h1>
+        <h1>Complexity</h1>
         {% if complexityInfo.count == 1 %}
-            {{ throwsInfo[0] }}
+            {{ complexityInfo[0] }}
         {% else %}
             <ul>
             {% for el in complexityInfo %}
