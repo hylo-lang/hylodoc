@@ -172,6 +172,7 @@ public enum SpecialSectionType {
   case `fileLevel`
   case `generic`
   case `yields`
+  case `projects`
 
   public var inlineName: String {
     switch self {
@@ -193,6 +194,8 @@ public enum SpecialSectionType {
       return "invariant: "
     case .complexity:
       return "complexity: "
+    case .projects:
+      return "projects: "
     case .generic:
       return "generic "
     case .yields:
@@ -220,6 +223,8 @@ public enum SpecialSectionType {
       return "invariants:"
     case .complexity:
       return "complexity:"
+    case .projects:
+      return "projects:"
     case .generic:
       return "generics:"
     case .yields:
@@ -255,11 +260,11 @@ public enum SpecialSectionPreset {
     case .subscript:
       return [
         .seeAlso, .parameter, .throws, .precondition, .postcondition, .complexity, .generic,
-        .yields,
+        .yields, .projects
       ]
     case .subscriptImpl:
       return [
-        .seeAlso, .throws, .precondition, .postcondition, .complexity, .yields,
+        .seeAlso, .throws, .precondition, .postcondition, .complexity, .yields, .projects,
       ]
     case .methodImpl:
       return [
@@ -546,7 +551,10 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
             ),
             yields: parseSpecialSection(
               type: .yields, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Yields.init(description:), markdownParser: markdownParser)
+              constructor: Yields.init(description:), markdownParser: markdownParser),
+            projectsInfo: parseSpecialSection(
+              type: .projects, comment: symbolComment, diagnostics: &diagnostics,
+              constructor: Projects.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -568,7 +576,10 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
             ),
             yields: parseSpecialSection(
               type: .yields, comment: symbolComment, diagnostics: &diagnostics,
-              constructor: Yields.init(description:), markdownParser: markdownParser)
+              constructor: Yields.init(description:), markdownParser: markdownParser),
+            projectsInfo: parseSpecialSection(
+              type: .projects, comment: symbolComment, diagnostics: &diagnostics,
+              constructor: Projects.init(description:), markdownParser: markdownParser)
           ),
           for: d
         )
@@ -630,7 +641,10 @@ private struct SymbolDocumenterASTVisitor: ASTWalkObserver {
         constructor: Postcondition.init(description:), markdownParser: markdownParser),
       throwsInfo: parseSpecialSection(
         type: .throws, comment: comment, diagnostics: &diagnostics,
-        constructor: Throws.init(description:), markdownParser: markdownParser)
+        constructor: Throws.init(description:), markdownParser: markdownParser),
+      complexityInfo: parseSpecialSection(
+        type: .complexity, comment: comment, diagnostics: &diagnostics,
+        constructor: Complexity.init(description:), markdownParser: markdownParser)
     )
   }
 

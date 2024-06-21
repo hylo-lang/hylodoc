@@ -28,12 +28,18 @@ final class SubscriptExtractionTest: XCTestCase {
         /// - Note: This is still the description.
         /// # Yields: some stuff.
         /// # Parameter param: sample param desc
+        /// # Complexity: O(2)
+        /// # Projects:
+        ///   - Insecurity
         subscript foo(param: Int): T { 
           /// Summary of subscript implementation.
           /// 
           /// This is the description2.
           /// - Note: This is still the description2.
           /// # Yields: some other stuff.
+          /// # Complexity: O(2)
+          /// # Projects:
+          ///   - Insecurity
           T() 
         }
         """, named: "testFile11.hylo")
@@ -76,6 +82,7 @@ final class SubscriptExtractionTest: XCTestCase {
       myTypeDoc.documentation.common.common.description?.debugDescription,
       what: "Note: This is still the description.")
     assertContains(myTypeDoc.yields.first?.description.description, what: "some stuff.")
+    assertContains(myTypeDoc.projectsInfo.first?.description.description, what: "Insecurity")
     assertContains(
       myTypeDoc.documentation.parameters.first?.value.description.description,
       what: "sample param desc")

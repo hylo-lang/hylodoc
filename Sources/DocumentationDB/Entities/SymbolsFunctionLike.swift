@@ -7,17 +7,20 @@ public struct CommonFunctionLikeDocumentation {
   public let preconditions: [Precondition]
   public let postconditions: [Postcondition]
   public let throwsInfo: [Throws]
+  public let complexityInfo: [Complexity]
 
   public init(
     common: GeneralDescriptionFields,
     preconditions: [Precondition],
     postconditions: [Postcondition],
-    throwsInfo: [Throws]
+    throwsInfo: [Throws],
+    complexityInfo: [Complexity]
   ) {
     self.common = common
     self.preconditions = preconditions
     self.postconditions = postconditions
     self.throwsInfo = throwsInfo
+    self.complexityInfo = complexityInfo
   }
 }
 
@@ -100,13 +103,17 @@ public struct InitializerDocumentation: IdentifiedEntity {
 public struct SubscriptDeclDocumentation: IdentifiedEntity {
   public let documentation: CommonFunctionDeclLikeDocumentation
   public let yields: [Yields]
+  public let projectsInfo: [Projects]
+
 
   public init(
     documentation: CommonFunctionDeclLikeDocumentation,
-    yields: [Yields]
+    yields: [Yields],
+    projectsInfo: [Projects]
   ) {
     self.documentation = documentation
     self.yields = yields
+    self.projectsInfo = projectsInfo
   }
 }
 
@@ -114,13 +121,16 @@ public struct SubscriptDeclDocumentation: IdentifiedEntity {
 public struct SubscriptImplDocumentation: IdentifiedEntity {
   public let documentation: CommonFunctionLikeDocumentation
   public let yields: [Yields]
+  public let projectsInfo: [Projects]
 
   public init(
     documentation: CommonFunctionLikeDocumentation,
-    yields: [Yields]
+    yields: [Yields],
+    projectsInfo: [Projects]
   ) {
     self.documentation = documentation
     self.yields = yields
+    self.projectsInfo = projectsInfo
   }
 }
 
@@ -145,6 +155,22 @@ public struct Yields {
 }
 
 public struct Throws {
+  public let description: Block
+
+  public init(description: Block) {
+    self.description = description
+  }
+}
+
+public struct Complexity {
+  public let description: Block
+
+  public init(description: Block) {
+    self.description = description
+  }
+}
+
+public struct Projects {
   public let description: Block
 
   public init(description: Block) {
