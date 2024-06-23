@@ -48,28 +48,11 @@ public struct Postcondition {
   }
 }
 
-public struct GenericParameterDocumentation {
-  public let description: Block
-
-  public init(description: Block) {
-    self.description = description
-  }
-}
-
 /// A map that associates each generic parameter declaration with its documentation.
-public typealias GenericParameterDocumentations = [GenericParameterDecl.ID:
-  GenericParameterDocumentation]
-
-public struct ParameterDocumentation {
-  public let description: Block
-
-  public init(description: Block) {
-    self.description = description
-  }
-}
+public typealias GenericParameterDocumentations = [GenericParameterDecl.ID: Block]
 
 /// A map that associates each parameter declaration with its documentation.
-public typealias ParameterDocumentations = [ParameterDecl.ID: ParameterDocumentation]
+public typealias ParameterDocumentations = [ParameterDecl.ID: Block]
 
 /// A collection of documentation information for symbols, organized by symbol kind.
 public struct SymbolDocStore {

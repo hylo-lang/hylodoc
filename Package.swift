@@ -63,7 +63,6 @@ let package = Package(
         "HDCMacros",
         .product(name: "FrontEnd", package: "hylo"),
       ],
-      exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .target(
       name: "CLI",
@@ -161,7 +160,6 @@ let package = Package(
         .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ],
-      exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .testTarget(
       name: "HDCUtilsTests",
@@ -171,7 +169,6 @@ let package = Package(
         .product(name: "FrontEnd", package: "hylo"),
       ],
       path: "Tests/HDCUtilsTests",
-      exclude: ["module.md"],
       swiftSettings: allTargetsSwiftSettings),
     .target(
       name: "HyloStandardLibrary",

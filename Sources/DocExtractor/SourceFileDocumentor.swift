@@ -260,7 +260,7 @@ public enum SpecialSectionPreset {
     case .subscript:
       return [
         .seeAlso, .parameter, .throws, .precondition, .postcondition, .complexity, .generic,
-        .yields, .projects
+        .yields, .projects,
       ]
     case .subscriptImpl:
       return [
@@ -787,7 +787,7 @@ private func makeParameters(
       paramMap: paramMap,
       comment: comment,
       diagnostics: &diagnostics,
-      constructor: ParameterDocumentation.init(description:)
+      constructor: { x in x }
     )
   }
 
@@ -797,7 +797,7 @@ private func makeParameters(
       paramMap: genericParamMap,
       comment: comment,
       diagnostics: &diagnostics,
-      constructor: GenericParameterDocumentation.init(description:)
+      constructor: { x in x }
     )
   }
 
@@ -826,7 +826,7 @@ private func makeJustGenericParameters(
       paramMap: genericParamMap,
       comment: comment,
       diagnostics: &diagnostics,
-      constructor: GenericParameterDocumentation.init(description:)
+      constructor: { x in x }
     )
   }
 

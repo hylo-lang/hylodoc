@@ -45,10 +45,10 @@ h3 {
   color: $text-primary;
 }
 
-p,
-a {
+body {
   @apply font-inter;
   font-size: $p-size;
+  line-height: 160%;
   font-weight: $p-weight;
   font-style: $p-style;
   color: $text-secondary;

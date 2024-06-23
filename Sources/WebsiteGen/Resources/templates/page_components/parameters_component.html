@@ -1,11 +1,11 @@
 {% if parameters %}
-    <div class="content-section" id="parameters">
-        <h1>Parameters</h1>
-        {% for key, value in parameters %}
-            <div class="parameter">
-                <span class="name">{{ key }}</span>
-                {{ value }}
-            </div>
-        {% endfor %}
-    </div>
+<div class="content-section" id="parameters">
+  <h1>Parameters</h1>
+  <div class="parameters-container">
+    {% for key, value in parameters %}
+    <span class="name">{{ key }}</span>
+    <div>{{ value }}</div>
+    {% endfor %}
+  </div>
+</div>
 {% endif %}

@@ -1,7 +1,9 @@
+$entry-vertical-padding: .625rem;
+
 .page-content {
   @apply flex flex-col gap-6;
 
-  & > div {
+  &>div {
     @apply scroll-m-4;
   }
 }
@@ -9,13 +11,15 @@
 .content-nested-section {
   @apply flex flex-col gap-4;
 
-  & > div {
+  &>div {
     @apply scroll-m-4;
   }
 }
 
 .content-section {
-  h1, h2 {
+
+  h1,
+  h2 {
     @apply mb-2;
   }
 
@@ -23,7 +27,13 @@
     @apply mt-2;
   }
 
-  blockquote, hr, img, ul, ol, .code-snippet, & > p {
+  blockquote,
+  hr,
+  img,
+  ul,
+  ol,
+  .code-snippet,
+  &>p {
     @apply mb-3;
   }
 
@@ -82,7 +92,7 @@
   }
 
   .declaration {
-    @apply py-2.5;
+    padding: $entry-vertical-padding 0;
     border-top: 1px solid $thin-divider;
 
     &:last-child {
@@ -98,20 +108,32 @@
     }
   }
 
-  .parameter {
-    @apply py-2.5 flex flex-row gap-4 items-center;
-    border-top: 1px solid $thin-divider;
+  .parameters-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
 
-    &:last-child {
+    &>* {
+      padding: $entry-vertical-padding 0;
+
       border-bottom: 1px solid $thin-divider;
+
+      &:nth-child(1),
+      &:nth-child(2) {
+        border-top: 1px solid $thin-divider;
+      }
     }
 
-    * {
-      @apply m-0 p-0;
-    }
-
-    .name {
+    &>.name {
       color: $text-primary;
+      @apply font-mono;
+      padding-right: 1em;
+      padding-left: 8px;
+    }
+
+    &>div {
+      color: $text-secondary;
     }
   }
+
+
 }

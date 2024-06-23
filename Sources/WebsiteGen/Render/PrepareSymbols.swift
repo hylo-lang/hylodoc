@@ -203,6 +203,21 @@ public func prepareOperatorPage(
   return StencilContext(templateName: "operator_layout.html", context: env)
 }
 
+/// If there is at least one parameter documented, we render all parameters. Otherwise, we render nothing.
+func allOrNothing<T: SingleEntityDecl>(documentation: [T.ID: Block], parameters: [T.ID], ast: AST)
+  -> [(name: String, description: Block)]
+{
+  if documentation.isEmpty {
+    return []
+  }
+  return parameters.map { parameterId in
+    (
+      ast[parameterId].baseName,
+      documentation[parameterId] ?? Block.document([])
+    )
+  }
+}
+
 /// Render the function page
 ///
 /// - Parameters:
@@ -255,18 +270,17 @@ public func prepareFunctionPage(
     }
 
     // TODO: https://gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-e/04d/automated-documentation-generation-tool/-/issues/147
-    env["parameters"] = doc.documentation.parameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
-    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
+    env["parameters"] = allOrNothing(
+      documentation: doc.documentation.parameters, parameters: decl.parameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
+
+    env["genericParameters"] = allOrNothing(
+      documentation: doc.documentation.genericParameters, parameters: decl.genericParameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
 
     env["preconditions"] = doc.documentation.common.preconditions.map {
       htmlGenerator.generate(document: $0.description)
@@ -332,18 +346,17 @@ public func prepareMethodPage(
       htmlGenerator.generate(document: $0.description)
     }
 
-    env["parameters"] = doc.documentation.parameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
-    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
+    env["parameters"] = allOrNothing(
+      documentation: doc.documentation.parameters, parameters: decl.parameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
+
+    env["genericParameters"] = allOrNothing(
+      documentation: doc.documentation.genericParameters, parameters: decl.genericParameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
 
     env["members"] = prepareMembersData(
       context,
@@ -405,18 +418,17 @@ public func prepareSubscriptPage(
       htmlGenerator.generate(document: $0.description)
     }
 
-    env["parameters"] = doc.documentation.parameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
-    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
+    env["parameters"] = allOrNothing(
+      documentation: doc.documentation.parameters, parameters: decl.parameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
+
+    env["genericParameters"] = allOrNothing(
+      documentation: doc.documentation.genericParameters, parameters: decl.genericParameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
 
     env["preconditions"] = doc.documentation.common.preconditions.map {
       htmlGenerator.generate(document: $0.description)
@@ -478,18 +490,17 @@ public func prepareInitializerPage(
       htmlGenerator.generate(document: $0.description)
     }
 
-    env["parameters"] = doc.documentation.parameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
-    env["genericParameters"] = doc.documentation.genericParameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
+    env["parameters"] = allOrNothing(
+      documentation: doc.documentation.parameters, parameters: decl.parameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
+
+    env["genericParameters"] = allOrNothing(
+      documentation: doc.documentation.genericParameters, parameters: decl.genericParameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
 
     env["throwsInfo"] = doc.documentation.common.throwsInfo.map {
       htmlGenerator.generate(document: $0.description)
@@ -597,12 +608,12 @@ public func prepareProductTypePage(
       htmlGenerator.generate(
         document: $0.description)
     }
-    env["genericParameters"] = doc.genericParameters.map { key, value in
-      (
-        context.documentation.typedProgram.ast[key].baseName,
-        htmlGenerator.generate(document: value.description)
-      )
-    }
+    env["genericParameters"] = allOrNothing(
+      documentation: doc.genericParameters, parameters: decl.genericParameters,
+      ast: context.documentation.typedProgram.ast
+    )
+    .map { ($0, htmlGenerator.generate(document: $1)) }
+
     env["seeAlso"] = doc.common.seeAlso.map(htmlGenerator.generate(document:))
   }
 
