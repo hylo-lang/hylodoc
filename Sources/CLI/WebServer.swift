@@ -1,48 +1,76 @@
-import Logging
-import NIOCore
-import NIOPosix
-import Vapor
-
-/// Start a web server asynchronously to serve the files in the given directory.
-func startWebServer(port: Int = 8080, publicDirectory: URL) async throws {
-  var env = Environment(name: "development", arguments: ["vapor"])
-  try LoggingSystem.bootstrap(from: &env)
-
-  let app = try await Application.make(env)
-  app.http.server.configuration.port = port
-  defer { app.shutdown() }
-
-  app.middleware.use(
-    FileMiddleware(
-      publicDirectory: publicDirectory.absoluteURL.path,
-      defaultFile: "index.html"
-    )
-  )
-
-  try await app.execute()
-  try await app.asyncShutdown()
-}
+import Foundation
 
 /// Start a web server synchronously to serve the files in the given directory.
-/// 
+///
 /// This function will exit when the user sends a SIGINT signal (Ctrl+C).
 func startWebserverSync(port: Int, publicDirectory: URL) throws {
-  // Set up signal handler for SIGINT (Ctrl+C)
+  // Example usage:
+  let _ = try runPythonWith(arguments: [
+    "-m", "http.server", String(port), "-d", publicDirectory.path,
+  ], port: port)
+}
+
+func runPythonWith(arguments: [String], port: Int) throws -> String {
+  let task = Process()
+  let pipe = Pipe()
+
+  task.standardOutput = pipe
+  task.standardError = pipe
+  task.arguments = arguments
+  task.executableURL = URL(fileURLWithPath: try findPythonExecutable())
+  task.standardInput = nil
+
+  // Set the termination handler to kill the child process when the parent is terminated
+
+
+
   let signalSource = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
   signal(SIGINT, SIG_IGN)  // Ignore default handling
   signalSource.setEventHandler {
-    print("Exiting...")
+    print("\nExiting...")
     signalSource.cancel()
+    task.terminate()
     exit(0)
   }
+
   // Start monitoring the signal
   signalSource.resume()
 
-  // Run the task asynchronously
-  Task {
-    try await startWebServer(port: port, publicDirectory: publicDirectory)
+
+  try task.run()
+
+  print("Server running at http://localhost:" + port.description)
+  task.waitUntilExit()
+  return ""
+}
+
+struct PythonNotFound: CustomStringConvertible, Error {
+  var description: String { "python executable not found. Try adding it to PATH." }
+}
+struct NoPathFoundError: CustomStringConvertible, Error {
+  var description: String { "PATH environment variable not found!" }
+}
+
+func findPythonExecutable() throws -> String {
+  // Get the environment's PATH variable
+  guard let path = ProcessInfo.processInfo.environment["PATH"] else {
+    throw NoPathFoundError()
   }
 
-  // Keep the run loop running
-  RunLoop.main.run()
+  // Split the PATH into individual directories
+  let directories = path.components(separatedBy: ":")
+
+  // Check each directory for the 'python' executable
+  for directory in directories {
+    #if os(Windows)
+      let pythonPath = (directory as NSString).appendingPathComponent("python3.exe")
+    #else
+      let pythonPath = (directory as NSString).appendingPathComponent("python3")
+    #endif
+
+    if FileManager.default.isExecutableFile(atPath: pythonPath) {
+      return pythonPath
+    }
+  }
+  throw PythonNotFound()
 }
