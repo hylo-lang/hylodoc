@@ -343,9 +343,44 @@ Examples:
 
 ### Symbol References
 
+#### Scoped Resolution
+
+Names can be referred to by a sequence of identifiers, separated by a dot, and optionally ended with a function
+parameter list (without types). The first identifier is resolved by unqualified lookup, after which, qualified lookups
+resolve the entities within the type of the previous component.
+
 Usage:
-``` ``MyModule.myFunction(x:y:_:)`` ```
+``` ``MyModule.MyType.myFunction(x:y:_:)`` ```
 
-Parameter labels can be omitted if the reference is unambiguous: ``` ``markdown``MyModule.myFunction`` ```
+Parameter labels can be omitted if the reference is unambiguous: ``` ``MyModule.myFunction`` ```
 
-> Note: Currently, only the latter syntax is implemented, and it is a fatal failure if the overload set contains more than 1 declaration.
+The scopes:
+
+- In API documentation, references are resolved from the scope of the declaration that is being documented.
+- In file-level documentation, references are resolved from the scope of the translation unit.
+- In HyloDoc articles, references are resolved in their module's scope.
+
+#### Global Resolution
+
+There are times when we want to refer to an entity that is not visible from the current scope, e.g. because it is in
+another module that is not imported. In these cases, we can use the `@YOUR_MODULE_NAME.` prefix to select the module in
+which we want to refer to a symbol.
+
+Usage:
+
+```
+@OtherModule.Vector2.x
+```
+
+#### Limitations
+
+Currently, we do not support qualified lookup within all scope types. The supported scopes are:
+
+- Module
+- Product Type
+- Trait
+- Type Alias
+- Namespace
+
+Some unsupported scopes are Function / Method / Subscript scope, so we currently cannot refer to
+`MyFunction(x:y:).inout`.

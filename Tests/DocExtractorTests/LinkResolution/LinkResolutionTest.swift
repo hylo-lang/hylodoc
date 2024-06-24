@@ -6,7 +6,176 @@ import XCTest
 @testable import DocExtractor
 @testable import FrontEnd
 
+func expectNoError<T>(
+  _ body: () throws -> T, filePath: StaticString = #filePath, line: UInt = #line
+) rethrows -> T {
+  do {
+    return try body()
+  } catch {
+    XCTFail("unexpected error: \(error)", file: filePath, line: line)
+    throw error
+  }
+}
 final class NameResolutionTest: XCTestCase {
+  func testTokenization() {
+    let a = tokenizeLinkReference("Hello.World")
+    XCTAssertNil(a.moduleName)
+    XCTAssertEqual(a.tokens.count, 3)
+    XCTAssertEqual(a.tokens[0].kind, .name)
+    XCTAssertEqual(a.tokens[1].kind, .dot)
+    XCTAssertEqual(a.tokens[2].kind, .name)
+
+    let b = tokenizeLinkReference("@Hello.World")
+    XCTAssertEqual(b.moduleName, "Hello")
+    XCTAssertEqual(b.tokens.count, 1)
+    XCTAssertEqual(b.tokens[0].kind, .name)
+    XCTAssertEqual("World", b.tokens[0].site.text)
+
+    let c = tokenizeLinkReference("@Hello")
+    XCTAssertEqual(c.moduleName, "Hello")
+    XCTAssertEqual(c.tokens.count, 0)
+
+    let d = tokenizeLinkReference("Hello")
+    XCTAssertNil(d.moduleName)
+    XCTAssertEqual(d.tokens.count, 1)
+    XCTAssertEqual(d.tokens[0].kind, .name)
+
+    let e = tokenizeLinkReference("")
+    XCTAssertNil(e.moduleName)
+    XCTAssertEqual(e.tokens.count, 0)
+  }
+  func testNameParsing() {
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedAName),
+      parseName(name: "")
+    )
+
+    XCTAssertEqual(
+      .success(EntityRef(moduleName: nil, identifiers: ["Hello"], labels: nil)),
+      parseName(name: "Hello")
+    )
+
+    XCTAssertEqual(
+      .success(EntityRef(moduleName: nil, identifiers: ["Hello", "World"], labels: nil)),
+      parseName(name: "Hello.World")
+    )
+
+    XCTAssertEqual(
+      .success(EntityRef(moduleName: "Hello", identifiers: [], labels: nil)),
+      parseName(name: "@Hello")
+    )
+
+    XCTAssertEqual(
+      .success(EntityRef(moduleName: "Hello", identifiers: ["World"], labels: nil)),
+      parseName(name: "@Hello.World")
+    )
+
+    XCTAssertEqual(
+      .success(EntityRef(moduleName: "Hello", identifiers: ["World", "MyType"], labels: nil)),
+      parseName(name: "@Hello.World.MyType")
+    )
+
+    XCTAssertEqual(
+      .success(
+        EntityRef(moduleName: "Hello", identifiers: ["World", "MyType", "MyMethod"], labels: nil)),
+      parseName(name: "@Hello.World.MyType.MyMethod")
+    )
+
+    XCTAssertEqual(
+      .success(
+        EntityRef(
+          moduleName: nil,
+          identifiers: ["MyMethod"],
+          labels: []
+        )
+      ),
+      parseName(name: "MyMethod()")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedAName),
+      parseName(name: "@MyMethod()")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedARightParen),
+      parseName(name: "MyMethod(")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedAColon),
+      parseName(name: "MyMethod(a)")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedAColon),
+      parseName(name: "MyMethod(a:b)")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedARightParen),
+      parseName(name: "MyMethod(a:")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedAColon),
+      parseName(name: "MyMethod(a")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedEndOfTokensAfterRightParen),
+      parseName(name: "MyMethod(a:b:) _")
+    )
+
+    XCTAssertEqual(
+      .failure(LinkResolverError.expectedAName),
+      parseName(name: "MyMethod(:)")
+    )
+
+    XCTAssertEqual(
+      .success(
+        EntityRef(
+          moduleName: nil,
+          identifiers: ["MyMethod"],
+          labels: ["a", "b"]
+        )
+      ),
+      parseName(name: "MyMethod(a:b:)")
+    )
+
+    XCTAssertEqual(
+      .success(
+        EntityRef(
+          moduleName: nil,
+          identifiers: ["MyMethod"],
+          labels: ["a", nil]
+        )
+      ),
+      parseName(name: "MyMethod(a:_:)")
+    )
+
+    XCTAssertEqual(
+      .success(
+        EntityRef(
+          moduleName: nil,
+          identifiers: ["MyMethod"],
+          labels: [nil, nil]
+        )
+      ),
+      parseName(name: "MyMethod(_:_:)")
+    )
+
+    XCTAssertEqual(
+      .success(
+        EntityRef(
+          moduleName: nil,
+          identifiers: ["MyMethod"],
+          labels: [nil, "a"]
+        )
+      ),
+      parseName(name: "MyMethod(_:a:)")
+    )
+  }
   func testNameResolution() throws {
 
     var ast = try checkNoDiagnostic { d in try AST.loadStandardLibraryCore(diagnostics: &d) }
@@ -78,82 +247,125 @@ final class NameResolutionTest: XCTestCase {
     }
 
     // add
-    guard let _add = typedProgram.resolveReference("add", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _add = try expectNoError { try typedProgram.resolveReference("add", in: vectorScope) }
     XCTAssertTrue(_add.contains(where: isFunction("add", ["dx", "dy"])))
     XCTAssertTrue(_add.contains(where: isFunction("add", ["s"])))
     XCTAssertEqual(_add.count, 2)
 
     // Vector.add
-    guard
-      let _vectorDotAdd = typedProgram.resolveReference("Vector.add", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _vectorDotAdd = try expectNoError {
+      try typedProgram.resolveReference("Vector.add", in: vectorScope)
+    }
     XCTAssertTrue(_vectorDotAdd.contains(where: isFunction("add", ["dx", "dy"])))
     XCTAssertTrue(_vectorDotAdd.contains(where: isFunction("add", ["s"])))
     XCTAssertEqual(_vectorDotAdd.count, 2)
 
     // Vector
-    guard let _vector = typedProgram.resolveReference("Vector", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _vector = try expectNoError { try typedProgram.resolveReference("Vector", in: vectorScope) }
     XCTAssertTrue(_vector.contains(where: isProductType("Vector")))
     XCTAssertEqual(_vector.count, 1)
 
+    // @RootModule
+    let _rootModule = try expectNoError {
+      try typedProgram.resolveReference(
+        "@RootModule", in: vectorScope)
+    }
+    XCTAssertEqual(_rootModule.count, 1)
+
+    // nothing
+    do {
+      let res = try typedProgram.resolveReference("", in: vectorScope)
+      XCTFail("This shouldn't have succeeded but got \(res)")
+    } catch let e as LinkResolverError {
+      XCTAssertEqual(e, .expectedAName)
+    } catch {
+      XCTFail("unexpected error")
+    }
+
+    // Not found module name
+
+    let res = try expectNoError {
+      try typedProgram.resolveReference("@OtherRandomModule", in: vectorScope)
+    }
+    XCTAssertEqual(res.count, 0, "Shouldn't have found anything but got \(res)")
+
     // @RootModule.Vector
-    guard
-      let _rootModuleDotVector = typedProgram.resolveReference(
+
+    let _rootModuleDotVector = try expectNoError {
+      try typedProgram.resolveReference(
         "@RootModule.Vector", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_rootModuleDotVector.contains(where: isProductType("Vector")))
     XCTAssertEqual(_rootModuleDotVector.count, 1)
 
     // @RootModule.Vector.add
-    guard
-      let _rootModuleDotVectorDotAdd = typedProgram.resolveReference(
+
+    let _rootModuleDotVectorDotAdd = try expectNoError {
+      try typedProgram.resolveReference(
         "@RootModule.Vector.add", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_rootModuleDotVectorDotAdd.contains(where: isFunction("add", ["dx", "dy"])))
     XCTAssertTrue(_rootModuleDotVectorDotAdd.contains(where: isFunction("add", ["s"])))
     XCTAssertEqual(_rootModuleDotVectorDotAdd.count, 2)
 
+    // overload resolution should work
+    let _rootModuleDotVectorDotAddWithOverload1 = try expectNoError {
+      try typedProgram.resolveReference(
+        "@RootModule.Vector.add(dx:dy:)", in: vectorScope)
+    }
+    XCTAssertTrue(
+      _rootModuleDotVectorDotAddWithOverload1.contains(where: isFunction("add", ["dx", "dy"])))
+    XCTAssertEqual(_rootModuleDotVectorDotAddWithOverload1.count, 1)
+
+    let _rootModuleDotVectorDotAddWithOverload2 = try expectNoError {
+      try typedProgram.resolveReference(
+        "@RootModule.Vector.add(s:)", in: vectorScope)
+    }
+    XCTAssertTrue(_rootModuleDotVectorDotAddWithOverload2.contains(where: isFunction("add", ["s"])))
+    XCTAssertEqual(_rootModuleDotVectorDotAddWithOverload2.count, 1)
+
     // Inner
-    guard let _inner = typedProgram.resolveReference("Inner", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _inner = try expectNoError { try typedProgram.resolveReference("Inner", in: vectorScope) }
     XCTAssertTrue(_inner.contains(where: isProductType("Inner")))
     XCTAssertEqual(_inner.count, 1)
 
     // Inner.add
-    guard let _innerDotAdd = typedProgram.resolveReference("Inner.add", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _innerDotAdd = try expectNoError {
+      try typedProgram.resolveReference("Inner.add", in: vectorScope)
+    }
     XCTAssertTrue(_innerDotAdd.contains(where: isFunction("add", ["dx"])))
     XCTAssertEqual(_innerDotAdd.count, 1)
 
     // Innerlijke (type alias)
-    guard let _innerlijke = typedProgram.resolveReference("Innerlijke", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _innerlijke = try expectNoError {
+      try typedProgram.resolveReference("Innerlijke", in: vectorScope)
+    }
     XCTAssertTrue(_innerlijke.contains(where: isTypeAlias("Innerlijke")))
     XCTAssertEqual(_innerlijke.count, 1)
 
     // Innerlijke.add
-    guard
-      let _innerlijkeDotAdd = typedProgram.resolveReference(
+    let _innerlijkeDotAdd = try expectNoError {
+      try typedProgram.resolveReference(
         "Innerlijke.add", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_innerlijkeDotAdd.contains(where: isFunction("add", ["dx"])))
     XCTAssertEqual(_innerlijkeDotAdd.count, 1)
 
     // @RootModule.Vector.Inner
-    guard
-      let _rootModuleDotVectorDotInner = typedProgram.resolveReference(
+
+    let _rootModuleDotVectorDotInner = try expectNoError {
+      try typedProgram.resolveReference(
         "@RootModule.Vector.Inner", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_rootModuleDotVectorDotInner.contains(where: isProductType("Inner")))
     XCTAssertEqual(_rootModuleDotVectorDotInner.count, 1)
 
     // @RootModule.Inner shouldn't exist because it's only present in an inner scope
-    guard
-      let _rootModuleDotInner = typedProgram.resolveReference(
+
+    let _rootModuleDotInner = try expectNoError {
+      try typedProgram.resolveReference(
         "@RootModule.Inner", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertEqual(_rootModuleDotInner.count, 0)
 
     // // todo: myMethod.inout
@@ -163,98 +375,104 @@ final class NameResolutionTest: XCTestCase {
     // else { return XCTFail("parsing error") }
     // XCTAssertEqual(_myMethodDotInout.count, 1)
     // print(_myMethodDotInout)
+    do {
+      _ = try typedProgram.resolveReference(
+        "myMethod.inoutTODO", in: vectorScope)
+    } catch let error as LinkResolverError {
+      XCTAssertEqual(error, LinkResolverError.unsupportedDeclKind(kind: MethodDecl.kind))
+    } catch {
+      XCTFail("unexpected error")
+    }
 
     // BASE_NS
-    guard let _baseNS = typedProgram.resolveReference("BASE_NS", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _baseNS = try expectNoError {
+      try typedProgram.resolveReference("BASE_NS", in: vectorScope)
+    }
     XCTAssertTrue(_baseNS.contains(where: isNamespace("BASE_NS")))
     XCTAssertEqual(_baseNS.count, 1)
 
     // @RootModule.BASE_NS
-    guard
-      let _rootModuleDotBaseNS = typedProgram.resolveReference(
+    let _rootModuleDotBaseNS = try expectNoError {
+      try typedProgram.resolveReference(
         "@RootModule.BASE_NS", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_rootModuleDotBaseNS.contains(where: isNamespace("BASE_NS")))
     XCTAssertEqual(_rootModuleDotBaseNS.count, 1)
 
     // BASE_NS.INNER_NS
-    guard
-      let _baseNSDotInnerNS = typedProgram.resolveReference(
+
+    let _baseNSDotInnerNS = try expectNoError {
+      try typedProgram.resolveReference(
         "BASE_NS.INNER_NS", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_baseNSDotInnerNS.contains(where: isNamespace("INNER_NS")))
     XCTAssertEqual(_baseNSDotInnerNS.count, 1)
 
     // INNER_NS
-    guard let _innerNS = typedProgram.resolveReference("INNER_NS", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _innerNS = try expectNoError {
+      try typedProgram.resolveReference("INNER_NS", in: vectorScope)
+    }
     XCTAssertEqual(_innerNS.count, 0)
 
     // BASE_NS.string
-    guard let _baseNSDotString = typedProgram.resolveReference("BASE_NS.string", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _baseNSDotString = try expectNoError {
+      try typedProgram.resolveReference("BASE_NS.string", in: vectorScope)
+    }
     XCTAssertTrue(_baseNSDotString.contains(where: isProductType("string")))
     XCTAssertEqual(_baseNSDotString.count, 1)
 
     // BASE_NS.INNER_NS.Flower
-    guard
-      let _baseNSDotInnerNSDotFlower = typedProgram.resolveReference(
+    let _baseNSDotInnerNSDotFlower = try expectNoError {
+      try typedProgram.resolveReference(
         "BASE_NS.INNER_NS.Flower", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_baseNSDotInnerNSDotFlower.contains(where: isProductType("Flower")))
     XCTAssertEqual(_baseNSDotInnerNSDotFlower.count, 1)
 
     // BASE_NS.INNER_NS.string shouldn't be there because of qualified lookup
-    guard
-      let _baseNSDotInnerNSDotString = typedProgram.resolveReference(
+    let _baseNSDotInnerNSDotString = try expectNoError {
+      try typedProgram.resolveReference(
         "BASE_NS.INNER_NS.string", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertEqual(_baseNSDotInnerNSDotString.count, 0)
 
     // Flower
-    guard let _flower = typedProgram.resolveReference("Flower", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _flower = try expectNoError { try typedProgram.resolveReference("Flower", in: vectorScope) }
     XCTAssertEqual(_flower.count, 0)
 
     // Collapsible
-    guard let _collapsible = typedProgram.resolveReference("Collapsible", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    let _collapsible = try expectNoError {
+      try typedProgram.resolveReference("Collapsible", in: vectorScope)
+    }
     XCTAssertTrue(_collapsible.contains(where: isTrait("Collapsible")))
 
     // Collapsible.collapse
-    guard
-      let _collapsibleDotCollapse = typedProgram.resolveReference(
+    let _collapsibleDotCollapse = try expectNoError {
+      try typedProgram.resolveReference(
         "Collapsible.collapse", in: vectorScope)
-    else { return XCTFail("parsing error") }
+    }
     XCTAssertTrue(_collapsibleDotCollapse.contains(where: isFunction("collapse", [])))
     XCTAssertEqual(_collapsibleDotCollapse.count, 1)
 
     // VarDecl inside a function should not be visible
     let outerFuncId = ast.resolveFunc(by: "varDeclInsideFunctionTest")!
-    guard
-      let innerResolved = typedProgram.resolveReference(
+    let innerResolved = try expectNoError {
+      try typedProgram.resolveReference(
         "myVarInsideTheFunction", in: AnyScopeID(outerFuncId))
-    else {
-      return XCTFail("parsing error")
     }
     XCTAssertEqual(innerResolved.count, 0)
 
     // but outside it should
-    guard
-      let outerResolved = typedProgram.resolveReference(
+    let outerResolved = try expectNoError {
+      try typedProgram.resolveReference(
         "varDeclOutsideTheFunction", in: AnyScopeID(outerFuncId))
-    else {
-      return XCTFail("parsing error")
     }
     XCTAssertEqual(outerResolved.count, 1)
 
     // parameters should be resolved in function scope
-    guard
-      let paramResolved = typedProgram.resolveReference(
+    let paramResolved = try expectNoError {
+      try typedProgram.resolveReference(
         "parameterHere", in: AnyScopeID(outerFuncId))
-    else {
-      return XCTFail("parsing error")
     }
     XCTAssertEqual(paramResolved.count, 1)
   }

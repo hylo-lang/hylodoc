@@ -123,13 +123,13 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
   public func render(hyloReference reference: HyloReference) -> String {
     precondition(referenceContext != nil)
 
-    let resolved = referenceContext!.typedProgram.resolveReference(
-      reference.text, in: referenceContext!.scopeId)
-
-    // Todo improve error handling
-    guard let resolved = resolved else {
-      fatalError("[ERROR] Reference \"\(reference.text)\" could not be parsed.")
+    let resolved: Set<AnyDeclID>
+    do {
+      resolved = try referenceContext!.typedProgram.resolveReference(reference.text, in: referenceContext!.scopeId)
+    } catch {
+      fatalError("[ERROR] Failed to resolve Hylo reference: \(error)\nin string: ``\(reference.text)``.")
     }
+
     guard !resolved.isEmpty else {
       fatalError(
         "[ERROR] Unable to resolve reference \(reference.text) in \(referenceContext!.scopeId).")
