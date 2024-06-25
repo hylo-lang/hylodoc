@@ -162,6 +162,10 @@
     display: none;
   }
 
+  li[forced-visible=true] > ul {
+    display: block !important;
+  }
+
   ul, li {
     display: block;
     width: 100%;

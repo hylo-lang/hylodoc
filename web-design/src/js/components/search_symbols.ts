@@ -18,6 +18,13 @@ if(query) {
 }
 
 function search(query: string) {
+  if(query.length === 0) {
+    listItems.forEach(li => {
+      li.removeAttribute("forced-visible");
+      (li as any).style.display = null;
+    });
+    return;
+  }
   // case-insensitive fuzzy search
   const regexp = new RegExp(".*"+query.split("").map(escapeRegExp).join(".*")+".*", "i");
 
@@ -26,6 +33,7 @@ function search(query: string) {
     const anyChildMatches = descendantEntries(text).some(entry => regexp.test(entry))
     if (anyChildMatches) {
       (li as any).style.display = null;
+      li.setAttribute("forced-visible", "true");
       let parent = li.parentElement;
       while (parent && parent !== navTreeContainer) {
         if (parent.tagName === "LI") {
@@ -34,6 +42,7 @@ function search(query: string) {
         parent = parent.parentElement;
       }
     } else {
+      li.removeAttribute("forced-visible");
       li.style.display = "none";
     }
   });
