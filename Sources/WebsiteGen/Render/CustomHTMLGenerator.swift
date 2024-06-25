@@ -35,38 +35,28 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
 {
   override open func generate(block: Block, tight: Bool = false) -> String {
     // Override how to generate code blocks
-    if case .indentedCode(let lines) = block {
-      return """
-        <div class="code-snippet">
-            <span class="options">
-                <a class="copy">Copy</a>
-            </span>
-            <code><pre>\(self.generate(lines: lines).encodingPredefinedXmlEntities())</pre></code>
-        </div>
-        """
-    } else if case .fencedCode(let lang, let lines) = block {
-      if let language = lang {
-        return """
-          <div class="code-snippet">
-              <span class="options">
-                  <a class="copy">Copy</a>
-              </span>
-              <code class=\"\(language)\"><pre>\(self.generate(lines: lines, separator: "").encodingPredefinedXmlEntities())</pre></code>
-          </div>
-          """
-      } else {
-        return """
-          <div class="code-snippet">
-              <span class="options">
-                  <a class="copy">Copy</a>
-              </span>
-              <code><pre>\(self.generate(lines: lines, separator: "").encodingPredefinedXmlEntities())</pre></code>
-          </div>
-          """
-      }
+    return switch block {
+    case .indentedCode(let lines):
+      generateCodeHTML(langauge: "text", lines: lines)
+    case .fencedCode(let lang, let lines):
+      generateCodeHTML(langauge: lang ?? "text", lines: lines)
+    default:
+      super.generate(block: block, tight: tight)
     }
+  }
 
-    return super.generate(block: block, tight: tight)
+  func generateCodeHTML(langauge: String, lines: Lines) -> String {
+    return """
+      <div class="code-snippet">
+          <span class="options">
+              <span class="icon-button copy" title="Copy"></span>
+              <a class="icon-button play" href="#" title="Open in Compiler Explorer"></a>
+          </span>
+          <div class="wrapper">
+            <code class="\(langauge)">\(lines.joined(separator: "\n").encodingPredefinedXmlEntities())</code>
+          </div>
+      </div>
+      """
   }
 
   override open func generate(textFragment fragment: TextFragment) -> String {
@@ -125,9 +115,11 @@ public class CustomHTMLGenerator: HtmlGenerator, HyloReferenceRenderer,
 
     let resolved: Set<AnyDeclID>
     do {
-      resolved = try referenceContext!.typedProgram.resolveReference(reference.text, in: referenceContext!.scopeId)
+      resolved = try referenceContext!.typedProgram.resolveReference(
+        reference.text, in: referenceContext!.scopeId)
     } catch {
-      fatalError("[ERROR] Failed to resolve Hylo reference: \(error)\nin string: ``\(reference.text)``.")
+      fatalError(
+        "[ERROR] Failed to resolve Hylo reference: \(error)\nin string: ``\(reference.text)``.")
     }
 
     guard !resolved.isEmpty else {

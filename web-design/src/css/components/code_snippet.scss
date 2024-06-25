@@ -2,13 +2,25 @@
 $snippet-background: #232323;
 
 .code-snippet {
-  @apply relative px-5 py-4 z-0 rounded-md overflow-hidden overflow-x-auto;
+  @apply relative z-0 rounded-md overflow-hidden;
   background-color: $snippet-background;
   border: 1px solid $thin-divider;
 
   // Icon overlay
   & > .options {
-    @apply absolute top-2 right-2 flex flex-row gap-2.5 z-10 opacity-0 transition-opacity duration-500;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding-top: 16px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    gap: 16px;
+
+    @apply flex flex-row z-10 opacity-0 transition-opacity duration-200;
+
+    background-color: $snippet-background;
+    opacity: 30%;
   }
 
   & > .body {
@@ -21,6 +33,31 @@ $snippet-background: #232323;
 
     a:hover {
       color: var(--text-primary);
+    }
+  }
+
+  code {
+    display: block;
+    padding: 16px;
+  }
+  .wrapper {
+    overflow: auto;
+  }
+
+  .icon-button {
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: block;
+    cursor: pointer;
+
+    &.copy {
+      background-image: url(/assets/icons/copy.svg);
+    }
+
+    &.play {
+      background-image: url(/assets/icons/play.svg);
     }
   }
 }

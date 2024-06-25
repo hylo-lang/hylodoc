@@ -16,6 +16,7 @@ $scrollbar-width: 7px;
 $scrollbar-padding: 8px;
 *::-webkit-scrollbar {
   width: 2 * $scrollbar-padding + $scrollbar-width;
+  height: 2 * $scrollbar-padding + $scrollbar-width; // Added this line
 }
 
 *::-webkit-scrollbar-track {
