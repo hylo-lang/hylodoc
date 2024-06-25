@@ -16,7 +16,7 @@ public enum HDCDiagnosticLevel: Hashable {
 
 extension HDCDiagnostic {
   public var description: String {
-    "\(site.gnuStandardText): \(level): \(message)"
+    "\(site.vscodeFriendlyDescription): \(level): \(message)"
   }
 }
 
@@ -34,3 +34,23 @@ extension HDCDiagnostic {
 )
 @attached(extension, conformances: HDCDiagnostic)
 public macro Diagnostify() = #externalMacro(module: "HDCMacros", type: "DiagnostifyMacro")
+
+extension SourceRange {
+
+  /// A textual representation per the
+  /// [Gnu-standard](https://www.gnu.org/prep/standards/html_node/Errors.html).
+  public var vscodeFriendlyDescription: String {
+    let start = self.start.lineAndColumn
+    let head = "\(file.url.relativePath):\(start.line):\(start.column)"
+    if regionOfFile.isEmpty { return head }
+
+    let end = file.position(endIndex).lineAndColumn
+    if end.line == start.line {
+      return head + "-\(end.column)"
+    }
+    return head + "-\(end.line):\(end.column)"
+  }
+
+  public var description: String { gnuStandardText }
+
+}

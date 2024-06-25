@@ -10,8 +10,9 @@ final class SubscriptExtractionTest: XCTestCase {
     let sourceFileDocumentor = RealSourceFileDocumentor(
       commentParser: commentParser, markdownParser: HyloDocMarkdownParser.standard)
 
-    let sourceFile = SourceFile(
-      synthesizedText: """
+    // todo projects and yields should not be possible to add to a subscript at the same time.
+    let sourceFile: SourceFile = 
+     """
         /// # File-level:
         /// This is the summary of the file.
         /// 
@@ -26,23 +27,23 @@ final class SubscriptExtractionTest: XCTestCase {
         /// 
         /// This is the description.
         /// - Note: This is still the description.
-        /// # Yields: some stuff.
         /// # Parameter param: sample param desc
-        /// # Complexity: O(2)
+        /// # Yields: some stuff.
         /// # Projects:
         ///   - Insecurity
+        /// # Complexity: O(2)
         subscript foo(param: Int): T { 
           /// Summary of subscript implementation.
           /// 
           /// This is the description2.
           /// - Note: This is still the description2.
           /// # Yields: some other stuff.
-          /// # Complexity: O(2)
           /// # Projects:
           ///   - Insecurity
+          /// # Complexity: O(2)
           T() 
         }
-        """, named: "testFile11.hylo")
+        """
 
     let ast = try checkNoDiagnostic { d in
       try AST(fromSingleSourceFile: sourceFile, diagnostics: &d)
@@ -53,7 +54,7 @@ final class SubscriptExtractionTest: XCTestCase {
     let fileLevel = checkNoHDCDiagnostic { d in
       sourceFileDocumentor.document(
         ast: ast,
-        translationUnitId: ast.resolveTranslationUnit(by: "testFile11.hylo")!,
+        translationUnitId: ast.resolveTranslationUnit(by: sourceFile.baseName)!,
         into: &store,
         diagnostics: &d
       )

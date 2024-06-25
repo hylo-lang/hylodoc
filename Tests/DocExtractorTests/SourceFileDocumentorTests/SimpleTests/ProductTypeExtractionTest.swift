@@ -17,8 +17,8 @@ final class ProductTypeExtractionTest: XCTestCase {
         /// Summary of the product type.
         ///
         /// This is the description of the product type.
-        /// # Invariant: x and y must always be positive.
         /// # Generic T: This is a generic.
+        /// # Invariant: x and y must always be positive.
         type A<T: D>{
           var x: Int
           var y: Int

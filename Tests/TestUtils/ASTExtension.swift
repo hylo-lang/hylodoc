@@ -337,8 +337,6 @@ extension AST {
 
   /// - Parameter name: file name without extension
   public func resolveTranslationUnit(by name: String) -> TranslationUnit.ID? {
-    precondition(name.hasSuffix(".hylo"), "Name should be passed with extension.")
-
     struct ASTWalker: ASTWalkObserver {
       var result: TranslationUnit.ID?
       let targetName: String

@@ -66,13 +66,13 @@ public func checkNoHDCDiagnostic<R>(
   var d = HDCDiagnosticSet()
   do {
     let r = try f(&d)
-    checkHDCEmpty(d)
+    checkHDCEmpty(d, file: testFile, line: line)
     return r
   } catch let d1 as HDCDiagnosticSet {
     XCTAssertEqual(
       d1, d, "thrown diagnostics don't match mutated diagnostics",
       file: testFile, line: line)
-    checkHDCEmpty(d)
+    checkHDCEmpty(d, file: testFile, line: line)
     throw d
   }
 }
@@ -110,10 +110,12 @@ public func expectHDCDiagnostic<R, D: HDCDiagnostic>(
 }
 
 /// Reports any diagnostics in `s` as XCTest issues.
-public func checkHDCEmpty(_ s: HDCDiagnosticSet) {
+public func checkHDCEmpty(_ s: HDCDiagnosticSet, file: StaticString = #filePath, line: UInt = #line)
+{
   if !s.elements.isEmpty {
     XCTFail(
-      "Unexpected diagnostics: \n\(s.elements.map{ "- " + $0.description }.joined(separator: "\n\n"))"
+      "Unexpected diagnostics: \n\(s.elements.map{ "- " + $0.description }.joined(separator: "\n\n"))",
+      file: file, line: line
     )
   }
 }

@@ -10,7 +10,9 @@ import XCTest
 
 @testable import WebsiteGen
 
-func runFullPipelineWithoutErrors(at sourceUrl: URL) throws {
+func runFullPipelineWithoutErrors(
+  at sourceUrl: URL, file: StaticString = #filePath, line: UInt = #line
+) throws {
   let outputURL = URL(fileURLWithPath: "./test-output/" + UUID.init().uuidString)
 
   let fileManager = FileManager.default
@@ -50,13 +52,11 @@ func runFullPipelineWithoutErrors(at sourceUrl: URL) throws {
         typedProgram: typedProgram,
         exportPath: outputURL
       )
-    else { return XCTFail("failed to generate documentation") }
-
-    print("Documentation successfully generated at \(outputURL).")
+    else {
+      return XCTFail("failed to generate documentation", file: file, line: line)
+    }
   case .failure(let error):
-    print("Failed to extract documentation: \(error)")
-
-    XCTFail()
+    XCTFail("Failed to extract documentation: \(error)", file: file, line: line)
   }
 }
 

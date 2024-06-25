@@ -15,6 +15,27 @@ public struct SpecialSectionMoreThanOneListWarning {}
 public struct ListSpecialSectionHasNoListError {}
 @Diagnostify
 public struct UnexpectedSpecialSectionTitleError {}
+
+public struct OutOfOrderError: HDCDiagnostic {
+  public let level: HDCDiagnosticLevel
+  public let message: String
+  public let site: SourceRange
+  public let notes: [AnyHashable]
+  public let found: SpecialSectionType
+  public let expectedBefore: SpecialSectionType
+
+  public init(
+    _ level: HDCDiagnosticLevel, message: String, at site: SourceRange, notes: [AnyHashable] = [],
+    found: SpecialSectionType, expectedBefore: SpecialSectionType
+  ) {
+    self.level = level
+    self.message = message
+    self.site = site
+    self.notes = notes
+    self.found = found
+    self.expectedBefore = expectedBefore
+  }
+}
 @Diagnostify
 public struct InlineSpecialSectionTitleRemoveFailureWarning {}
 @Diagnostify
@@ -160,6 +181,11 @@ private func parseSeeAlsoSection(
   return Array(blocks)
 }
 
+let strictOrdering: [SpecialSectionType] = [
+  .fileLevel, .parameter, .generic, .precondition, .postcondition, .invariant, 
+  .returns, .throws, .yields, .projects, .complexity, .seeAlso,
+]
+
 public enum SpecialSectionType {
   case `parameter`
   case `returns`
@@ -298,6 +324,7 @@ private func validateAllowedSpecialSections(
     allowedSectionTitles = []
   }
 
+  // Check for unexpected special sections
   for section in comment.value.specialSections {
     if !allowedSectionTitles.contains(where: { section.name.lowercased().starts(with: $0) }) {
       diagnostics.insert(
@@ -307,6 +334,50 @@ private func validateAllowedSpecialSections(
       )
     }
   }
+
+  // Check if sections that are present are in the correct order
+  var highestSectionIndexFound = -1
+  for i in 0..<comment.value.specialSections.count {
+    let section = comment.value.specialSections[i]
+    let lowercasedName = section.name.lowercased()
+    guard
+      let sectionType = strictOrdering.first(where: {
+        lowercasedName.starts(with: $0.inlineName) || lowercasedName.starts(with: $0.headingName)
+      })
+    else {
+      continue  // invalid section title, already diagnosed
+    }
+
+    let expectedSectionIndex = strictOrdering.firstIndex(of: sectionType)!
+
+    if expectedSectionIndex < highestSectionIndexFound {
+      let earliestSectionPresentThatShouldBeStillAfterThis: Int = (0..<i).map { (sectionI: Int) in
+        let rawSection = comment.value.specialSections[sectionI]
+        let lowercasedName = rawSection.name.lowercased()
+        return strictOrdering.firstIndex { sectionType in
+          lowercasedName.starts(with: sectionType.inlineName)
+            || lowercasedName.starts(with: sectionType.headingName)
+        }!
+      }  // map to index of each section
+      .first { index in
+        return expectedSectionIndex < index
+      }!
+
+      diagnostics.insert(
+        OutOfOrderError.init(
+          .error,
+          message:
+            "'\(sectionType.inlineName)' expected before '\(strictOrdering[highestSectionIndexFound].inlineName)'.",
+          at: comment.site,
+          found: sectionType,
+          expectedBefore: strictOrdering[earliestSectionPresentThatShouldBeStillAfterThis]
+        )
+      )
+    } else {
+      highestSectionIndexFound = expectedSectionIndex
+    }
+  }
+
 }
 
 public struct DummySourceFileDocumentor: SourceFileDocumentor {
