@@ -65,7 +65,9 @@ final class ProductTypeTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let partialResolved = partialResolveDecl(
-      documentation, typedProgram, declId: AnyDeclID(productTypeId))
+      documentation, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      declId: AnyDeclID(productTypeId))
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -75,7 +77,8 @@ final class ProductTypeTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 

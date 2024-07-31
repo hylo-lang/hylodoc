@@ -162,12 +162,15 @@ public func generateModuleIndex(_ context: inout GenerationContext) throws {
 public func generateTree(_ stencil: inout Environment, _ documentation: DocumentationContext) throws
   -> String
 {
-  return try documentation.targetResolver.rootTargets.map {
-    documentation.targetResolver.navigationItemFromTarget(targetId: $0)
-  }
-  .filter { $0 != nil }
-  .map {
-    try stencil.renderTemplate(name: "page_components/tree_item.html", context: ["item": $0 as Any])
-  }
-  .joined(separator: "\n")
+  return try documentation.targetResolver.rootTargets
+    .compactMap {
+      documentation.targetResolver.navigationItemFromTarget(targetId: $0)
+    }
+    .map {
+      try stencil.renderTemplate(
+        name: "page_components/tree_item.html",
+        context: ["item": $0 as Any]
+      )
+    }
+    .joined(separator: "\n")
 }

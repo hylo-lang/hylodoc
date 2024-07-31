@@ -8,17 +8,19 @@
 <div class="content-section" id="summary">
   <h2 style="color: #F25FB7">{{ pageType }}</h2>
   <h1>{{ target.simpleName }}</h1>
-  
+
   <!-- Summary -->
   {% if summary %}
     {{ summary }}
   {% endif %}
-  
+
   <!-- Symbol Declaration Preview (if applicable) -->
   {% if declarationPreview %}
     <div class="code-snippet">
       <span class="options">
-        <!-- <a class="github">Declaration</a> unsupported --> <!-- todo rename css class -->
+        {% if target.openSourceUrl %}
+          <a class="github" href="{{ target.openSourceUrl }}">Source <img src="/assets/icons/github.svg" width="16" height="16"></a>
+        {% endif %}
       </span>
       <code><pre>{{ declarationPreview }}</pre></code>
     </div>

@@ -60,26 +60,34 @@ final class SubscriptTest: XCTestCase {
           postconditions: [],
           throwsInfo: [],
           complexityInfo: [
-            Complexity(description: .document([.htmlBlock([
-              "<p id=\"exampleComplexity\">And he kept on screeming about complexity</p>"
-            ])]))
+            Complexity(
+              description: .document([
+                .htmlBlock([
+                  "<p id=\"exampleComplexity\">And he kept on screeming about complexity</p>"
+                ])
+              ]))
           ]
         ),
         parameters: [:],
         genericParameters: [:]
       ),
       yields: [
-        Yields(description: .document([
-          .paragraph(Text("If you'd have been there, if you'd have yielded it"))
-        ])),
-        Yields(description: .document([
-          .paragraph(Text("I betcha you would have yield the same!"))
-        ]))
+        Yields(
+          description: .document([
+            .paragraph(Text("If you'd have been there, if you'd have yielded it"))
+          ])),
+        Yields(
+          description: .document([
+            .paragraph(Text("I betcha you would have yield the same!"))
+          ])),
       ],
       projectsInfo: [
-        Projects(description: .document([.htmlBlock([
+        Projects(
+          description: .document([
+            .htmlBlock([
               "<p id=\"exampleProjects\">And then he ran into my projects. He ran into my projects 10 times...</p>"
-            ])]))
+            ])
+          ]))
       ]
     )
 
@@ -88,7 +96,9 @@ final class SubscriptTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let partialResolved = partialResolveDecl(
-      documentation, typedProgram, declId: AnyDeclID(subscriptId))
+      documentation, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      declId: AnyDeclID(subscriptId))
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -98,7 +108,8 @@ final class SubscriptTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 
@@ -125,8 +136,13 @@ final class SubscriptTest: XCTestCase {
       "In storms my husband Wilbur in a jealous description. He was crazy!", in: res, file: #file,
       line: #line)
 
-    assertByID("exampleComplexity", contains: "And he kept on screeming about complexity", in: res, file: #file, line: #line)
-    assertByID("exampleProjects", contains: "And then he ran into my projects. He ran into my projects 10 times...", in: res, file: #file, line: #line)
+    assertByID(
+      "exampleComplexity", contains: "And he kept on screeming about complexity", in: res,
+      file: #file, line: #line)
+    assertByID(
+      "exampleProjects",
+      contains: "And then he ran into my projects. He ran into my projects 10 times...", in: res,
+      file: #file, line: #line)
 
     assertListExistAndCount(id: "yields", count: 2, in: res, file: #file, line: #line)
 

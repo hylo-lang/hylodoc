@@ -12,8 +12,9 @@
         <span>{{ item.name }}</span>
         {% endif %}
     </a>
-    <!-- <a href="#" class="go-to-location" title="Open source location"></a> unsupported -->
-
+    {% if item.openSourceUrl %}
+      <a href="{{ item.openSourceUrl }}" class="go-to-location" title="Open source location"></a>
+    {% endif %}
     {% if item.children %}
     <ul>
         {% for item in item.children %}

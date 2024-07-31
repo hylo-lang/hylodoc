@@ -70,7 +70,9 @@ final class InitializerTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let partialResolved = partialResolveDecl(
-      documentation, typedProgram, declId: AnyDeclID(initializerId))
+      documentation, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      declId: AnyDeclID(initializerId)
+    )
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -80,7 +82,8 @@ final class InitializerTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 

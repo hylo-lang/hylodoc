@@ -85,7 +85,11 @@ final class FunctionTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let partialResolved = partialResolveDecl(
-      documentation, typedProgram, declId: AnyDeclID(functionId))
+      documentation,
+      typedProgram,
+      moduleRoot: libraryPath,
+      moduleOpenSourceUrl: nil,
+      declId: AnyDeclID(functionId))
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -95,7 +99,8 @@ final class FunctionTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 

@@ -66,7 +66,7 @@ final class SourceFileTest: XCTestCase {
     let targetId: AnyTargetID = .asset(.sourceFile(sourceFileID))
 
     var targetResolver: TargetResolver = .init()
-    let partialResolved = partialResolveAsset(db, typedProgram, assetId: .sourceFile(sourceFileID))
+    let partialResolved = partialResolveAsset(db, typedProgram, moduleRoot: URL(string: "file:///hello")!, moduleOpenSourceUrl: nil, assetId: .sourceFile(sourceFileID))
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -76,7 +76,8 @@ final class SourceFileTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 

@@ -52,7 +52,10 @@ final class ArticleTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let targetId: AnyTargetID = .asset(.article(articleId))
-    let partialResolved = partialResolveAsset(db, typedProgram, assetId: .article(articleId))
+    let partialResolved = partialResolveAsset(
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .article(articleId))
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -62,7 +65,8 @@ final class ArticleTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 
@@ -135,7 +139,11 @@ final class ArticleTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let targetId: AnyTargetID = .asset(.article(article1Id))
-    let partialResolved = partialResolveAsset(db, typedProgram, assetId: .article(article1Id))
+    let partialResolved = partialResolveAsset(
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .article(article1Id)
+    )
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -145,7 +153,8 @@ final class ArticleTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 

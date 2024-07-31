@@ -41,7 +41,10 @@ func runFullPipelineWithoutErrors(
   let result = extractDocumentation(
     typedProgram: typedProgram,
     for: [
-      .init(name: "ExampleModule", rootFolderPath: sourceUrl, astId: rootModuleId)
+      .init(
+        name: "ExampleModule", rootFolderPath: sourceUrl, astId: rootModuleId,
+        openSourceUrlBase: URL(
+          string: "https://github.com/hylo-lang/hylo/blob/main/StandardLibrary/Sources/")!)
     ])
 
   switch result {
