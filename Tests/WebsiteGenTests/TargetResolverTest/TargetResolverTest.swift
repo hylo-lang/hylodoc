@@ -137,7 +137,8 @@ final class TargetResolverTest: XCTestCase {
         navigationName: "placeholder",
         metaDescription: "placeholder",
         children: [],
-        url: URL(fileURLWithPath: "/index.html")
+        url: URL(fileURLWithPath: "/index.html"),
+        openSourceUrl: nil
       )
     )
 
@@ -181,7 +182,12 @@ final class TargetResolverTest: XCTestCase {
     let result = extractDocumentation(
       typedProgram: typedProgram,
       for: [
-        .init(name: "TestHyloModule", rootFolderPath: sourceUrl, astId: rootModuleId)
+        .init(
+          name: "TestHyloModule",
+          rootFolderPath: sourceUrl,
+          astId: rootModuleId,
+          openSourceUrlBase: nil
+        )
       ])
 
     let documentationDatabase: DocumentationDatabase

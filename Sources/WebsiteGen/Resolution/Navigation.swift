@@ -6,6 +6,7 @@ public struct NavigationItem {
   let name: String
   let url: URL
   let cssClassOfTarget: String
+  let openSourceUrl: URL?
 
   // Relations
   let children: [NavigationItem]

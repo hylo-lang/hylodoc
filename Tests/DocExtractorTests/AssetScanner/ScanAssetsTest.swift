@@ -46,8 +46,8 @@ final class ScanAssetsTests: XCTestCase {
     let result = extractDocumentation(
       typedProgram: typedProgram,
       for: [
-        .init(name: "ModuleA", rootFolderPath: moduleAPath, astId: moduleAId),
-        .init(name: "ModuleB", rootFolderPath: moduleBPath, astId: moduleBId),
+        .init(name: "ModuleA", rootFolderPath: moduleAPath, astId: moduleAId, openSourceUrlBase: nil),
+        .init(name: "ModuleB", rootFolderPath: moduleBPath, astId: moduleBId, openSourceUrlBase: URL(string: "https://github.com/hylo-lang/hylo/blob/main/StandardLibrary/Sources/")),
       ])
 
     // THEN the documentation should be extracted successfully
@@ -71,10 +71,12 @@ final class ScanAssetsTests: XCTestCase {
     XCTAssertEqual(moduleA.name, "ModuleA")
     XCTAssertEqual(moduleA.astId, moduleAId)
     XCTAssertEqual(moduleA.rootFolderPath, moduleAPath)
+    XCTAssertEqual(moduleA.openSourceUrlBase, nil)
 
     XCTAssertEqual(moduleB.name, "ModuleB")
     XCTAssertEqual(moduleB.astId, moduleBId)
     XCTAssertEqual(moduleB.rootFolderPath, moduleBPath)
+    XCTAssertEqual(moduleB.openSourceUrlBase, URL(string: "https://github.com/hylo-lang/hylo/blob/main/StandardLibrary/Sources/"))
 
     // THEN the database should contain the root folder of the two modules
     guard let moduleARootFolder = db.assets[moduleA.rootFolder] else {

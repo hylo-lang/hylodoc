@@ -8,11 +8,13 @@ public struct InputModuleInfo {
   public let name: String
   public let rootFolderPath: URL
   public let astId: ModuleDecl.ID
+  public let openSourceUrlBase: URL?
 
-  public init(name: String, rootFolderPath: URL, astId: ModuleDecl.ID) {
+  public init(name: String, rootFolderPath: URL, astId: ModuleDecl.ID, openSourceUrlBase: URL?) {
     self.name = name
     self.rootFolderPath = rootFolderPath
     self.astId = astId
+    self.openSourceUrlBase = openSourceUrlBase
   }
 }
 
@@ -22,7 +24,8 @@ extension ModuleInfo {
       name: inputInfo.name,
       rootFolderPath: inputInfo.rootFolderPath,
       astId: inputInfo.astId,
-      rootFolder: rootFolderId
+      rootFolder: rootFolderId,
+      openSourceUrlBase: inputInfo.openSourceUrlBase
     )
   }
 }
@@ -177,7 +180,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
 
   public mutating func build() -> Result<DocumentationDatabase, DocExtractionError<Self>> {
     modules
-      .map { module in
+      .map { (module: InputModuleInfo) in
         recursivelyVisitFolder(
           folderPath: module.rootFolderPath.absoluteURL,
           visitor: &self,
@@ -186,7 +189,7 @@ public struct DocDBBuildingAssetScanner<SFDocumentor: SourceFileDocumentor>: Ass
         .map { (module, rootFolderId: $0) }
       }
       .collectResults()
-      .map { extendedModuleInfos in
+      .map { (extendedModuleInfos: [(module: InputModuleInfo, rootFolderId: FolderAsset.ID)]) in
         DocumentationDatabase(
           assets: assets,
           symbols: symbolDocs,

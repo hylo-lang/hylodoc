@@ -17,10 +17,15 @@ $snippet-background: #232323;
     padding-left: 16px;
     gap: 16px;
 
-    @apply flex flex-row z-10 opacity-0 transition-opacity duration-200;
+    @apply flex flex-row z-10;
 
     background-color: $snippet-background;
-    opacity: 30%;
+
+    & > * {
+      cursor: pointer;
+      @apply opacity-0 transition-opacity duration-200;
+      opacity: 30%;
+    }
   }
 
   & > .body {
@@ -29,7 +34,9 @@ $snippet-background: #232323;
 
   // Hover effect
   &:hover > .options {
-    @apply opacity-100;
+    & > * {
+      opacity: 100%;
+    }
 
     a:hover {
       color: var(--text-primary);
@@ -40,6 +47,7 @@ $snippet-background: #232323;
     display: block;
     padding: 16px;
   }
+
   .wrapper {
     overflow: auto;
   }
@@ -58,6 +66,24 @@ $snippet-background: #232323;
 
     &.play {
       background-image: url(/assets/icons/play.svg);
+    }
+  }
+
+  .github {
+    background: var(--important-snippet-button-bg);
+    padding: 4px 10px;
+    border-radius: 10px;
+    opacity: 100% !important;
+    line-height: 19px;
+    height: 27px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    & > img {
+      width: 16px;
+      height: 16px;
+      margin: 0;
     }
   }
 }

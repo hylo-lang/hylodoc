@@ -47,7 +47,10 @@ final class FolderTest: XCTestCase {
     let targetId: AnyTargetID = .asset(.folder(folder1Id))
 
     // folder1Id
-    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    let partialResolvedParent = partialResolveAsset(
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .folder(folder1Id))
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -57,7 +60,8 @@ final class FolderTest: XCTestCase {
         navigationName: partialResolvedParent.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
-        url: URL(fileURLWithPath: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html"),
+        openSourceUrl: nil
       )
     )
 
@@ -129,7 +133,10 @@ final class FolderTest: XCTestCase {
     let targetId: AnyTargetID = .asset(.folder(folder1Id))
 
     // folder1Id
-    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    let partialResolvedParent = partialResolveAsset(
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .folder(folder1Id))
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -139,7 +146,8 @@ final class FolderTest: XCTestCase {
         navigationName: partialResolvedParent.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
-        url: URL(fileURLWithPath: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html"),
+        openSourceUrl: nil
       )
     )
 
@@ -229,7 +237,9 @@ final class FolderTest: XCTestCase {
 
     // child1ArticleId
     let partialResolvedChild1 = partialResolveAsset(
-      db, typedProgram, assetId: .article(child1ArticleId))
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .article(child1ArticleId)
+    )
     targetResolver.resolve(
       targetId: .asset(.article(child1ArticleId)),
       ResolvedTarget(
@@ -239,13 +249,16 @@ final class FolderTest: XCTestCase {
         navigationName: partialResolvedChild1.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolvedChild1.metaDescription),
         children: partialResolvedChild1.children,
-        url: URL(fileURLWithPath: "root/Folder1/child1.hylodoc")
+        url: URL(fileURLWithPath: "root/Folder1/child1.hylodoc"),
+        openSourceUrl: nil
       )
     )
 
     // child2FolderId
     let partialResolvedChild2 = partialResolveAsset(
-      db, typedProgram, assetId: .folder(child2FolderId))
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .folder(child2FolderId))
+
     targetResolver.resolve(
       targetId: .asset(.folder(child2FolderId)),
       ResolvedTarget(
@@ -255,12 +268,16 @@ final class FolderTest: XCTestCase {
         navigationName: partialResolvedChild2.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolvedChild2.metaDescription),
         children: partialResolvedChild2.children,
-        url: URL(fileURLWithPath: "root/Folder1/Folder2/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/Folder2/index.html"),
+        openSourceUrl: nil
       )
     )
 
     // folder1Id
-    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    let partialResolvedParent = partialResolveAsset(
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .folder(folder1Id))
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -270,7 +287,8 @@ final class FolderTest: XCTestCase {
         navigationName: partialResolvedParent.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
-        url: URL(fileURLWithPath: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html"),
+        openSourceUrl: nil
       )
     )
 
@@ -353,7 +371,10 @@ final class FolderTest: XCTestCase {
     let targetId: AnyTargetID = .asset(.folder(folder1Id))
 
     // folder1Id
-    let partialResolvedParent = partialResolveAsset(db, typedProgram, assetId: .folder(folder1Id))
+    let partialResolvedParent = partialResolveAsset(
+      db, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      assetId: .folder(folder1Id))
+
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -363,7 +384,8 @@ final class FolderTest: XCTestCase {
         navigationName: partialResolvedParent.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolvedParent.metaDescription),
         children: partialResolvedParent.children,
-        url: URL(fileURLWithPath: "root/Folder1/index.html")
+        url: URL(fileURLWithPath: "root/Folder1/index.html"),
+        openSourceUrl: nil
       )
     )
 

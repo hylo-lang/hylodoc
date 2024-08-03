@@ -61,7 +61,8 @@ final class AssociatedValueTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let partialResolved = partialResolveDecl(
-      documentation, typedProgram, declId: AnyDeclID(associatedValueId))
+      documentation, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil,
+      declId: AnyDeclID(associatedValueId))
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -71,7 +72,8 @@ final class AssociatedValueTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 

@@ -3,7 +3,7 @@ import DocumentationDB
 import Foundation
 import FrontEnd
 
-typealias TargetItem = (parentId: AnyTargetID?, targetId: AnyTargetID)
+typealias TargetItem = (parentId: AnyTargetID?, targetId: AnyTargetID, module: ModuleInfo)
 
 public func resolveTargets(documentationDatabase: DocumentationDatabase, typedProgram: TypedProgram)
   -> TargetResolver
@@ -13,7 +13,8 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
     documentationDatabase.modules.map {
       TargetItem(
         parentId: nil,
-        targetId: .asset(.folder($0.rootFolder))
+        targetId: .asset(.folder($0.rootFolder)),
+        module: $0
       )
     })
 
@@ -38,6 +39,8 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
     let partialResolved = partialResolveTarget(
       documentationDatabase,
       typedProgram,
+      moduleRoot: targetItem.module.rootFolderPath,
+      moduleOpenSourceUrl: targetItem.module.openSourceUrlBase,
       targetId: targetItem.targetId
     )
 
@@ -50,7 +53,7 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
 
     // Add the children of the target to the queue
     for childId in partialResolved.children {
-      queue.append((parentId: targetItem.targetId, targetId: childId))
+      queue.append(TargetItem(parentId: targetItem.targetId, targetId: childId, module: targetItem.module))
     }
 
     // Resolve the target
@@ -63,7 +66,8 @@ public func resolveTargets(documentationDatabase: DocumentationDatabase, typedPr
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children.filter { !isDirectlyCopiedAssetTarget($0) },  // other files should not show up anywhere
-        url: url
+        url: url,
+        openSourceUrl: partialResolved.openSourceUrl
       )
     )
 

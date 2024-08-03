@@ -158,7 +158,8 @@ public struct CLICore {
         InputModuleInfo(
           name: "Hylo",
           rootFolderPath: modulePaths[0],
-          astId: coreLibraryId
+          astId: coreLibraryId,
+          openSourceUrlBase: URL(string: "https://github.com/hylo-lang/hylo/blob/main/StandardLibrary/Sources/")!
         )
       ],
       ast
@@ -192,7 +193,8 @@ public struct CLICore {
 
       return InputModuleInfo(
         name: "\(sourceURL.lastPathComponent)",
-        rootFolderPath: sourceURL, astId: rootModuleId
+        rootFolderPath: sourceURL, astId: rootModuleId,
+        openSourceUrlBase: nil // todo: allow input of open source url base
       )
     }
 

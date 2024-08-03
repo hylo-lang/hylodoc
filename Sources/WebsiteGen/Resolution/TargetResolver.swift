@@ -16,10 +16,11 @@ public struct ResolvedTarget {
   let metaDescription: String // a string already escaped from " and & symbols
   let children: [AnyTargetID]
   let url: URL
+  let openSourceUrl: URL?
 
   public init(
     id: AnyTargetID, parent: AnyTargetID?, simpleName: String, navigationName: String,
-    metaDescription: String, children: [AnyTargetID], url: URL
+    metaDescription: String, children: [AnyTargetID], url: URL, openSourceUrl: URL?
   ) {
     self.id = id
     self.parent = parent
@@ -28,6 +29,7 @@ public struct ResolvedTarget {
     self.metaDescription = metaDescription
     self.children = children
     self.url = url
+    self.openSourceUrl = openSourceUrl
   }
 }
 
@@ -104,6 +106,7 @@ public struct TargetResolver {
       name: resolved.navigationName,
       url: resolved.url,
       cssClassOfTarget: getCssClassOfTarget(targetId),
+      openSourceUrl: resolved.openSourceUrl,
       children: resolved.children.map { navigationItemFromTarget(targetId: $0) }.filter {
         $0 != nil
       }.map { $0! }

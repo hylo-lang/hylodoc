@@ -65,7 +65,7 @@ final class BindingTest: XCTestCase {
 
     var targetResolver: TargetResolver = .init()
     let partialResolved = partialResolveDecl(
-      documentation, typedProgram, declId: AnyDeclID(bindingId))
+      documentation, typedProgram, moduleRoot: libraryPath, moduleOpenSourceUrl: nil, declId: AnyDeclID(bindingId))
     targetResolver.resolve(
       targetId: targetId,
       ResolvedTarget(
@@ -75,7 +75,8 @@ final class BindingTest: XCTestCase {
         navigationName: partialResolved.navigationName,
         metaDescription: escapeStringForHTMLAttribute(partialResolved.metaDescription),
         children: partialResolved.children,
-        url: URL(fileURLWithPath: "/")
+        url: URL(fileURLWithPath: "/"),
+        openSourceUrl: nil
       )
     )
 
