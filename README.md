@@ -1,4 +1,6 @@
-# HyloDoc - Automatic Documentation Generation Tool
+# HyloDoc - Documentation Compiler for Hylo
+
+> This project started as a university project. The project's [Final Report](./project-report.pdf) presents academic research and industry practices around documentation, and details HyloDoc's design, implementation and plans for future development.
 
 ## Getting Started
 To use HyloDoc for generating websites, you can use its command line interface or use it as a library in your project
